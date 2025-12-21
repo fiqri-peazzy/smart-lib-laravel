@@ -29,6 +29,11 @@ class Major extends Model
     {
         return $this->hasMany(User::class);
     }
+    // Relasi Ke Jurusan
+    public function recommendedBooks(): HasMany
+    {
+        return $this->hasMany(Book::class, 'recommended_for_major_id');
+    }
 
     /**
      * Scope untuk prodi aktif

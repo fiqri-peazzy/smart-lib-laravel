@@ -1,12 +1,11 @@
 <?php
 
-
 namespace App\Filament\Widgets;
 
 use App\Models\DigitalCollection;
 use Filament\Widgets\ChartWidget;
 
-class DigitalCollectionByTypeChart extends ChartWidget
+class DigitalCollectionsByTypeChart extends ChartWidget
 {
     protected static ?string $heading = 'Koleksi Digital Berdasarkan Tipe';
 
@@ -40,6 +39,6 @@ class DigitalCollectionByTypeChart extends ChartWidget
 
     protected function getType(): string
     {
-        return 'bar';
+        return 'line';
     }
 }
