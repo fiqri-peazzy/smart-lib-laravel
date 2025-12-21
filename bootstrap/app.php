@@ -15,7 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
         //
 
         $middleware->alias(['filament-admin-auth' => FilamentAdminAuth::class]);
-    })
+    })->withCommands([
+        __DIR__ . '/../app/Console/Commands',
+    ])
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();

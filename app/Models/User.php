@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use App\Models\Loan;
+use App\Models\Booking;
+use App\Models\LoanHistory;
+use App\Models\Fine;
 
 class User extends Authenticatable
 {
@@ -164,16 +168,16 @@ class User extends Authenticatable
      * Method untuk kalkulasi ulang credit score
      * (akan digunakan di service layer nanti)
      */
-    public function recalculateCreditScore(): void
-    {
-        // Implementasi algoritma credit score
-        // Base score: 100
-        // - (Late Returns × 5)
-        // - (Unpaid Fines / 1000)
-        // + (On-time Returns × 0.5)
+    // public function recalculateCreditScore(): void
+    // {
+    //     // Implementasi algoritma credit score
+    //     // Base score: 100
+    //     // - (Late Returns × 5)
+    //     // - (Unpaid Fines / 1000)
+    //     // + (On-time Returns × 0.5)
 
-        // TODO: Implement setelah ada tabel loans
-    }
+    //     // TODO: Implement setelah ada tabel loans
+    // }
 
     /**
      * Method untuk update max_loans berdasarkan credit_score
@@ -218,5 +222,104 @@ class User extends Authenticatable
         // TODO: Cek jumlah peminjaman aktif (setelah ada tabel loans)
 
         return true;
+    }
+
+    /**
+     * Relasi ke loans
+     */
+    public function loans()
+    {
+        return $this->hasMany(Loan::class);
+    }
+
+    /**
+     * Relasi ke active loans
+     */
+    public function activeLoans()
+    {
+        return $this->hasMany(Loan::class)
+            ->whereIn('status', ['active', 'overdue', 'extended']);
+    }
+
+    /**
+     * Relasi ke bookings
+     */
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
+
+    /**
+     * Relasi ke fines
+     */
+    public function fines()
+    {
+        return $this->hasMany(Fine::class);
+    }
+
+    /**
+     * Update loan history
+     */
+    public function updateLoanHistory(): void
+    {
+        $history = LoanHistory::firstOrCreate(['user_id' => $this->id]);
+
+        $allLoans = $this->loans()->whereNotNull('return_date')->get();
+
+        $onTimeReturns = $allLoans->filter(function ($loan) {
+            return $loan->return_date <= $loan->due_date;
+        })->count();
+
+        $lateReturns = $allLoans->filter(function ($loan) {
+            return $loan->return_date > $loan->due_date;
+        })->count();
+
+        $history->update([
+            'total_loans' => $this->loans()->count(),
+            'on_time_returns' => $onTimeReturns,
+            'late_returns' => $lateReturns,
+            'total_extensions' => $this->loans()->where('is_extended', true)->count(),
+            'active_loans' => $this->activeLoans()->count(),
+            'overdue_loans' => $this->loans()->where('status', 'overdue')->count(),
+            'total_fines_incurred' => $this->fines()->sum('amount'),
+            'total_fines_paid' => $this->fines()->where('status', 'paid')->sum('paid_amount'),
+            'last_loan_at' => $this->loans()->latest('loan_date')->first()?->loan_date,
+            'last_return_at' => $this->loans()->whereNotNull('return_date')
+                ->latest('return_date')->first()?->return_date,
+        ]);
+    }
+
+    /**
+     * Method untuk kalkulasi ulang credit score
+     */
+    public function recalculateCreditScore(): void
+    {
+        // Get or create loan history
+        $history = LoanHistory::firstOrCreate(['user_id' => $this->id]);
+
+        // Base score: 100
+        $baseScore = 100;
+
+        // - (Late Returns × 5)
+        $lateReturnsPenalty = $history->late_returns * 5;
+
+        // - (Unpaid Fines / 1000)
+        $unpaidFines = $this->fines()->where('status', 'unpaid')->sum('amount');
+        $finesPenalty = $unpaidFines / 1000;
+
+        // + (On-time Returns × 0.5)
+        $onTimeBonus = $history->on_time_returns * 0.5;
+
+        // Calculate final score
+        $calculatedScore = $baseScore - $lateReturnsPenalty - $finesPenalty + $onTimeBonus;
+
+        // Ensure score is between 0-100
+        $finalScore = max(0, min(100, $calculatedScore));
+
+        // Update history
+        $history->update(['calculated_score' => $finalScore]);
+
+        // Update user
+        $this->update(['credit_score' => $finalScore]);
     }
 }
