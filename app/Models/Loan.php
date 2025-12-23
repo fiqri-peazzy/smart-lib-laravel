@@ -10,6 +10,14 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @property \Carbon\Carbon $loan_date
+ * @property \Carbon\Carbon $due_date
+ * @property \Carbon\Carbon|null $return_date
+ * @property \Carbon\Carbon|null $original_due_date
+ * @property \Carbon\Carbon|null $extended_at
+ * @property \Carbon\Carbon|null $fine_paid_at
+ */
 class Loan extends Model
 {
     use HasFactory, SoftDeletes;
@@ -153,17 +161,20 @@ class Loan extends Model
      */
     public function getDaysOverdue(): int
     {
+        $returnDate = $this->return_date;
+        $dueDate = $this->due_date;
+
         // Jika belum dikembalikan, hitung dari sekarang
-        if (!$this->return_date) {
-            if (now()->isAfter($this->due_date)) {
-                return (int) abs(now()->diffInDays($this->due_date, false));
+        if (!$returnDate) {
+            if (now()->isAfter($dueDate)) {
+                return (int) abs(now()->diffInDays($dueDate, false));
             }
             return 0;
         }
 
         // Jika sudah dikembalikan, hitung dari return_date
-        if ($this->return_date->isAfter($this->due_date)) {
-            return (int) abs($this->return_date->diffInDays($this->due_date, false));
+        if ($returnDate->isAfter($dueDate)) {
+            return (int) abs($returnDate->diffInDays($dueDate, false));
         }
 
         return 0;

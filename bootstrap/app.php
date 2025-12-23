@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\FilamentAdminAuth;
+use App\Http\Middleware\EnsureUserRole;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -14,7 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         //
 
-        $middleware->alias(['filament-admin-auth' => FilamentAdminAuth::class]);
+        $middleware->alias([
+            'user.role' => EnsureUserRole::class,
+            'filament-admin-auth' => FilamentAdminAuth::class
+        ]);
     })->withCommands([
         __DIR__ . '/../app/Console/Commands',
     ])

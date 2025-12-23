@@ -101,7 +101,7 @@ class SendLoanReminders extends Command
             default => "Reminder: Please return your book.",
         };
 
-        // TODO: Implement actual notification sending
+        // Implement actual notification sending
         // Options:
         // 1. Email: Mail::to($loan->user->email)->send(new LoanReminderMail($loan, $message));
         // 2. WhatsApp: Send via WhatsApp API

@@ -175,7 +175,7 @@ class FineResource extends Resource
                             ->required()
                             ->default(fn(Fine $record) => $record->amount)
                             ->minValue(0)
-                            ->helperText(fn(Fine $record) => 'Total denda: Rp ' . number_format($record->amount, 0)),
+                            ->helperText(fn(Fine $record) => 'Total denda: Rp ' . number_format((float)$record->amount, 0)),
 
                         Forms\Components\Select::make('payment_method')
                             ->label('Metode Pembayaran')

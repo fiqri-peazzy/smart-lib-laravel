@@ -75,8 +75,8 @@ class RecalculateCreditScores extends Command
 
             $results[] = [
                 'user' => $user->name . ' (' . $user->nim . ')',
-                'old_score' => number_format($oldScore, 2),
-                'new_score' => number_format($user->credit_score, 2),
+                'old_score' => number_format((float) $oldScore, 2),
+                'new_score' => number_format((float) $user->credit_score, 2),
                 'old_max' => $oldMaxLoans,
                 'new_max' => $user->max_loans,
                 'change' => $user->credit_score - $oldScore > 0 ? '↑' : ($user->credit_score - $oldScore < 0 ? '↓' : '='),

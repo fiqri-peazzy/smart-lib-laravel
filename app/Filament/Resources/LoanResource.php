@@ -55,7 +55,7 @@ class LoanResource extends Resource
 
                                         // Show user info
                                         $activeLoans = $user->activeLoans()->count();
-                                        $set('user_info', "Credit Score: {$user->credit_score} | Max Loans: {$user->max_loans} | Active: {$activeLoans} | Denda: Rp " . number_format($user->total_fines, 0));
+                                        $set('user_info', "Credit Score: {$user->credit_score} | Max Loans: {$user->max_loans} | Active: {$activeLoans} | Denda: Rp " . number_format((float)$user->total_fines, 0));
                                     }
                                 }
                             })
