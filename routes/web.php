@@ -5,7 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\DigitalLibraryController;
 use App\Http\Controllers\UserDashboardController;
-
+use App\Models\BookItem;
 /*
 |--------------------------------------------------------------------------
 | Frontend Routes
@@ -77,6 +77,13 @@ Route::middleware(['auth', 'user.role'])->group(function () {
 |--------------------------------------------------------------------------
 */
 // /admin/* handled by Filament
+Route::middleware(['auth'])->group(function () {
+    Route::get('/book-items/{bookItem}/print-qr', function (BookItem $bookItem) {
+        return view('book-items.print-qr', [
+            'item' => $bookItem
+        ]);
+    })->name('book-items.print-qr');
+});
 
 /*
 |--------------------------------------------------------------------------
