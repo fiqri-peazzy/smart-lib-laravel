@@ -52,10 +52,9 @@ class LoanResource extends Resource
                                                 ->danger()
                                                 ->send();
                                         }
-
                                         // Show user info
                                         $activeLoans = $user->activeLoans()->count();
-                                        $set('user_info', "Credit Score: {$user->credit_score} | Max Loans: {$user->max_loans} | Active: {$activeLoans} | Denda: Rp " . number_format((float)$user->total_fines, 0));
+                                        $set('user_info', "Credit Score: {$user->credit_score} | Max Loans: {$user->max_loans} | Active: {$activeLoans} | Denda: Rp " . number_format((float) $user->total_fines, 0));
                                     }
                                 }
                             })
@@ -116,13 +115,10 @@ class LoanResource extends Resource
                             ->afterStateUpdated(function ($state, callable $get, callable $set) {
                                 $loanDate = $get('loan_date');
                                 $userId = $get('user_id');
-
                                 if ($loanDate && $state && $userId) {
                                     $user = User::find($userId);
                                     $maxDays = $user && $user->isDosen() ? 30 : 14;
-
                                     $diffDays = \Carbon\Carbon::parse($loanDate)->diffInDays($state);
-
                                     if ($diffDays > $maxDays) {
                                         $set('due_date', \Carbon\Carbon::parse($loanDate)->addDays($maxDays));
                                         \Filament\Notifications\Notification::make()
@@ -181,18 +177,22 @@ class LoanResource extends Resource
                 Tables\Columns\TextColumn::make('loan_date')
                     ->label('Tgl Pinjam')
                     ->date('d M Y')
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('Belum diambil')
+                    ->color(fn(Loan $record) => $record->loan_date === null ? 'warning' : null),
 
                 Tables\Columns\TextColumn::make('due_date')
                     ->label('Jatuh Tempo')
                     ->date('d M Y')
                     ->sortable()
+                    ->placeholder('Belum diambil')
                     ->color(fn(Loan $record) => $record->isOverdue() ? 'danger' : 'success'),
 
                 Tables\Columns\TextColumn::make('days_until_due')
                     ->label('Sisa Hari')
                     ->badge()
                     ->color(fn(Loan $record) => match (true) {
+                        $record->status === 'pending_pickup' => 'warning',
                         $record->return_date !== null => 'gray',
                         $record->days_until_due < 0 => 'danger',
                         $record->days_until_due <= 2 => 'warning',
@@ -200,19 +200,21 @@ class LoanResource extends Resource
                     })
                     ->formatStateUsing(
                         fn(Loan $record) =>
-                        $record->return_date ? 'Returned' : ($record->days_until_due < 0 ? 'OVERDUE ' . abs($record->days_until_due) . 'd' : $record->days_until_due . ' hari')
+                        $record->status === 'pending_pickup' ? 'Pending Pickup' : ($record->return_date ? 'Returned' : ($record->days_until_due < 0 ? 'OVERDUE ' . abs($record->days_until_due) . 'd' : $record->days_until_due . ' hari'))
                     ),
 
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
                     ->badge()
                     ->colors([
+                        'warning' => 'pending_pickup',
                         'success' => 'active',
                         'info' => 'extended',
                         'danger' => 'overdue',
                         'gray' => 'returned',
                     ])
                     ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'pending_pickup' => 'Pending Pickup',
                         'active' => 'Aktif',
                         'extended' => 'Diperpanjang',
                         'overdue' => 'Terlambat',
@@ -235,10 +237,18 @@ class LoanResource extends Resource
                     ->label('Tgl Kembali')
                     ->date('d M Y')
                     ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('pickup_deadline')
+                    ->label('Deadline Pickup')
+                    ->dateTime('d M Y H:i')
+                    ->placeholder('-')
+                    ->toggleable()
+                    ->color(fn(Loan $record) => $record->isPickupExpired() ? 'danger' : 'success'),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
+                        'pending_pickup' => 'Pending Pickup',
                         'active' => 'Aktif',
                         'extended' => 'Diperpanjang',
                         'overdue' => 'Terlambat',
@@ -252,6 +262,10 @@ class LoanResource extends Resource
                     ->searchable()
                     ->preload(),
 
+                Tables\Filters\Filter::make('pending_pickup')
+                    ->label('Pending Pickup')
+                    ->query(fn(Builder $query): Builder => $query->where('status', 'pending_pickup')),
+
                 Tables\Filters\Filter::make('overdue')
                     ->label('Hanya Terlambat')
                     ->query(fn(Builder $query): Builder => $query->where('status', 'overdue')),
@@ -262,6 +276,57 @@ class LoanResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+
+                // CONFIRM PICKUP ACTION (NEW)
+                Tables\Actions\Action::make('confirmPickup')
+                    ->label('Confirm Pickup')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->visible(fn(Loan $record) => $record->status === 'pending_pickup')
+                    ->requiresConfirmation()
+                    ->modalHeading('Konfirmasi Pengambilan Buku')
+                    ->modalDescription(fn(Loan $record) => "Konfirmasi bahwa {$record->user->name} telah mengambil buku \"{$record->bookItem->book->title}\"?")
+                    ->modalSubmitActionLabel('Konfirmasi')
+                    ->form([
+                        Forms\Components\DatePicker::make('loan_date')
+                            ->label('Tanggal Pinjam')
+                            ->default(now())
+                            ->required()
+                            ->maxDate(now()),
+
+                        Forms\Components\Select::make('loan_duration')
+                            ->label('Durasi Peminjaman')
+                            ->options([
+                                7 => '7 hari',
+                                14 => '14 hari (default)',
+                                21 => '21 hari',
+                                30 => '30 hari (dosen)',
+                            ])
+                            ->default(14)
+                            ->required()
+                            ->helperText('Pilih durasi sesuai kebijakan'),
+                    ])
+                    ->action(function (Loan $record, array $data) {
+                        $record->confirmPickup(
+                            processedBy: Auth::id(),
+                            loanDays: $data['loan_duration'] ?? 14
+                        );
+
+                        // Update loan_date if specified
+                        if (isset($data['loan_date'])) {
+                            $record->update([
+                                'loan_date' => $data['loan_date'],
+                                'due_date' => \Carbon\Carbon::parse($data['loan_date'])->addDays($data['loan_duration'] ?? 14),
+                            ]);
+                        }
+
+                        \Filament\Notifications\Notification::make()
+                            ->title('Pickup Berhasil Dikonfirmasi')
+                            ->body("Loan untuk {$record->user->name} telah aktif. Jatuh tempo: " . $record->due_date->format('d M Y'))
+                            ->success()
+                            ->send();
+                    }),
+
                 Tables\Actions\EditAction::make()
                     ->visible(fn(Loan $record) => in_array($record->status, ['active', 'overdue', 'extended'])),
 
@@ -324,6 +389,31 @@ class LoanResource extends Resource
                             ->success()
                             ->send();
                     }),
+
+                // CANCEL PENDING PICKUP ACTION (NEW)
+                Tables\Actions\Action::make('cancelPendingPickup')
+                    ->label('Cancel Request')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->visible(fn(Loan $record) => $record->status === 'pending_pickup')
+                    ->requiresConfirmation()
+                    ->modalHeading('Batalkan Request Peminjaman')
+                    ->modalDescription('Request peminjaman akan dibatalkan dan buku dikembalikan ke status available.')
+                    ->form([
+                        Forms\Components\Textarea::make('cancel_reason')
+                            ->label('Alasan Pembatalan')
+                            ->required()
+                            ->rows(3),
+                    ])
+                    ->action(function (Loan $record, array $data) {
+                        $record->cancelPendingPickup($data['cancel_reason'] ?? 'Dibatalkan oleh staff');
+
+                        \Filament\Notifications\Notification::make()
+                            ->title('Request Dibatalkan')
+                            ->body('Peminjaman telah dibatalkan dan buku tersedia kembali')
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -331,7 +421,7 @@ class LoanResource extends Resource
                         ->requiresConfirmation(),
                 ]),
             ])
-            ->defaultSort('loan_date', 'desc');
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array
@@ -353,13 +443,20 @@ class LoanResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::whereIn('status', ['active', 'overdue', 'extended'])->count();
+        $pendingCount = static::getModel()::where('status', 'pending_pickup')->count();
+        $activeCount = static::getModel()::whereIn('status', ['active', 'overdue', 'extended'])->count();
+
+        return $pendingCount > 0 ? "⏳ {$pendingCount} | ✓ {$activeCount}" : $activeCount;
     }
 
     public static function getNavigationBadgeColor(): ?string
     {
         $overdueCount = static::getModel()::where('status', 'overdue')->count();
-        return $overdueCount > 0 ? 'danger' : 'success';
+        $pendingCount = static::getModel()::where('status', 'pending_pickup')->count();
+
+        if ($overdueCount > 0) return 'danger';
+        if ($pendingCount > 0) return 'warning';
+        return 'success';
     }
 
     public static function getEloquentQuery(): Builder

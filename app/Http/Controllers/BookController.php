@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use App\Models\BookCategory;
+use App\Models\Loan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class BookController extends Controller
 {
@@ -84,10 +87,8 @@ class BookController extends Controller
         // Check if user can borrow
         $canBorrow = false;
         $borrowMessage = '';
-
         if (Auth::check()) {
             $user = Auth::user();
-
             if (!$user->canBorrow()) {
                 $borrowMessage = 'Anda tidak dapat meminjam. Silakan bayar denda atau hubungi admin.';
             } elseif ($user->activeLoans()->count() >= $user->max_loans) {
@@ -141,5 +142,91 @@ class BookController extends Controller
             ->paginate(12);
 
         return view('frontend.books.category', compact('books', 'category'));
+    }
+
+    /**
+     * Request loan (user action from book detail)
+     */
+    public function requestLoan(Request $request, Book $book)
+    {
+        // Must be authenticated
+        if (!Auth::check()) {
+            return back()->with('error', 'Silakan login terlebih dahulu untuk meminjam buku.');
+        }
+
+        $user = Auth::user();
+
+        // Validate user can borrow
+        if (!$user->canBorrow()) {
+            return back()->with('error', 'Anda tidak dapat meminjam buku. Silakan bayar denda terlebih dahulu.');
+        }
+
+        // Check loan limit
+        if ($user->activeLoans()->count() >= $user->max_loans) {
+            return back()->with('error', "Anda sudah mencapai limit peminjaman ({$user->max_loans} buku).");
+        }
+
+        // Check if book is available
+        if ($book->available_stock <= 0) {
+            return back()->with('error', 'Buku ini tidak tersedia. Silakan lakukan booking.');
+        }
+
+        // Check if user already has active loan for this book
+        $existingLoan = $user->loans()
+            ->whereHas('bookItem', function ($q) use ($book) {
+                $q->where('book_id', $book->id);
+            })
+            ->whereIn('status', ['pending_pickup', 'active', 'extended', 'overdue'])
+            ->first();
+
+        if ($existingLoan) {
+            return back()->with('error', 'Anda sudah memiliki peminjaman aktif atau pending untuk buku ini.');
+        }
+
+        // Check if user has pending booking for this book
+        $existingBooking = $user->bookings()
+            ->where('book_id', $book->id)
+            ->whereIn('status', ['pending', 'notified'])
+            ->first();
+
+        if ($existingBooking) {
+            return back()->with('error', 'Anda sudah memiliki booking untuk buku ini. Silakan ambil buku di perpustakaan.');
+        }
+
+        // Use DB transaction
+        DB::beginTransaction();
+        try {
+            // Auto-assign first available book item
+            $bookItem = $book->getAvailableItems()->first();
+
+            if (!$bookItem) {
+                DB::rollBack();
+                return back()->with('error', 'Tidak ada eksemplar yang tersedia saat ini.');
+            }
+
+            // Create loan request with pending_pickup status
+            $loan = Loan::create([
+                'user_id' => $user->id,
+                'book_item_id' => $bookItem->id,
+                'status' => 'pending_pickup',
+                'requested_at' => now(),
+                'pickup_deadline' => now()->addDays(3), // 3 days to pickup
+                'loan_date' => null, // Will be set when staff confirms pickup
+                'due_date' => null, // Will be set when staff confirms pickup
+            ]);
+
+            // Book item status is updated in model boot (markAsBorrowed)
+
+            DB::commit();
+
+            return redirect()->route('loans.my-loans')->with(
+                'success',
+                'Request peminjaman berhasil! Silakan datang ke perpustakaan dalam 3 hari untuk mengambil buku. Tunjukkan QR code Anda ke staff.'
+            );
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Request loan failed: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan. Silakan coba lagi.');
+        }
     }
 }

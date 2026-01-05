@@ -21,6 +21,12 @@ class DatabaseSeeder extends Seeder
 
         // 3. Create default users for testing
         $this->createDefaultUsers();
+
+        // 4. Seed Categories
+        $this->call(BookCategorySeeder::class);
+
+        // 5. Seed Books & Items
+        $this->call(BookSeeder::class);
     }
 
     /**

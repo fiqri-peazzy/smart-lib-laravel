@@ -22,6 +22,10 @@ Route::prefix('books')->name('books.')->group(function () {
     Route::get('/', [BookController::class, 'index'])->name('index');
     Route::get('/{book}', [BookController::class, 'show'])->name('show');
     Route::get('/category/{category}', [BookController::class, 'byCategory'])->name('category');
+
+    // request loan (butuh login)
+
+    Route::post('/{book}/request-loan', [BookController::class, 'requestLoan'])->name('request-loan')->middleware(['auth', 'user.role']);
 });
 
 // Digital Library Routes (Public browse, download butuh login)

@@ -172,7 +172,7 @@
                             @else
                                 @if ($canBorrow)
                                     <!-- Can Borrow -->
-                                    <button type="button" onclick="alert('Fitur Request Loan akan segera diimplementasi')"
+                                    <button type="button" onclick="openRequestModal()"
                                         class="w-full flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition-colors">
                                         <i class="bi bi-bookmark-check mr-2"></i>
                                         Request Loan
@@ -383,4 +383,115 @@
             </div>
         </div>
     </section>
+
+    <!-- Request Loan Modal -->
+    <div id="requestModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-green-600 to-emerald-600 text-white p-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-2xl font-bold flex items-center">
+                        <i class="bi bi-bookmark-check mr-3"></i>
+                        Request Peminjaman
+                    </h3>
+                    <button onclick="closeRequestModal()" class="text-white hover:text-gray-200 transition-colors">
+                        <i class="bi bi-x-lg text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 space-y-6">
+                <!-- Book Info -->
+                <div class="flex items-start space-x-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                    <img src="{{ $book->cover_url }}" alt="{{ $book->title }}"
+                        class="w-20 h-28 object-cover rounded-lg shadow">
+                    <div class="flex-1">
+                        <h4 class="font-bold text-gray-900 dark:text-white mb-1 line-clamp-2">{{ $book->title }}</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ $book->author }}</p>
+                        <div class="flex items-center text-sm text-green-600 dark:text-green-400">
+                            <i class="bi bi-check-circle-fill mr-1"></i>
+                            <span class="font-semibold">{{ $book->available_stock }} eksemplar tersedia</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Box -->
+                <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-500 rounded-xl p-4">
+                    <div class="flex items-start">
+                        <i class="bi bi-info-circle-fill text-blue-600 dark:text-blue-400 text-xl mr-3 mt-0.5"></i>
+                        <div class="flex-1">
+                            <h5 class="text-blue-900 dark:text-blue-300 font-bold mb-2">Informasi Penting:</h5>
+                            <ul class="text-sm text-blue-800 dark:text-blue-300 space-y-1 list-disc list-inside">
+                                <li>Anda memiliki <strong>3 hari</strong> untuk mengambil buku di perpustakaan</li>
+                                <li>Tunjukkan <strong>QR code</strong> dari halaman "My Loans" ke staff</li>
+                                <li>Masa peminjaman: <strong>14 hari</strong> dari tanggal pengambilan</li>
+                                <li>Request akan otomatis dibatalkan jika tidak diambil dalam 3 hari</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Your Credit Info -->
+                @auth
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                            <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">Credit Score Anda</div>
+                            <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ Auth::user()->credit_score }}
+                            </div>
+                        </div>
+                        <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                            <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">Peminjaman Aktif</div>
+                            <div class="text-2xl font-bold text-gray-900 dark:text-white">
+                                {{ Auth::user()->activeLoans()->count() }}/{{ Auth::user()->max_loans }}
+                            </div>
+                        </div>
+                    </div>
+                @endauth
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-6 bg-gray-50 dark:bg-gray-700/50 flex gap-3">
+                <button onclick="closeRequestModal()"
+                    class="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors">
+                    Batal
+                </button>
+                <form action="{{ route('books.request-loan', $book) }}" method="POST" class="flex-1">
+                    @csrf
+                    <button type="submit"
+                        class="w-full px-6 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition-colors shadow-lg">
+                        <i class="bi bi-check-circle mr-2"></i>
+                        Konfirmasi Request
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Scripts -->
+    <script>
+        function openRequestModal() {
+            document.getElementById('requestModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeRequestModal() {
+            document.getElementById('requestModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeRequestModal();
+            }
+        });
+
+        // Close modal on backdrop click
+        document.getElementById('requestModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeRequestModal();
+            }
+        });
+    </script>
 @endsection

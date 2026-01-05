@@ -40,6 +40,8 @@ class Loan extends Model
         'return_condition',
         'return_notes',
         'notes',
+        'requested_at',
+        'pickup_deadline',
     ];
 
     protected $casts = [
@@ -52,6 +54,8 @@ class Loan extends Model
         'is_extended' => 'boolean',
         'fine_paid' => 'boolean',
         'fine_amount' => 'decimal:2',
+        'requested_at' => 'datetime',
+        'pickup_deadline' => 'datetime',
     ];
 
     /**
@@ -62,8 +66,8 @@ class Loan extends Model
         parent::boot();
 
         static::creating(function ($loan) {
-            // Auto-set loan_date if not set
-            if (!$loan->loan_date) {
+            // Only set loan_date for non-pending_pickup loans
+            if (!$loan->loan_date && $loan->status !== 'pending_pickup') {
                 $loan->loan_date = now();
             }
 
@@ -72,14 +76,21 @@ class Loan extends Model
         });
 
         static::created(function ($loan) {
-            // Update loan history
-            $loan->user->updateLoanHistory();
+            // Update loan history only for active loans
+            if ($loan->status !== 'pending_pickup') {
+                $loan->user->updateLoanHistory();
+            }
         });
 
         static::updated(function ($loan) {
             // Check for overdue
             if ($loan->status === 'active' && $loan->isOverdue()) {
                 $loan->updateQuietly(['status' => 'overdue']);
+            }
+
+            // Auto-cancel expired pending pickups
+            if ($loan->status === 'pending_pickup' && $loan->isPickupExpired()) {
+                $loan->cancelPendingPickup();
             }
         });
     }
@@ -133,6 +144,14 @@ class Loan extends Model
     }
 
     /**
+     * Scope pending pickup loans
+     */
+    public function scopePendingPickup($query)
+    {
+        return $query->where('status', 'pending_pickup');
+    }
+
+    /**
      * Scope overdue loans
      */
     public function scopeOverdue($query)
@@ -150,10 +169,37 @@ class Loan extends Model
     public function isOverdue(): bool
     {
         if ($this->return_date) {
-            return false; // Already returned
+            return false;
+        }
+        return now()->isAfter($this->due_date);
+    }
+
+    /**
+     * Check if pending pickup is expired
+     */
+    public function isPickupExpired(): bool
+    {
+        if ($this->status !== 'pending_pickup') {
+            return false;
         }
 
-        return now()->isAfter($this->due_date);
+        if (!$this->pickup_deadline) {
+            return false;
+        }
+
+        return now()->isAfter($this->pickup_deadline);
+    }
+
+    /**
+     * Get days until pickup deadline
+     */
+    public function getDaysUntilPickupAttribute(): int
+    {
+        if ($this->status !== 'pending_pickup' || !$this->pickup_deadline) {
+            return 0;
+        }
+
+        return now()->diffInDays($this->pickup_deadline, false);
     }
 
     /**
@@ -164,7 +210,6 @@ class Loan extends Model
         $returnDate = $this->return_date;
         $dueDate = $this->due_date;
 
-        // Jika belum dikembalikan, hitung dari sekarang
         if (!$returnDate) {
             if (now()->isAfter($dueDate)) {
                 return (int) abs(now()->diffInDays($dueDate, false));
@@ -172,7 +217,6 @@ class Loan extends Model
             return 0;
         }
 
-        // Jika sudah dikembalikan, hitung dari return_date
         if ($returnDate->isAfter($dueDate)) {
             return (int) abs($returnDate->diffInDays($dueDate, false));
         }
@@ -186,17 +230,13 @@ class Loan extends Model
     public function calculateFine(): float
     {
         $daysOverdue = abs($this->getDaysOverdue());
-
         if ($daysOverdue <= 0) {
             return 0;
         }
 
-        // Rp 1.000 per hari, max Rp 50.000
         $finePerDay = 1000;
         $maxFine = 50000;
-
         $calculatedFine = $daysOverdue * $finePerDay;
-
         return (float) min($calculatedFine, $maxFine);
     }
 
@@ -205,17 +245,14 @@ class Loan extends Model
      */
     public function canBeExtended(): bool
     {
-        // Already extended
         if ($this->is_extended) {
             return false;
         }
 
-        // Not active
         if (!in_array($this->status, ['active', 'overdue'])) {
             return false;
         }
 
-        // Check if book has pending bookings
         $hasPendingBookings = Booking::where('book_id', $this->bookItem->book_id)
             ->where('status', 'pending')
             ->exists();
@@ -244,6 +281,43 @@ class Loan extends Model
     }
 
     /**
+     * Confirm pickup (staff action)
+     */
+    public function confirmPickup(int $processedBy, int $loanDays = 14): void
+    {
+        $this->update([
+            'status' => 'active',
+            'loan_date' => now(),
+            'due_date' => now()->addDays($loanDays),
+            'processed_by' => $processedBy,
+            'pickup_deadline' => null,
+        ]);
+
+        // Update loan history
+        $this->user->updateLoanHistory();
+    }
+
+    /**
+     * Cancel pending pickup (auto or manual)
+     */
+    public function cancelPendingPickup(?string $reason = null): void
+    {
+        if ($this->status !== 'pending_pickup') {
+            return;
+        }
+
+        // Update book item back to available
+        $this->bookItem->update(['status' => 'available']);
+
+        // Soft delete the loan request
+        $this->update([
+            'notes' => $this->notes . "\n" . now()->format('Y-m-d H:i') . ': ' . ($reason ?? 'Pickup expired'),
+        ]);
+
+        $this->delete();
+    }
+
+    /**
      * Process return
      */
     public function processReturn(
@@ -251,10 +325,8 @@ class Loan extends Model
         ?string $notes = null,
         ?int $returnedTo = null
     ): void {
-        // Calculate fine SEBELUM set return_date
         $returnDate = now();
         $daysLate = 0;
-
         if ($returnDate->isAfter($this->due_date)) {
             $daysLate = (int) abs($returnDate->diffInDays($this->due_date, false));
         }
@@ -266,7 +338,6 @@ class Loan extends Model
             $fineAmount = min($daysLate * $finePerDay, $maxFine);
         }
 
-        // Update loan record
         $this->update([
             'return_date' => $returnDate,
             'status' => 'returned',
@@ -276,7 +347,6 @@ class Loan extends Model
             'fine_amount' => $fineAmount,
         ]);
 
-        // Create fine record jika ada denda
         if ($fineAmount > 0) {
             Fine::create([
                 'loan_id' => $this->id,
@@ -286,24 +356,18 @@ class Loan extends Model
                 'daily_rate' => 1000,
             ]);
 
-            // Update total fines di user
             $this->user->increment('total_fines', $fineAmount);
         }
 
-        // Update book item status
         $this->bookItem->update([
             'status' => 'available',
             'condition' => $condition,
         ]);
 
-        // Update loan history
         $this->user->updateLoanHistory();
-
-        // Recalculate credit score
         $this->user->recalculateCreditScore();
         $this->user->updateMaxLoans();
 
-        // Notify bookings if any
         $this->notifyBookings();
     }
 
@@ -329,6 +393,7 @@ class Loan extends Model
     public function getStatusColorAttribute(): string
     {
         return match ($this->status) {
+            'pending_pickup' => 'warning',
             'active' => 'success',
             'extended' => 'info',
             'overdue' => 'danger',
@@ -345,7 +410,6 @@ class Loan extends Model
         if ($this->return_date) {
             return 0;
         }
-
         return now()->diffInDays($this->due_date, false);
     }
 }
