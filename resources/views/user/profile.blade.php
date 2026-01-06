@@ -104,7 +104,7 @@
                                     <div>
                                         <div class="text-xs text-gray-500 dark:text-gray-400">Denda Aktif</div>
                                         <div class="text-lg font-bold text-gray-900 dark:text-white">Rp
-                                            {{ number_format($user->total_fines, 0, ',', '.') }}</div>
+                                            {{ number_format($user->total_fines ?? 0, 0, ',', '.') }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -123,7 +123,7 @@
                             <a href="{{ route('bookings.my-bookings') }}"
                                 class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group">
                                 <div class="flex items-center">
-                                    <i class="bi bi-bookmark text-gray-600 dark:text-gray-400 mr-3"></i>
+                                    <i class="bi bi-calendar-event text-gray-600 dark:text-gray-400 mr-3"></i>
                                     <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Booking</span>
                                 </div>
                                 <i class="bi bi-chevron-right text-gray-400 group-hover:text-indigo-600"></i>

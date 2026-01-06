@@ -96,13 +96,13 @@
     </section>
 
     <!-- Categories -->
-    <section class="py-16 bg-white">
+    <section class="py-16 bg-white dark:bg-gray-900 transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12" data-aos="fade-up">
-                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
                     Jelajahi Kategori
                 </h2>
-                <p class="text-gray-600">
+                <p class="text-gray-600 dark:text-gray-400">
                     Temukan buku dari berbagai kategori teknologi informasi
                 </p>
             </div>
@@ -157,17 +157,17 @@
                                 class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 px-4">
                                 @foreach ($chunk as $category)
                                     <a href="{{ route('books.index', ['category' => $category->id]) }}"
-                                        class="group p-6 bg-gray-50 rounded-2xl hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+                                        class="group p-6 bg-gray-50 dark:bg-gray-800 rounded-2xl hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
                                         <div class="w-12 h-12 mx-auto mb-4 rounded-lg flex items-center justify-center text-2xl"
                                             style="background-color: {{ $category->color }}20;">
                                             <i class="bi {{ $icons[($chunkIndex * 6 + $loop->index) % 6] }}"
                                                 style="color: {{ $category->color }};"></i>
                                         </div>
                                         <h3
-                                            class="text-sm font-semibold text-center text-gray-900 group-hover:text-indigo-600 transition-colors">
+                                            class="text-sm font-semibold text-center text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                                             {{ $category->name }}
                                         </h3>
-                                        <p class="text-xs text-center text-gray-500 mt-1">
+                                        <p class="text-xs text-center text-gray-500 dark:text-gray-400 mt-1">
                                             {{ $category->books_count }} buku
                                         </p>
                                     </a>
@@ -180,13 +180,13 @@
                 <!-- Navigation Arrows -->
                 @if ($categoryChunks->count() > 1)
                     <button @click="prev()" type="button"
-                        class="absolute top-1/2 left-0 z-10 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <i class="bi bi-chevron-left text-gray-800 text-xl"></i>
+                        class="absolute top-1/2 left-0 z-10 -translate-y-1/2 bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-700 rounded-full p-3 shadow-lg transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <i class="bi bi-chevron-left text-gray-800 dark:text-white text-xl"></i>
                     </button>
 
                     <button @click="next()" type="button"
-                        class="absolute top-1/2 right-0 z-10 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <i class="bi bi-chevron-right text-gray-800 text-xl"></i>
+                        class="absolute top-1/2 right-0 z-10 -translate-y-1/2 bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-700 rounded-full p-3 shadow-lg transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <i class="bi bi-chevron-right text-gray-800 dark:text-white text-xl"></i>
                     </button>
                 @endif
 
@@ -207,18 +207,18 @@
     </section>
 
     <!-- Featured Books -->
-    <section class="py-16 bg-gray-50">
+    <section class="py-16 bg-gray-50 dark:bg-gray-800/50 transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center mb-12">
                 <div data-aos="fade-right">
-                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
                         Buku Unggulan
                     </h2>
-                    <p class="text-gray-600">
+                    <p class="text-gray-600 dark:text-gray-400">
                         Koleksi terbaik pilihan perpustakaan
                     </p>
                 </div>
-                <a href="{{ route('books.index') }}" class="text-indigo-600 hover:underline font-semibold"
+                <a href="{{ route('books.index') }}" class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold"
                     data-aos="fade-left">
                     Lihat Semua →
                 </a>
@@ -227,7 +227,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach ($featuredBooks as $book)
                     <a href="{{ route('books.show', $book) }}"
-                        class="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300"
+                        class="group bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300"
                         data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
                         <div
                             class="aspect-w-16 aspect-h-9 bg-gradient-to-br from-indigo-500 to-purple-600 relative overflow-hidden">
@@ -262,17 +262,17 @@
                                 @endforeach
                             </div>
                             <h3
-                                class="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-indigo-600 transition-colors">
+                                class="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                                 {{ $book->title }}
                             </h3>
-                            <p class="text-sm text-gray-600 mb-4">
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
                                 {{ $book->author }}
                             </p>
                             <div class="flex items-center justify-between text-sm">
-                                <span class="text-gray-500">
+                                <span class="text-gray-500 dark:text-gray-400 font-medium">
                                     <i class="bi bi-geo-alt me-1"></i> {{ $book->rack_location }}
                                 </span>
-                                <span class="font-semibold text-indigo-600">
+                                <span class="font-bold text-indigo-600 dark:text-indigo-400">
                                     {{ $book->available_stock }}/{{ $book->total_stock }} available
                                 </span>
                             </div>
@@ -284,18 +284,18 @@
     </section>
 
     <!-- Latest Digital -->
-    <section class="py-16 bg-white">
+    <section class="py-16 bg-white dark:bg-gray-900 transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center mb-12">
                 <div data-aos="fade-right">
-                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
                         Koleksi Digital Terbaru
                     </h2>
-                    <p class="text-gray-600">
+                    <p class="text-gray-600 dark:text-gray-400">
                         E-books dan jurnal terkini
                     </p>
                 </div>
-                <a href="{{ route('digital.index') }}" class="text-indigo-600 hover:underline font-semibold"
+                <a href="{{ route('digital.index') }}" class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold"
                     data-aos="fade-left">
                     Lihat Semua →
                 </a>
@@ -304,10 +304,10 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach ($latestDigital as $digital)
                     <a href="{{ route('digital.show', $digital) }}"
-                        class="group bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-6 hover:shadow-xl transform hover:-translate-y-2 transition-all"
+                        class="group bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-800/50 rounded-2xl p-6 hover:shadow-xl transform hover:-translate-y-2 transition-all"
                         data-aos="flip-left" data-aos-delay="{{ $loop->index * 100 }}">
                         <div
-                            class="w-16 h-16 bg-white rounded-xl flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">
+                            class="w-16 h-16 bg-white dark:bg-gray-700 rounded-xl flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">
                             @php
                                 $digitalIcons = [
                                     'bi-file-earmark-text',
@@ -316,12 +316,12 @@
                                     'bi-pencil-square',
                                 ];
                             @endphp
-                            <i class="bi {{ $digitalIcons[$loop->index % 4] }} text-indigo-600"></i>
+                            <i class="bi {{ $digitalIcons[$loop->index % 4] }} text-indigo-600 dark:text-indigo-400"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
                             {{ $digital->title }}
                         </h3>
-                        <p class="text-sm text-gray-600 mb-3">
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
                             {{ $digital->author }}
                         </p>
                         <div class="flex items-center justify-between text-xs">

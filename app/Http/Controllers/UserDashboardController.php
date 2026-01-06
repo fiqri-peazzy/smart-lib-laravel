@@ -294,4 +294,41 @@ class UserDashboardController extends Controller
 
         return back()->with('success', 'Profil berhasil diperbarui.');
     }
+
+    /**
+     * Display user payment page
+     */
+    public function payment()
+    {
+        $user = Auth::user();
+
+        // Unpaid fines with loan details
+        $unpaidFines = $user->fines()
+            ->with(['loan.bookItem.book'])
+            ->where('status', 'unpaid')
+            ->latest()
+            ->get();
+
+        // Paid fines (history)
+        $paidFines = $user->fines()
+            ->with(['loan.bookItem.book'])
+            ->whereIn('status', ['paid', 'waived'])
+            ->latest()
+            ->take(10)
+            ->get();
+
+        // Total unpaid amount
+        $totalUnpaid = $unpaidFines->sum('amount');
+
+        return view('user.payment', compact('unpaidFines', 'paidFines', 'totalUnpaid'));
+    }
+
+    /**
+     * Process payment (redirect with message - payment via staff only)
+     */
+    public function processPayment(Request $request)
+    {
+        return back()->with('error', 'Pembayaran harus dilakukan melalui staff perpustakaan. Silakan datang ke perpustakaan dengan membawa halaman ini.');
+    }
+
 }
