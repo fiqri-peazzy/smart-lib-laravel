@@ -7,6 +7,7 @@ use App\Models\Booking;
 use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Storage;
@@ -151,55 +152,78 @@ class UserDashboardController extends Controller
      */
     public function createBooking(Request $request)
     {
-        $request->validate([
-            'book_id' => 'required|exists:books,id',
-        ]);
+        Log::info('--- Start Create Booking Process ---');
+        Log::info('Request data:', $request->all());
+        Log::info('Authenticated User:', ['id' => Auth::id(), 'roles' => Auth::user()?->getRoleNames()]);
+        
+        try {
+            $request->validate([
+                'book_id' => 'required|exists:books,id',
+            ]);
 
-        $user = Auth::user();
-        $book = Book::findOrFail($request->book_id);
+            $user = Auth::user();
+            $book = Book::findOrFail($request->book_id);
 
-        // Check if user can borrow
-        if (!$user->canBorrow()) {
-            return back()->with('error', 'Anda tidak dapat membuat booking. Silakan bayar denda terlebih dahulu.');
+            Log::info('Target Book:', ['id' => $book->id, 'title' => $book->title, 'stock' => $book->available_stock]);
+
+            // Check if user can borrow
+            if (!$user->canBorrow()) {
+                Log::warning('Booking rejected: User cannot borrow/has fines', ['user_id' => $user->id]);
+                return back()->with('error', 'Anda tidak dapat membuat booking. Silakan bayar denda terlebih dahulu.');
+            }
+
+            // Check if book is available (shouldn't allow booking if available)
+            if ($book->available_stock > 0) {
+                Log::warning('Booking rejected: Book is available', ['book_id' => $book->id]);
+                return back()->with('error', 'Buku ini masih tersedia. Anda bisa langsung meminjam tanpa booking.');
+            }
+
+            // Check if user already has active booking for this book
+            $existingBooking = $user->bookings()
+                ->where('book_id', $book->id)
+                ->whereIn('status', ['pending', 'notified'])
+                ->first();
+
+            if ($existingBooking) {
+                Log::warning('Booking rejected: Existing active booking', ['user_id' => $user->id, 'book_id' => $book->id]);
+                return back()->with('error', 'Anda sudah memiliki booking aktif untuk buku ini.');
+            }
+
+            // Check if user already borrowed this book
+            $activeLoan = $user->activeLoans()
+                ->whereHas('bookItem', function ($q) use ($book) {
+                    $q->where('book_id', $book->id);
+                })
+                ->first();
+
+            if ($activeLoan) {
+                Log::warning('Booking rejected: User already borrowing book', ['user_id' => $user->id, 'book_id' => $book->id]);
+                return back()->with('error', 'Anda sedang meminjam buku ini.');
+            }
+
+            // Create booking
+            $booking = Booking::create([
+                'user_id' => $user->id,
+                'book_id' => $book->id,
+                'booking_date' => now(),
+                'expires_at' => now()->addDays(3),
+                'status' => 'pending',
+                'is_priority' => $user->isDosen(), // Dosen auto priority
+            ]);
+
+            Log::info('Booking created successfully:', ['id' => $booking->id]);
+
+            return redirect()->route('bookings.my-bookings')->with('success', 'Booking berhasil dibuat. Anda akan diberitahu saat buku tersedia.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Booking Validation Failed:', $e->errors());
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Booking Creation Failed with Exception:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return back()->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage());
         }
-
-        // Check if book is available (shouldn't allow booking if available)
-        if ($book->available_stock > 0) {
-            return back()->with('error', 'Buku ini masih tersedia. Anda bisa langsung meminjam tanpa booking.');
-        }
-
-        // Check if user already has active booking for this book
-        $existingBooking = $user->bookings()
-            ->where('book_id', $book->id)
-            ->whereIn('status', ['pending', 'notified'])
-            ->first();
-
-        if ($existingBooking) {
-            return back()->with('error', 'Anda sudah memiliki booking aktif untuk buku ini.');
-        }
-
-        // Check if user already borrowed this book
-        $activeLoan = $user->activeLoans()
-            ->whereHas('bookItem', function ($q) use ($book) {
-                $q->where('book_id', $book->id);
-            })
-            ->first();
-
-        if ($activeLoan) {
-            return back()->with('error', 'Anda sedang meminjam buku ini.');
-        }
-
-        // Create booking
-        $booking = Booking::create([
-            'user_id' => $user->id,
-            'book_id' => $book->id,
-            'booking_date' => now(),
-            'expires_at' => now()->addDays(3),
-            'status' => 'pending',
-            'is_priority' => $user->isDosen(), // Dosen auto priority
-        ]);
-
-        return back()->with('success', 'Booking berhasil dibuat. Anda akan diberitahu saat buku tersedia.');
     }
 
     /**

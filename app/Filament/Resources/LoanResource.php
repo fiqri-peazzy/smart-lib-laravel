@@ -446,7 +446,7 @@ class LoanResource extends Resource
         $pendingCount = static::getModel()::where('status', 'pending_pickup')->count();
         $activeCount = static::getModel()::whereIn('status', ['active', 'overdue', 'extended'])->count();
 
-        return $pendingCount > 0 ? "⏳ {$pendingCount} | ✓ {$activeCount}" : $activeCount;
+        return $pendingCount > 0 ? "Pending {$pendingCount} | Active {$activeCount}" : $activeCount;
     }
 
     public static function getNavigationBadgeColor(): ?string

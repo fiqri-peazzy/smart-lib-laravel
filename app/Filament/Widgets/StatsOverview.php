@@ -41,10 +41,10 @@ class StatsOverview extends BaseWidget
                 ->color('info')
                 ->chart([10, 15, 20, 25, 30, 35, $totalDigitalCollections]),
 
-            Stat::make('Denda Belum Dibayar', 'Rp ' . number_format($totalFines, 0, ',', '.'))
-                ->description("$usersWithFines pengguna memiliki denda")
-                ->descriptionIcon('heroicon-o-banknotes')
-                ->color($totalFines > 0 ? 'danger' : 'success'),
+            // Stat::make('Denda Belum Dibayar', 'Rp ' . number_format($totalFines, 0, ',', '.'))
+            //     ->description("$usersWithFines pengguna memiliki denda")
+            //     ->descriptionIcon('heroicon-o-banknotes')
+            //     ->color($totalFines > 0 ? 'danger' : 'success'),
 
             Stat::make('Peminjaman Aktif', $activeLoans)
                 ->description("$overdueLoans terlambat")
@@ -52,6 +52,7 @@ class StatsOverview extends BaseWidget
                 ->color($overdueLoans > 0 ? 'danger' : 'success'),
 
             Stat::make('Denda Belum Dibayar', 'Rp ' . number_format($unpaidFines, 0, ',', '.'))
+                ->description("$usersWithFines pengguna memiliki denda")
                 ->descriptionIcon('heroicon-o-banknotes')
                 ->color($unpaidFines > 0 ? 'danger' : 'success'),
         ];

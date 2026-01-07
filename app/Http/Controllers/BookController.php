@@ -17,8 +17,7 @@ class BookController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Book::with(['categories', 'recommendedForMajor', 'items'])
-            ->where('is_available', true);
+        $query = Book::with(['categories', 'recommendedForMajor', 'items']);
 
         // Search
         if ($request->filled('search')) {

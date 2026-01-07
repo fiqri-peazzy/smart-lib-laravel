@@ -186,8 +186,8 @@
                                             Sudah Dibooking
                                         </button>
                                     @else
-                                        <button type="button" onclick="alert('Fitur Booking akan segera diimplementasi')"
-                                            class="w-full flex items-center justify-center px-6 py-3 bg-yellow-600 text-white rounded-xl font-semibold hover:bg-yellow-700 transition-colors">
+                                        <button type="button" onclick="openBookingModal()"
+                                            class="w-full flex items-center justify-center px-6 py-3 bg-yellow-600 text-white rounded-xl font-semibold hover:bg-yellow-700 transition-colors shadow-lg shadow-yellow-500/20">
                                             <i class="bi bi-calendar-plus mr-2"></i>
                                             Book Now
                                         </button>
@@ -385,7 +385,7 @@
     </section>
 
     <!-- Request Loan Modal -->
-    <div id="requestModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div id="requestModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
             <!-- Modal Header -->
             <div class="bg-gradient-to-r from-green-600 to-emerald-600 text-white p-6">
@@ -468,15 +468,101 @@
         </div>
     </div>
 
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-yellow-600 to-orange-600 text-white p-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-2xl font-bold flex items-center">
+                        <i class="bi bi-calendar-check mr-3"></i>
+                        Pesan Buku (Booking)
+                    </h3>
+                    <button onclick="closeBookingModal()" class="text-white hover:text-gray-200 transition-colors">
+                        <i class="bi bi-x-lg text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 space-y-6">
+                <!-- Book Info -->
+                <div class="flex items-start space-x-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                    <img src="{{ $book->cover_url }}" alt="{{ $book->title }}"
+                        class="w-20 h-28 object-cover rounded-lg shadow">
+                    <div class="flex-1">
+                        <h4 class="font-bold text-gray-900 dark:text-white mb-1 line-clamp-2">{{ $book->title }}</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ $book->author }}</p>
+                        <div class="flex items-center text-sm text-red-600 dark:text-red-400">
+                            <i class="bi bi-info-circle-fill mr-1 text-yellow-500"></i>
+                            <span class="font-semibold">Stok fisik sedang kosong</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Box -->
+                <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-500 rounded-xl p-4">
+                    <div class="flex items-start">
+                        <i class="bi bi-info-circle-fill text-yellow-600 dark:text-yellow-400 text-xl mr-3 mt-0.5"></i>
+                        <div class="flex-1">
+                            <h5 class="text-yellow-900 dark:text-yellow-300 font-bold mb-2">Sistem Antrian Perpustakaan:</h5>
+                            <ul class="text-sm text-yellow-800 dark:text-yellow-300 space-y-1 list-disc list-inside">
+                                <li>Anda akan masuk ke dalam <strong>daftar tunggu</strong> peminjaman</li>
+                                <li>Kami akan memberikan notifikasi saat buku sudah tersedia kembali</li>
+                                <li>Setelah tersedia, Anda punya <strong>3 hari</strong> untuk mengambil buku</li>
+                                <li>Prioritas diberikan berdasarkan urutan waktu booking</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-6 bg-gray-50 dark:bg-gray-700/50 flex gap-3">
+                <button onclick="closeBookingModal()"
+                    class="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors">
+                    Batal
+                </button>
+                <form action="{{ route('bookings.create') }}" method="POST" class="flex-1">
+                    @csrf
+                    <input type="hidden" name="book_id" value="{{ $book->id }}">
+                    <button type="submit"
+                        class="w-full px-6 py-3 bg-yellow-600 text-white rounded-xl font-semibold hover:bg-yellow-700 transition-colors shadow-lg">
+                        <i class="bi bi-calendar-plus mr-2"></i>
+                        Konfirmasi Booking
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Scripts -->
     <script>
         function openRequestModal() {
-            document.getElementById('requestModal').classList.remove('hidden');
+            const modal = document.getElementById('requestModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
             document.body.style.overflow = 'hidden';
         }
 
         function closeRequestModal() {
-            document.getElementById('requestModal').classList.add('hidden');
+            const modal = document.getElementById('requestModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        function openBookingModal() {
+            const modal = document.getElementById('bookingModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeBookingModal() {
+            const modal = document.getElementById('bookingModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
             document.body.style.overflow = 'auto';
         }
 
@@ -491,6 +577,12 @@
         document.getElementById('requestModal')?.addEventListener('click', function(e) {
             if (e.target === this) {
                 closeRequestModal();
+            }
+        });
+
+        document.getElementById('bookingModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeBookingModal();
             }
         });
     </script>

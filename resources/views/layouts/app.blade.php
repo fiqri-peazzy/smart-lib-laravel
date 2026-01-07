@@ -265,7 +265,24 @@
     </nav>
 
     <!-- Main Content -->
-    <main>
+    <main class="min-h-[60vh]">
+        <!-- Flash Messages -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            @if (session('success'))
+                <div class="mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-r-xl shadow-sm flex items-center" role="alert">
+                    <i class="bi bi-check-circle-fill mr-3 text-xl"></i>
+                    <p class="font-medium">{{ session('success') }}</p>
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 dark:bg-red-900/30 dark:text-red-400 rounded-r-xl shadow-sm flex items-center" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill mr-3 text-xl"></i>
+                    <p class="font-medium">{{ session('error') }}</p>
+                </div>
+            @endif
+        </div>
+
         @yield('content')
     </main>
 
