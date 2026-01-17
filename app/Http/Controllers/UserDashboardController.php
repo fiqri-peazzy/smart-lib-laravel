@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Storage;
+use App\Models\PaymentTransaction;
+use App\Services\PaymentService;
 
 class UserDashboardController extends Controller
 {
@@ -155,7 +157,7 @@ class UserDashboardController extends Controller
         Log::info('--- Start Create Booking Process ---');
         Log::info('Request data:', $request->all());
         Log::info('Authenticated User:', ['id' => Auth::id(), 'roles' => Auth::user()?->getRoleNames()]);
-        
+
         try {
             $request->validate([
                 'book_id' => 'required|exists:books,id',
@@ -355,4 +357,43 @@ class UserDashboardController extends Controller
         return back()->with('error', 'Pembayaran harus dilakukan melalui staff perpustakaan. Silakan datang ke perpustakaan dengan membawa halaman ini.');
     }
 
+    /**
+     * Handle redirection from Midtrans
+     */
+    public function paymentFinish(Request $request)
+    {
+        $orderId = $request->query('order_id');
+
+        if (!$orderId) {
+            return redirect()->route('payment.index');
+        }
+
+        $transaction = PaymentTransaction::where('gateway_order_id', $orderId)->first();
+
+        if ($transaction) {
+            try {
+                $paymentService = app(PaymentService::class);
+                $status = $paymentService->checkPaymentStatus($transaction);
+
+                if ($status['success']) {
+                    $paymentService->handleWebhook($status['data']);
+
+                    if (in_array($status['status'], ['settlement', 'capture'])) {
+                        session()->flash('success', 'Pembayaran berhasil dikonfirmasi. Terima kasih!');
+                    } else {
+                        session()->flash('info', 'Status pembayaran: ' . strtoupper($status['status']));
+                    }
+                }
+            } catch (\Exception $e) {
+                Log::error('Finish payment error: ' . $e->getMessage());
+            }
+        }
+
+        // Redirect based on user role (Admin/Staff back to Filament, User to Dashboard)
+        if (Auth::user()->hasRole('admin') || Auth::user()->hasRole('staff')) {
+            return redirect('/admin/fines');
+        }
+
+        return redirect()->route('payment.index');
+    }
 }

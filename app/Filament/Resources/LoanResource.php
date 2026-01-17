@@ -120,7 +120,7 @@ class LoanResource extends Resource
                                     $maxDays = $user && $user->isDosen() ? 30 : 14;
                                     $diffDays = \Carbon\Carbon::parse($loanDate)->diffInDays($state);
                                     if ($diffDays > $maxDays) {
-                                        $set('due_date', \Carbon\Carbon::parse($loanDate)->addDays($maxDays));
+                                        $set('due_date', \Carbon\Carbon::parse($loanDate)->addDays((int) $maxDays));
                                         \Filament\Notifications\Notification::make()
                                             ->title('Durasi peminjaman disesuaikan')
                                             ->body("Maksimal durasi untuk user ini adalah {$maxDays} hari")
@@ -309,14 +309,14 @@ class LoanResource extends Resource
                     ->action(function (Loan $record, array $data) {
                         $record->confirmPickup(
                             processedBy: Auth::id(),
-                            loanDays: $data['loan_duration'] ?? 14
+                            loanDays: (int) ($data['loan_duration'] ?? 14)
                         );
 
                         // Update loan_date if specified
                         if (isset($data['loan_date'])) {
                             $record->update([
                                 'loan_date' => $data['loan_date'],
-                                'due_date' => \Carbon\Carbon::parse($data['loan_date'])->addDays($data['loan_duration'] ?? 14),
+                                'due_date' => \Carbon\Carbon::parse($data['loan_date'])->addDays((int) ($data['loan_duration'] ?? 14)),
                             ]);
                         }
 

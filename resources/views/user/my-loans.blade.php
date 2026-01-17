@@ -293,10 +293,10 @@
                                                     </div>
                                                 </td>
                                                 <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                                                    {{ $loan->loan_date->format('d M Y') }}
+                                                    {{ $loan->loan_date ? $loan->loan_date->format('d M Y') : '-' }}
                                                 </td>
                                                 <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                                                    {{ $loan->due_date->format('d M Y') }}
+                                                    {{ $loan->due_date ? $loan->due_date->format('d M Y') : '-' }}
                                                 </td>
                                                 <td class="px-6 py-4">
                                                     @php
@@ -437,7 +437,7 @@
                                                     </div>
                                                 </td>
                                                 <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                                                    {{ $loan->due_date->format('d M Y') }}
+                                                    {{ $loan->due_date ? $loan->due_date->format('d M Y') : '-' }}
                                                 </td>
                                                 <td class="px-6 py-4">
                                                     <span
@@ -522,10 +522,10 @@
                                                     </div>
                                                 </td>
                                                 <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                                                    {{ $loan->loan_date->format('d M Y') }}
+                                                    {{ $loan->loan_date ? $loan->loan_date->format('d M Y') : '-' }}
                                                 </td>
                                                 <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                                                    {{ $loan->return_date->format('d M Y') }}
+                                                    {{ $loan->return_date ? $loan->return_date->format('d M Y') : '-' }}
                                                 </td>
                                                 <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                                                     {{ $loan->loan_date->diffInDays($loan->return_date) }} hari

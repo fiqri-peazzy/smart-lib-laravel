@@ -18,8 +18,8 @@ class PaymentService
         $this->serverKey = config('services.midtrans.server_key');
         $this->clientKey = config('services.midtrans.client_key');
         // Force sandbox mode for now as requested
-        $this->isProduction = false; 
-        
+        $this->isProduction = false;
+
         \Midtrans\Config::$serverKey = $this->serverKey;
         \Midtrans\Config::$isProduction = $this->isProduction;
         \Midtrans\Config::$isSanitized = true;
@@ -68,6 +68,13 @@ class PaymentService
                     ],
                 ],
                 'enabled_payments' => ['gopay', 'shopeepay', 'other_qris'],
+                'expiry' => [
+                    'duration' => 24,
+                    'unit' => 'hour',
+                ],
+                'callbacks' => [
+                    'finish' => route('payment.finish'),
+                ],
             ];
 
             $response = \Midtrans\Snap::createTransaction($params);
@@ -77,12 +84,11 @@ class PaymentService
                 'metadata' => [
                     'snap_token' => $response->token,
                     'snap_url' => $response->redirect_url,
-                    'raw_response' => $response
+                    'raw_response' => (array) $response
                 ],
             ]);
 
             return $transaction;
-
         } catch (\Exception $e) {
             $transaction->markAsFailed($e->getMessage());
             throw $e;
@@ -124,6 +130,9 @@ class PaymentService
                     'phone' => $fine->user->phone ?? '08123456789',
                 ],
                 'enabled_payments' => [$bank . '_va'],
+                'callbacks' => [
+                    'finish' => route('payment.finish'),
+                ],
             ];
 
             $response = \Midtrans\Snap::createTransaction($params);
@@ -137,7 +146,6 @@ class PaymentService
             ]);
 
             return $transaction;
-
         } catch (\Exception $e) {
             $transaction->markAsFailed($e->getMessage());
             throw $e;
@@ -154,13 +162,12 @@ class PaymentService
     {
         try {
             $status = \Midtrans\Transaction::status($transaction->gateway_order_id);
-            
+
             return [
                 'success' => true,
                 'status' => data_get($status, 'transaction_status'),
                 'data' => (array) $status,
             ];
-
         } catch (\Exception $e) {
             return [
                 'success' => false,
@@ -177,34 +184,33 @@ class PaymentService
      */
     public function handleWebhook(array $notification): bool
     {
-        // TODO: UNCOMMENT UNTUK PRODUCTION
-        /*
         try {
             $orderId = $notification['order_id'];
-            $statusCode = $notification['status_code'];
-            $grossAmount = $notification['gross_amount'];
             $transactionStatus = $notification['transaction_status'];
+            $transactionId = $notification['transaction_id'] ?? null;
 
-            // Verify signature
-            $signatureKey = hash('sha512', $orderId . $statusCode . $grossAmount . $this->serverKey);
-            
-            if ($signatureKey !== $notification['signature_key']) {
-                throw new \Exception('Invalid signature');
-            }
+            Log::info('Processing Midtrans Notification', ['order_id' => $orderId, 'status' => $transactionStatus]);
 
             // Find transaction
-            $transaction = PaymentTransaction::where('gateway_order_id', $orderId)->firstOrFail();
+            $transaction = PaymentTransaction::where('gateway_order_id', $orderId)->first();
+
+            if (!$transaction) {
+                Log::error('Transaction not found for webhook', ['order_id' => $orderId]);
+                return false;
+            }
 
             // Update status based on transaction status
             if ($transactionStatus == 'settlement' || $transactionStatus == 'capture') {
-                $transaction->markAsSuccess($notification['transaction_id']);
-                
+                $transaction->markAsSuccess($transactionId);
+
                 // Process fine payment
                 $transaction->fine->processPayment(
-                    amount: $transaction->amount,
+                    amount: (float) $transaction->amount,
                     method: $transaction->payment_method,
-                    reference: $notification['transaction_id']
+                    reference: $transactionId
                 );
+            } elseif ($transactionStatus == 'pending') {
+                $transaction->update(['status' => 'pending']);
             } elseif ($transactionStatus == 'expire') {
                 $transaction->markAsExpired();
             } elseif ($transactionStatus == 'cancel' || $transactionStatus == 'deny') {
@@ -212,16 +218,10 @@ class PaymentService
             }
 
             return true;
-
         } catch (\Exception $e) {
-            \Log::error('Webhook error: ' . $e->getMessage());
+            Log::error('Webhook error: ' . $e->getMessage());
             return false;
         }
-        */
-
-        // DUMMY handler
-        Log::info('Dummy webhook received', $notification);
-        return true;
     }
 
     /**
@@ -229,7 +229,7 @@ class PaymentService
      */
     protected function generateOrderId(Fine $fine): string
     {
-        return 'FINE-' . $fine->id . '-' . now()->format('YmdHis') . '-' . Str::random(4);
+        return 'FINE-' . $fine->id . '-' . time() . '-' . Str::random(4);
     }
 
     /**

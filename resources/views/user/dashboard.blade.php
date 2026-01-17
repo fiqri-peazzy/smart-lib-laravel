@@ -107,10 +107,10 @@
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                                            {{ $loan->loan_date->format('d M Y') }}
+                                            {{ $loan->loan_date ? $loan->loan_date->format('d M Y') : '-' }}
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                                            {{ $loan->due_date->format('d M Y') }}
+                                            {{ $loan->due_date ? $loan->due_date->format('d M Y') : '-' }}
                                         </td>
                                         <td class="px-6 py-4">
                                             @php
@@ -123,6 +123,8 @@
                                                         'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
                                                     'extended' =>
                                                         'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+                                                    'pending_pickup' =>
+                                                        'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
                                                 ];
                                             @endphp
                                             <span

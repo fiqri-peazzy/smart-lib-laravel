@@ -67,6 +67,7 @@ Route::middleware(['auth', 'user.role'])->group(function () {
     // Payment (Fines)
     Route::prefix('payment')->name('payment.')->group(function () {
         Route::get('/', [UserDashboardController::class, 'payment'])->name('index');
+        Route::get('/finish', [UserDashboardController::class, 'paymentFinish'])->name('finish');
         Route::post('/process', [UserDashboardController::class, 'processPayment'])->name('process');
     });
 

@@ -272,7 +272,7 @@ class Loan extends Model
         $this->update([
             'is_extended' => true,
             'original_due_date' => $this->due_date,
-            'due_date' => $this->due_date->addDays($additionalDays),
+            'due_date' => $this->due_date->addDays((int) $additionalDays),
             'extended_at' => now(),
             'status' => 'extended',
         ]);
@@ -288,7 +288,7 @@ class Loan extends Model
         $this->update([
             'status' => 'active',
             'loan_date' => now(),
-            'due_date' => now()->addDays($loanDays),
+            'due_date' => now()->addDays((int) $loanDays),
             'processed_by' => $processedBy,
             'pickup_deadline' => null,
         ]);

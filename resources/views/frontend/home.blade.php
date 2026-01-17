@@ -62,8 +62,7 @@
 
                 <div class="relative" data-aos="fade-left">
                     <div class="relative z-10">
-                        {{-- <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800" alt="Library"
-                            class="rounded-2xl shadow-2xl"> --}}
+                        <img src="{{ asset('images/hero.png') }}" alt="Library" class="rounded-2xl shadow-2xl">
                     </div>
                     <!-- Floating Cards -->
                     <div
@@ -218,8 +217,8 @@
                         Koleksi terbaik pilihan perpustakaan
                     </p>
                 </div>
-                <a href="{{ route('books.index') }}" class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold"
-                    data-aos="fade-left">
+                <a href="{{ route('books.index') }}"
+                    class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold" data-aos="fade-left">
                     Lihat Semua →
                 </a>
             </div>
@@ -295,8 +294,8 @@
                         E-books dan jurnal terkini
                     </p>
                 </div>
-                <a href="{{ route('digital.index') }}" class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold"
-                    data-aos="fade-left">
+                <a href="{{ route('digital.index') }}"
+                    class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold" data-aos="fade-left">
                     Lihat Semua →
                 </a>
             </div>
