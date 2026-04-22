@@ -26,6 +26,10 @@ class LoanResource extends Resource
 
     protected static ?int $navigationSort = 4;
 
+    protected static ?string $modelLabel = 'Peminjaman';
+
+    protected static ?string $pluralModelLabel = 'Peminjaman';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -279,7 +283,7 @@ class LoanResource extends Resource
 
                 // CONFIRM PICKUP ACTION (NEW)
                 Tables\Actions\Action::make('confirmPickup')
-                    ->label('Confirm Pickup')
+                    ->label('Konfirmasi Pengambilan')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->visible(fn(Loan $record) => $record->status === 'pending_pickup')
@@ -392,7 +396,7 @@ class LoanResource extends Resource
 
                 // CANCEL PENDING PICKUP ACTION (NEW)
                 Tables\Actions\Action::make('cancelPendingPickup')
-                    ->label('Cancel Request')
+                    ->label('Batalkan Request')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
                     ->visible(fn(Loan $record) => $record->status === 'pending_pickup')

@@ -26,6 +26,10 @@ class FineResource extends Resource
 
     protected static ?int $navigationSort = 6;
 
+    protected static ?string $modelLabel = 'Denda';
+
+    protected static ?string $pluralModelLabel = 'Denda';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -84,7 +88,7 @@ class FineResource extends Resource
                     ->label('User')
                     ->searchable(['name', 'nim'])
                     ->sortable()
-                    ->description(fn (Fine $record) => $record->user->nim),
+                    ->description(fn(Fine $record) => $record->user->nim),
 
                 Tables\Columns\TextColumn::make('loan.bookItem.book.title')
                     ->label('Buku')
@@ -124,7 +128,7 @@ class FineResource extends Resource
                         'success' => 'paid',
                         'info' => 'waived',
                     ])
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
                         'unpaid' => 'Belum Dibayar',
                         'paid' => 'Lunas',
                         'waived' => 'Dibebaskan',
@@ -159,7 +163,7 @@ class FineResource extends Resource
 
                 Tables\Filters\Filter::make('high_fines')
                     ->label('Denda Tinggi (> Rp 25.000)')
-                    ->query(fn (Builder $query): Builder => $query->where('amount', '>', 25000)),
+                    ->query(fn(Builder $query): Builder => $query->where('amount', '>', 25000)),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -167,13 +171,13 @@ class FineResource extends Resource
                 // PAYMENT GATEWAY ACTIONS
 
                 Tables\Actions\Action::make('generateQRIS')
-                    ->label('Generate QRIS')
+                    ->label('Buat QRIS')
                     ->icon('heroicon-o-qr-code')
                     ->color('info')
-                    ->visible(fn (Fine $record) => $record->status === 'unpaid')
+                    ->visible(fn(Fine $record) => $record->status === 'unpaid')
                     ->requiresConfirmation()
                     ->modalHeading('Generate QRIS Payment')
-                    ->modalDescription(fn (Fine $record) => "Generate QRIS untuk pembayaran denda Rp " . number_format((float)$record->amount, 0, ',', '.'))
+                    ->modalDescription(fn(Fine $record) => "Generate QRIS untuk pembayaran denda Rp " . number_format((float)$record->amount, 0, ',', '.'))
                     ->modalSubmitActionLabel('Generate QRIS')
                     ->action(function (Fine $record) {
                         try {
@@ -191,7 +195,6 @@ class FineResource extends Resource
                             if ($snapUrl) {
                                 return redirect()->away($snapUrl);
                             }
-
                         } catch (\Exception $e) {
                             \Filament\Notifications\Notification::make()
                                 ->title('Gagal Generate QRIS')
@@ -202,10 +205,10 @@ class FineResource extends Resource
                     }),
 
                 Tables\Actions\Action::make('generateVA')
-                    ->label('Generate VA')
+                    ->label('Buat VA')
                     ->icon('heroicon-o-credit-card')
                     ->color('warning')
-                    ->visible(fn (Fine $record) => $record->status === 'unpaid')
+                    ->visible(fn(Fine $record) => $record->status === 'unpaid')
                     ->form([
                         Forms\Components\Select::make('bank')
                             ->label('Bank')
@@ -236,7 +239,6 @@ class FineResource extends Resource
                             if ($snapUrl) {
                                 return redirect()->away($snapUrl);
                             }
-
                         } catch (\Exception $e) {
                             \Filament\Notifications\Notification::make()
                                 ->title('Gagal Generate VA')
@@ -247,15 +249,15 @@ class FineResource extends Resource
                     }),
 
                 Tables\Actions\Action::make('checkPaymentStatus')
-                    ->label('Check Status')
+                    ->label('Cek Status Pembayaran')
                     ->icon('heroicon-o-arrow-path')
                     ->color('gray')
                     ->visible(function (Fine $record) {
                         // Show jika ada pending transaction
                         return $record->status === 'unpaid' &&
-                               PaymentTransaction::where('fine_id', $record->id)
-                                   ->where('status', 'pending')
-                                   ->exists();
+                            PaymentTransaction::where('fine_id', $record->id)
+                            ->where('status', 'pending')
+                            ->exists();
                     })
                     ->action(function (Fine $record) {
                         try {
@@ -277,12 +279,12 @@ class FineResource extends Resource
 
                             if ($status['success']) {
                                 $transactionStatus = $status['status'];
-                                
+
                                 // Jika sukses, update transaksi dan fine
                                 if (in_array($transactionStatus, ['settlement', 'capture'])) {
                                     $transactionId = data_get($status['data'], 'transaction_id');
                                     $transaction->markAsSuccess($transactionId);
-                                    
+
                                     // Proses pembayaran denda
                                     $record->processPayment(
                                         amount: (float) $transaction->amount,
@@ -309,7 +311,6 @@ class FineResource extends Resource
                                     ->danger()
                                     ->send();
                             }
-
                         } catch (\Exception $e) {
                             \Filament\Notifications\Notification::make()
                                 ->title('Error')
@@ -325,16 +326,16 @@ class FineResource extends Resource
                     ->label('Bayar Manual')
                     ->icon('heroicon-o-currency-dollar')
                     ->color('success')
-                    ->visible(fn (Fine $record) => $record->status === 'unpaid')
+                    ->visible(fn(Fine $record) => $record->status === 'unpaid')
                     ->form([
                         Forms\Components\TextInput::make('paid_amount')
                             ->label('Jumlah Dibayar')
                             ->numeric()
                             ->prefix('Rp')
                             ->required()
-                            ->default(fn (Fine $record) => $record->amount)
+                            ->default(fn(Fine $record) => $record->amount)
                             ->minValue(0)
-                            ->helperText(fn (Fine $record) => 'Total denda: Rp ' . number_format((float) $record->amount, 0)),
+                            ->helperText(fn(Fine $record) => 'Total denda: Rp ' . number_format((float) $record->amount, 0)),
 
                         Forms\Components\Select::make('payment_method')
                             ->label('Metode Pembayaran')
@@ -373,7 +374,7 @@ class FineResource extends Resource
                     ->label('Bebaskan')
                     ->icon('heroicon-o-shield-check')
                     ->color('info')
-                    ->visible(fn (Fine $record) => $record->status === 'unpaid' && Auth::user()->hasRole('admin'))
+                    ->visible(fn(Fine $record) => $record->status === 'unpaid' && Auth::user()->hasRole('admin'))
                     ->requiresConfirmation()
                     ->form([
                         Forms\Components\Textarea::make('waive_reason')
@@ -398,9 +399,9 @@ class FineResource extends Resource
                     ->label('Log Transaksi')
                     ->icon('heroicon-o-list-bullet')
                     ->color('gray')
-                    ->visible(fn (Fine $record) => PaymentTransaction::where('fine_id', $record->id)->exists())
+                    ->visible(fn(Fine $record) => PaymentTransaction::where('fine_id', $record->id)->exists())
                     ->modalHeading('Riwayat Transaksi Gateway')
-                    ->modalContent(fn (Fine $record) => view('filament.resources.fines.transactions-modal', [
+                    ->modalContent(fn(Fine $record) => view('filament.resources.fines.transactions-modal', [
                         'transactions' => PaymentTransaction::where('fine_id', $record->id)->latest()->get()
                     ])),
             ])

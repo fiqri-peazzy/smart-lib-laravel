@@ -25,6 +25,10 @@ class DigitalCollectionResource extends Resource
 
     protected static ?int $navigationSort = 3;
 
+    protected static ?string $modelLabel = 'Koleksi Digital';
+
+    protected static ?string $pluralModelLabel = 'Koleksi Digital';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -315,7 +319,7 @@ class DigitalCollectionResource extends Resource
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('download')
-                    ->label('Download')
+                    ->label('Unduh')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('success')
                     ->url(fn(DigitalCollection $record): string => Storage::url($record->file_path))

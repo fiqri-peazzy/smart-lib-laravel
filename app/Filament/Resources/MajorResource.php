@@ -22,6 +22,10 @@ class MajorResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    protected static ?string $modelLabel = 'Jurusan/Prodi';
+
+    protected static ?string $pluralModelLabel = 'Jurusan/Prodi';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -35,26 +39,26 @@ class MajorResource extends Resource
                             ->unique(ignoreRecord: true)
                             ->placeholder('Contoh: IF, SI, TI')
                             ->helperText('Kode singkat untuk identifikasi prodi'),
-                        
+
                         Forms\Components\TextInput::make('name')
                             ->label('Nama Lengkap')
                             ->required()
                             ->maxLength(255)
                             ->placeholder('Contoh: Teknik Informatika')
                             ->columnSpanFull(),
-                        
+
                         Forms\Components\TextInput::make('faculty')
                             ->label('Fakultas')
                             ->default('Ilmu Komputer')
                             ->required()
                             ->maxLength(255),
-                        
+
                         Forms\Components\Textarea::make('description')
                             ->label('Deskripsi')
                             ->rows(4)
                             ->columnSpanFull()
                             ->placeholder('Deskripsi singkat tentang program studi ini'),
-                        
+
                         Forms\Components\Toggle::make('is_active')
                             ->label('Status Aktif')
                             ->default(true)
@@ -74,26 +78,26 @@ class MajorResource extends Resource
                     ->sortable()
                     ->weight('bold')
                     ->size('lg'),
-                
+
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama Program Studi')
                     ->searchable()
                     ->sortable()
                     ->wrap(),
-                
+
                 Tables\Columns\TextColumn::make('faculty')
                     ->label('Fakultas')
                     ->badge()
                     ->color('info')
                     ->searchable(),
-                
+
                 Tables\Columns\TextColumn::make('users_count')
                     ->label('Jumlah Mahasiswa')
                     ->counts('users')
                     ->sortable()
                     ->badge()
                     ->color('success'),
-                
+
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Status')
                     ->boolean()
@@ -102,7 +106,7 @@ class MajorResource extends Resource
                     ->falseIcon('heroicon-o-x-circle')
                     ->trueColor('success')
                     ->falseColor('danger'),
-                
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d M Y')

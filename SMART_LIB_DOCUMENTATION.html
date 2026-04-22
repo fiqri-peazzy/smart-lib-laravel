@@ -1,0 +1,2512 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIPERPUS Fasilkom - Smart Digital Library System Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @page {
+            size: A4;
+            margin: 2cm;
+            page-break-after: always;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            font-size: 11pt;
+        }
+
+        .page-break {
+            page-break-after: always;
+            padding-bottom: 100px;
+        }
+
+        /* Cover */
+        .cover {
+            text-align: center;
+            padding: 80px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            page-break-after: always;
+            min-height: 297mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cover h1 {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .cover .subtitle {
+            font-size: 24px;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .cover .divider {
+            width: 100px;
+            height: 3px;
+            background: white;
+            margin: 30px auto;
+        }
+
+        .cover .version {
+            font-size: 14px;
+            margin-top: 60px;
+            opacity: 0.8;
+        }
+
+        .cover .date {
+            font-size: 12px;
+            margin-top: 10px;
+            opacity: 0.7;
+        }
+
+        /* Table of Contents */
+        .toc {
+            page-break-after: always;
+            padding: 40px 0;
+        }
+
+        .toc h1 {
+            font-size: 28px;
+            margin-bottom: 40px;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .toc-section {
+            margin-bottom: 20px;
+            padding-left: 0;
+        }
+
+        .toc-section h3 {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .toc-section ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+
+        .toc-section li {
+            margin-bottom: 5px;
+            font-size: 11px;
+            color: #666;
+        }
+
+        /* Main Headings */
+        h1 {
+            font-size: 24px;
+            color: #667eea;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+            page-break-after: avoid;
+        }
+
+        h2 {
+            font-size: 18px;
+            color: #764ba2;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            page-break-after: avoid;
+        }
+
+        h3 {
+            font-size: 14px;
+            color: #555;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            page-break-after: avoid;
+        }
+
+        h4 {
+            font-size: 12px;
+            color: #666;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            font-weight: bold;
+            page-break-after: avoid;
+        }
+
+        /* Paragraphs */
+        p {
+            margin-bottom: 12px;
+            text-align: justify;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        /* Code blocks */
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            color: #d63384;
+        }
+
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            page-break-inside: avoid;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+        }
+
+        thead {
+            background: #667eea;
+            color: white;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            font-size: 10px;
+        }
+
+        th {
+            font-weight: bold;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        /* Highlight boxes */
+        .highlight {
+            background: #e8f4f8;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 3px;
+            page-break-inside: avoid;
+        }
+
+        .highlight-info {
+            background: #e3f2fd;
+            border-left-color: #2196F3;
+        }
+
+        .highlight-warning {
+            background: #fff3e0;
+            border-left-color: #FF9800;
+        }
+
+        .highlight-success {
+            background: #e8f5e9;
+            border-left-color: #4CAF50;
+        }
+
+        .highlight h4 {
+            margin-top: 0;
+            color: #667eea;
+        }
+
+        /* Workflow diagram */
+        .workflow {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            page-break-inside: avoid;
+            font-family: monospace;
+            font-size: 10px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* Icons */
+        .icon {
+            display: inline-block;
+            font-size: 14px;
+            margin-right: 8px;
+        }
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .checklist li:before {
+            content: "✓ ";
+            color: #4CAF50;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .checklist li {
+            margin-bottom: 8px;
+        }
+
+        /* Feature boxes */
+        .feature-box {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            background: #fafafa;
+            page-break-inside: avoid;
+        }
+
+        .feature-box h4 {
+            color: #667eea;
+            margin-top: 0;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            font-size: 10px;
+            color: #999;
+            page-break-before: avoid;
+        }
+
+        .section-divider {
+            page-break-after: always;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============================================
+                    COVER PAGE
+    ============================================ -->
+<div class="cover">
+    <h1>SIPERPUS Fasilkom</h1>
+    <p class="subtitle">Smart Digital Library System</p>
+    <div class="divider"></div>
+    <p>Sistem Manajemen Perpustakaan Digital Terintegrasi<br>untuk Fakultas Ilmu Komputer</p>
+    <div class="version">
+        <strong>Versi 1.0</strong><br>
+        Platform: Laravel 11 | Database: MySQL | Admin: Filament CMS
+    </div>
+    <div class="date">
+        Dokumentasi Teknis & User Manual<br>
+        April 2026
+    </div>
+</div>
+
+<!-- ============================================
+            TABLE OF CONTENTS
+    ============================================ -->
+<div class="toc">
+    <h1>Daftar Isi</h1>
+    
+    <div class="toc-section">
+        <h3>1. PENGENALAN SISTEM</h3>
+        <ul>
+            <li>Apa itu SIPERPUS Fasilkom?</li>
+            <li>Tujuan dan Manfaat</li>
+            <li>Fitur Utama Sistem</li>
+            <li>Teknologi yang Digunakan</li>
+        </ul>
+    </div>
+
+    <div class="toc-section">
+        <h3>2. PANDUAN INSTALASI & SETUP</h3>
+        <ul>
+            <li>Persyaratan Sistem</li>
+            <li>Langkah-langkah Instalasi</li>
+            <li>Konfigurasi Database</li>
+            <li>Menjalankan Server</li>
+            <li>Akses Aplikasi</li>
+        </ul>
+    </div>
+
+    <div class="toc-section">
+        <h3>3. ARSITEKTUR & STRUKTUR SISTEM</h3>
+        <ul>
+            <li>Diagram Arsitektur</li>
+            <li>Model Data Utama</li>
+            <li>Modul Sistem</li>
+            <li>Hubungan Antar Modul</li>
+        </ul>
+    </div>
+
+    <div class="toc-section">
+        <h3>4. PENGGUNA & PERAN (Role Management)</h3>
+        <ul>
+            <li>4 Role Utama Sistem</li>
+            <li>Hak Akses Setiap Role</li>
+            <li>Workflow per Role</li>
+        </ul>
+    </div>
+
+    <div class="toc-section">
+        <h3>5. FITUR MANAJEMEN BUKU & KOLEKSI</h3>
+        <ul>
+            <li>Katalog Buku Fisik</li>
+            <li>Item/Copy Buku & QR Code</li>
+            <li>Kategori Buku</li>
+            <li>Koleksi Digital (E-Book)</li>
+        </ul>
+    </div>
+
+    <div class="toc-section">
+        <h3>6. ALUR PEMINJAMAN (LOAN FLOW)</h3>
+        <ul>
+            <li>Workflow Peminjaman Lengkap</li>
+            <li>Request hingga Return</li>
+            <li>Perpanjangan Peminjaman</li>
+            <li>Validasi & Business Rules</li>
+        </ul>
+    </div>
+
+    <div class="toc-section">
+        <h3>7. SISTEM BOOKING & ANTRIAN</h3>
+        <ul>
+            <li>Cara Kerja Booking</li>
+            <li>Priority System (Dosen vs Mahasiswa)</li>
+            <li>Notifikasi & Pickup Window</li>
+        </ul>
+    </div>
+
+    <div class="toc-section">
+        <h3>8. SISTEM DENDA & PEMBAYARAN</h3>
+        <ul>
+            <li>Kalkulasi Denda Otomatis</li>
+            <li>Metode Pembayaran</li>
+            <li>Status Denda</li>
+        </ul>
+    </div>
+
+    <div class="toc-section">
+        <h3>9. MODUL FRONTEND (USER)</h3>
+        <ul>
+            <li>Homepage & Browse Books</li>
+            <li>Detail Buku & Request/Booking</li>
+            <li>User Dashboard</li>
+            <li>Koleksi Digital & PDF Viewer</li>
+        </ul>
+    </div>
+
+    <div class="toc-section">
+        <h3>10. MODUL ADMIN PANEL (FILAMENT)</h3>
+        <ul>
+            <li>Dashboard & Analytics</li>
+            <li>Manajemen Resource</li>
+            <li>Laporan & Statistik</li>
+        </ul>
+    </div>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ============================================
+        1. PENGENALAN SISTEM
+    ============================================ -->
+<h1>1. Pengenalan Sistem SIPERPUS Fasilkom</h1>
+
+<h2>1.1 Apa itu SIPERPUS Fasilkom?</h2>
+
+<p>
+    <strong>SIPERPUS Fasilkom</strong> adalah sistem manajemen perpustakaan digital yang dirancang khusus untuk Fakultas Ilmu Komputer. Sistem ini menggabungkan fitur-fitur manajemen buku fisik dengan koleksi digital dalam satu platform terintegrasi yang mudah digunakan.
+</p>
+
+<p>
+    Sistem ini memungkinkan mahasiswa, dosen, dan staff perpustakaan untuk mengelola peminjaman buku, booking, pembayaran denda, dan akses koleksi e-book dengan efisien. Semua proses dapat dilakukan melalui aplikasi web yang responsif dan user-friendly.
+</p>
+
+<h2>1.2 Tujuan & Manfaat Sistem</h2>
+
+<div class="highlight highlight-success">
+    <h4>📌 Tujuan Utama:</h4>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li>Modernisasi pengelolaan perpustakaan dengan sistem digital</li>
+        <li>Meningkatkan efisiensi operasional staff perpustakaan</li>
+        <li>Memberikan kemudahan akses informasi bagi pengguna</li>
+        <li>Mengurangi waktu tunggu dan proses manual</li>
+        <li>Menyediakan statistik dan laporan real-time</li>
+    </ul>
+</div>
+
+<h3>Manfaat untuk Berbagai Pengguna:</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Pengguna</th>
+            <th>Manfaat</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Mahasiswa</strong></td>
+            <td>Cari buku mudah, booking online, tracking peminjaman, akses e-book</td>
+        </tr>
+        <tr>
+            <td><strong>Dosen</strong></td>
+            <td>Kuota peminjaman lebih tinggi, priority booking, extended loan period</td>
+        </tr>
+        <tr>
+            <td><strong>Staff Perpustakaan</strong></td>
+            <td>Automasi proses, denda otomatis, laporan real-time, notifikasi user</td>
+        </tr>
+        <tr>
+            <td><strong>Admin</strong></td>
+            <td>Kontrol penuh sistem, user management, analytics, konfigurasi</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>1.3 Fitur Utama Sistem</h2>
+
+<div class="feature-box">
+    <h4>📚 Manajemen Koleksi</h4>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li>Katalog buku fisik dengan cover image dan metadata lengkap</li>
+        <li>Barcode & QR Code otomatis untuk setiap copy</li>
+        <li>Koleksi digital (E-Book, Jurnal, Skripsi, Modul, Paper)</li>
+        <li>Kategorisasi otomatis dan rekomendasi per program studi</li>
+    </ul>
+</div>
+
+<div class="feature-box">
+    <h4>🔄 Sistem Peminjaman</h4>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li>Request peminjaman online dengan validasi otomatis</li>
+        <li>Checkout via QR Code scanning</li>
+        <li>Tracking peminjaman real-time</li>
+        <li>Perpanjangan dengan validasi business rules</li>
+        <li>Auto-calculate durasi berbeda per role (Dosen vs Mahasiswa)</li>
+    </ul>
+</div>
+
+<div class="feature-box">
+    <h4>📅 Sistem Booking</h4>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li>Booking untuk buku yang sedang dipinjam</li>
+        <li>Notifikasi otomatis saat buku tersedia</li>
+        <li>Priority queue (Dosen lebih prioritas)</li>
+        <li>3-hari pickup window</li>
+    </ul>
+</div>
+
+<div class="feature-box">
+    <h4>💰 Sistem Denda & Pembayaran</h4>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li>Auto-calculate denda overdue (Rp 5.000/hari)</li>
+        <li>Metode pembayaran: Cash, Transfer, QRIS</li>
+        <li>Pembayaran bisa di-waive oleh admin</li>
+        <li>Tracking pembayaran lengkap</li>
+    </ul>
+</div>
+
+<div class="feature-box">
+    <h4>👤 User Management</h4>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li>4 Role dengan hak akses berbeda</li>
+        <li>Credit score tracking (0-100)</li>
+        <li>Status user (active, suspended, graduated)</li>
+        <li>Kuota peminjaman per role</li>
+    </ul>
+</div>
+
+<h2>1.4 Teknologi yang Digunakan</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Komponen</th>
+            <th>Teknologi</th>
+            <th>Versi</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Backend Framework</strong></td>
+            <td>Laravel</td>
+            <td>11.0</td>
+        </tr>
+        <tr>
+            <td><strong>Database</strong></td>
+            <td>MySQL / MariaDB</td>
+            <td>5.7+</td>
+        </tr>
+        <tr>
+            <td><strong>Admin Panel</strong></td>
+            <td>Filament CMS</td>
+            <td>3.3+</td>
+        </tr>
+        <tr>
+            <td><strong>Frontend Framework</strong></td>
+            <td>Blade Templates + Alpine.js</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td><strong>CSS Framework</strong></td>
+            <td>TailwindCSS</td>
+            <td>3.0+</td>
+        </tr>
+        <tr>
+            <td><strong>QR Code Generator</strong></td>
+            <td>Endroid QR Code</td>
+            <td>6.1+</td>
+        </tr>
+        <tr>
+            <td><strong>Permission System</strong></td>
+            <td>Spatie Laravel Permission</td>
+            <td>Latest</td>
+        </tr>
+        <tr>
+            <td><strong>Payment Gateway</strong></td>
+            <td>Midtrans</td>
+            <td>2.6+</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="section-divider"></div>
+
+<!-- ============================================
+    2. PANDUAN INSTALASI & SETUP
+    ============================================ -->
+<h1>2. Panduan Instalasi & Setup Sistem</h1>
+
+<h2>2.1 Persyaratan Sistem</h2>
+
+<h3>Hardware Minimum:</h3>
+<ul style="margin-left: 30px;">
+    <li><strong>Processor:</strong> Intel Core i3 atau setara</li>
+    <li><strong>RAM:</strong> 4 GB minimum (8 GB recommended)</li>
+    <li><strong>Storage:</strong> 2 GB space minimum</li>
+    <li><strong>Network:</strong> Internet connection untuk dependencies</li>
+</ul>
+
+<h3>Software Requirements:</h3>
+<ul style="margin-left: 30px;">
+    <li><strong>PHP:</strong> versi 8.2 atau lebih tinggi</li>
+    <li><strong>Composer:</strong> PHP Package Manager (terbaru)</li>
+    <li><strong>Node.js:</strong> versi 16+ (untuk build assets)</li>
+    <li><strong>MySQL/MariaDB:</strong> versi 5.7+</li>
+    <li><strong>Text Editor:</strong> Visual Studio Code (recommended)</li>
+    <li><strong>Server Local:</strong> Laragon atau XAMPP</li>
+</ul>
+
+<h2>2.2 Langkah-Langkah Instalasi</h2>
+
+<h3>Step 1: Siapkan Local Server (XAMPP/Laragon)</h3>
+
+<div class="highlight highlight-warning">
+    <h4>⚠️ Cara menggunakan XAMPP:</h4>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li>Download XAMPP dari https://www.apachefriends.org</li>
+        <li>Install dengan default settings</li>
+        <li>Buka Control Panel XAMPP</li>
+        <li>Start layanan <code>Apache</code> dan <code>MySQL</code></li>
+        <li>Pastikan port 3306 (MySQL) dan 80 (Apache) tidak terpakai</li>
+    </ul>
+</div>
+
+<p><strong>Atau menggunakan Laragon (Recommended):</strong></p>
+<ul style="margin-left: 30px;">
+    <li>Download Laragon dari https://laragon.org</li>
+    <li>Install dan buka aplikasi</li>
+    <li>Klik tombol "Start All" untuk menjalankan server</li>
+    <li>Laragon otomatis setup virtual host untuk project</li>
+</ul>
+
+<h3>Step 2: Clone atau Copy Project</h3>
+
+<p>Asumsikan project sudah berada di <code>c:\xampp\htdocs\smart-lib</code> (untuk XAMPP) atau folder htdocs di Laragon.</p>
+
+<h3>Step 3: Buka Terminal di VS Code</h3>
+
+<div class="highlight highlight-info">
+    <h4>🔹 Cara membuka terminal di VS Code:</h4>
+    <ol style="margin: 0; padding-left: 20px;">
+        <li>Buka VS Code</li>
+        <li>Klik menu <code>File → Open Folder</code></li>
+        <li>Pilih folder <code>smart-lib</code></li>
+        <li>Tekan <code>Ctrl + `</code> (backtick) atau <code>Ctrl + Shift + `</code> untuk buka terminal</li>
+        <li>Jika ingin menggunakan Bash, klik dropdown terminal pilih <code>bash</code></li>
+    </ol>
+</div>
+
+<h3>Step 4: Install PHP Dependencies (Composer)</h3>
+
+<p>Jalankan command berikut di terminal:</p>
+
+<pre>composer install</pre>
+
+<p>Proses ini akan mengunduh dan install semua library PHP yang diperlukan. Tunggu hingga selesai (biasanya 2-5 menit).</p>
+
+<h3>Step 5: Install Node.js Dependencies (NPM)</h3>
+
+<pre>npm install</pre>
+
+<p>Atau jika menggunakan Yarn:</p>
+
+<pre>yarn install</pre>
+
+<h3>Step 6: Setup Environment File</h3>
+
+<p>Copy file <code>.env.example</code> menjadi <code>.env</code>:</p>
+
+<pre>copy .env.example .env</pre>
+
+<p>Atau di terminal Linux/Mac:</p>
+
+<pre>cp .env.example .env</pre>
+
+<h3>Step 7: Generate Laravel Application Key</h3>
+
+<pre>php artisan key:generate</pre>
+
+<p>Proses ini akan menggenerate <code>APP_KEY</code> di file <code>.env</code> untuk encryption.</p>
+
+<h2>2.3 Konfigurasi Database</h2>
+
+<h3>Langkah 1: Buat Database</h3>
+
+<p><strong>Menggunakan phpMyAdmin (XAMPP):</strong></p>
+<ol style="margin-left: 30px;">
+    <li>Buka browser dan akses <code>http://localhost/phpmyadmin</code></li>
+    <li>Login dengan user <code>root</code> (password kosong default)</li>
+    <li>Klik menu <code>Databases</code></li>
+    <li>Isi nama database: <code>smart_lib</code></li>
+    <li>Pilih collation: <code>utf8mb4_unicode_ci</code></li>
+    <li>Klik <code>Create</code></li>
+</ol>
+
+<h3>Langkah 2: Konfigurasi File .env</h3>
+
+<p>Edit file <code>.env</code> dan sesuaikan dengan konfigurasi database Anda:</p>
+
+<pre>DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=smart_lib
+DB_USERNAME=root
+DB_PASSWORD=</pre>
+
+<p><strong>Penjelasan:</strong></p>
+<ul style="margin-left: 30px;">
+    <li><code>DB_HOST</code>: Alamat server database (localhost = 127.0.0.1)</li>
+    <li><code>DB_PORT</code>: Port MySQL (default: 3306)</li>
+    <li><code>DB_DATABASE</code>: Nama database yang baru dibuat</li>
+    <li><code>DB_USERNAME</code>: Username database (default: root)</li>
+    <li><code>DB_PASSWORD</code>: Password database (kosong jika tidak ada)</li>
+</ul>
+
+<h3>Langkah 3: Jalankan Migration</h3>
+
+<p>Migration adalah perintah untuk membuat table-table database secara otomatis:</p>
+
+<pre>php artisan migrate</pre>
+
+<p>Proses ini akan membuat table berikut:</p>
+<ul style="margin-left: 30px;">
+    <li><code>users</code> - Data pengguna</li>
+    <li><code>books</code> - Katalog buku</li>
+    <li><code>book_items</code> - Copy/item buku fisik</li>
+    <li><code>book_categories</code> - Kategori buku</li>
+    <li><code>loans</code> - Data peminjaman</li>
+    <li><code>bookings</code> - Data booking</li>
+    <li><code>fines</code> - Data denda</li>
+    <li><code>digital_collections</code> - Koleksi digital (e-book)</li>
+    <li>Dan table pendukung lainnya...</li>
+</ul>
+
+<h3>Langkah 4: Seed Database (Optional - untuk test data)</h3>
+
+<p>Jalankan seeder untuk mengisi data initial (opsional):</p>
+
+<pre>php artisan db:seed</pre>
+
+<p>Atau jika ingin seed seeder tertentu:</p>
+
+<pre>php artisan db:seed --class=BookSeeder</pre>
+
+<h2>2.4 Build Frontend Assets</h2>
+
+<p>Kompilasi CSS dan JavaScript:</p>
+
+<pre>npm run build</pre>
+
+<p>Atau untuk development mode dengan auto-reload:</p>
+
+<pre>npm run dev</pre>
+
+<h2>2.5 Menjalankan Server</h2>
+
+<p>Buka terminal baru (jangan tutup terminal yang sudah run) dan jalankan:</p>
+
+<pre>php artisan serve</pre>
+
+<p>Atau dengan custom host dan port:</p>
+
+<pre>php artisan serve --host=0.0.0.0 --port=8000</pre>
+
+<h2>2.6 Akses Aplikasi</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>URL</th>
+            <th>Akses</th>
+            <th>Keterangan</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>http://localhost:8000</code></td>
+            <td>Frontend</td>
+            <td>Homepage, katalog buku, user dashboard</td>
+        </tr>
+        <tr>
+            <td><code>http://localhost:8000/admin</code></td>
+            <td>Admin Panel</td>
+            <td>Filament CMS untuk management</td>
+        </tr>
+        <tr>
+            <td><code>http://localhost:8000/login</code></td>
+            <td>Login</td>
+            <td>Halaman login user</td>
+        </tr>
+        <tr>
+            <td><code>http://localhost:8000/register</code></td>
+            <td>Register</td>
+            <td>Halaman daftar user baru (mahasiswa)</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="highlight highlight-success">
+    <h4>✅ Setup Selesai!</h4>
+    <p>Jika tidak ada error, sistem sudah siap digunakan. Akses frontend di <code>http://localhost:8000</code> dan admin di <code>http://localhost:8000/admin</code></p>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ============================================
+    3. ARSITEKTUR & STRUKTUR SISTEM
+    ============================================ -->
+<h1>3. Arsitektur & Struktur Sistem</h1>
+
+<h2>3.1 Diagram Arsitektur Umum</h2>
+
+<div class="workflow">
+┌─────────────────────────────────────────────────────┐
+│                   USERS / CLIENTS                    │
+│  Mahasiswa | Dosen | Staff | Admin                   │
+└────────┬────────────────────────┬────────────────────┘
+         │                        │
+    ┌────▼─────────┐      ┌──────▼──────────┐
+    │ FRONTEND     │      │  ADMIN PANEL    │
+    │ (Web App)    │      │  (Filament CMS) │
+    │              │      │                 │
+    │ - Homepage   │      │ - Dashboard     │
+    │ - Katalog    │      │ - Resources     │
+    │ - Dashboard  │      │ - Widgets       │
+    │ - E-Library  │      │ - Reports       │
+    └────┬─────────┘      └──────┬──────────┘
+         │                       │
+         └───────────┬───────────┘
+                     │
+              ┌──────▼──────────┐
+              │  LARAVEL API    │
+              │  (Controllers)  │
+              │                 │
+              │ - UserController│
+              │ - BookController│
+              │ - LoanController│
+              │ - BookingCtrl   │
+              │ - FineController│
+              └────────┬────────┘
+                       │
+         ┌─────────────┼─────────────┐
+         │             │             │
+    ┌────▼────┐   ┌───▼────┐   ┌──▼──────┐
+    │ MODELS  │   │SERVICE │   │MIDDLEWARE
+    │         │   │ LAYER  │   │
+    │ - User  │   │        │   │ - Auth
+    │ - Book  │   │ Payment│   │ - Role Check
+    │ - Loan  │   │ Service│   │ - CORS
+    │ - Fine  │   │        │   │
+    │ - Booking   │ Denda  │   │
+    └────┬────┘   │ Calc   │   └──────────┘
+         │        └────────┘
+         │
+    ┌────▼──────────────────────┐
+    │  DATABASE (MySQL)          │
+    │                            │
+    │ - users                    │
+    │ - books                    │
+    │ - book_items               │
+    │ - book_categories          │
+    │ - loans                    │
+    │ - bookings                 │
+    │ - fines                    │
+    │ - digital_collections      │
+    │ - dan table lainnya        │
+    └────────────────────────────┘
+</div>
+
+<h2>3.2 Model Data Utama (Entity Relationship)</h2>
+
+<h3>Penjelasan Hubungan Antar Tabel:</h3>
+
+<div class="highlight highlight-info">
+    <h4>🔹 Hubungan Buku (Book)</h4>
+    <p><strong>Tujuan:</strong> Menyimpan informasi katalog buku. Satu book bisa punya banyak copy (book_items).</p>
+    <p><strong>Relasi:</strong></p>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li><code>Book → BookItem</code>: One-to-Many (1 buku bisa punya N copy)</li>
+        <li><code>Book → BookCategory</code>: Many-to-Many (1 buku bisa punya N kategori)</li>
+    </ul>
+</div>
+
+<div class="highlight highlight-info">
+    <h4>🔹 Hubungan Peminjaman (Loan)</h4>
+    <p><strong>Tujuan:</strong> Mencatat setiap transaksi peminjaman buku. Melacak siapa yang meminjam, kapan, sampai kapan, dan status.</p>
+    <p><strong>Relasi:</strong></p>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li><code>Loan → User</code>: Many-to-One (N peminjaman dari 1 user)</li>
+        <li><code>Loan → BookItem</code>: Many-to-One (N peminjaman dari 1 copy buku)</li>
+        <li><code>Loan → Fine</code>: One-to-One (1 peminjaman bisa punya 1 denda ketika overdue)</li>
+    </ul>
+</div>
+
+<div class="highlight highlight-info">
+    <h4>🔹 Hubungan Booking</h4>
+    <p><strong>Tujuan:</strong> Mencatat antrian ketika buku sedang dipinjam user lain.</p>
+    <p><strong>Relasi:</strong></p>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li><code>Booking → User</code>: Many-to-One (N booking dari 1 user)</li>
+        <li><code>Booking → Book</code>: Many-to-One (N booking untuk 1 buku)</li>
+    </ul>
+</div>
+
+<div class="highlight highlight-info">
+    <h4>🔹 Hubungan Denda (Fine)</h4>
+    <p><strong>Tujuan:</strong> Mencatat denda ketika peminjaman overdue dan tracking pembayaran.</p>
+    <p><strong>Relasi:</strong></p>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li><code>Fine → Loan</code>: One-to-One (1 denda dari 1 peminjaman)</li>
+        <li><code>Fine → User</code>: Many-to-One (N denda dari 1 user)</li>
+    </ul>
+</div>
+
+<h2>3.3 Struktur Folder Project</h2>
+
+<pre>smart-lib/
+│
+├── app/                          # Code aplikasi (Business Logic)
+│   ├── Models/                   # Database Models
+│   │   ├── User.php              # Model User
+│   │   ├── Book.php              # Model Buku
+│   │   ├── BookItem.php          # Model Copy/Item Buku
+│   │   ├── Loan.php              # Model Peminjaman
+│   │   ├── Booking.php           # Model Booking
+│   │   ├── Fine.php              # Model Denda
+│   │   ├── DigitalCollection.php # Model E-Book
+│   │   └── ...
+│   │
+│   ├── Http/
+│   │   ├── Controllers/          # Controllers untuk Frontend
+│   │   │   ├── UserController.php
+│   │   │   ├── BookController.php
+│   │   │   ├── LoanController.php
+│   │   │   └── ...
+│   │   │
+│   │   ├── Requests/             # Form Validation
+│   │   └── Middleware/           # Middleware (Auth, etc)
+│   │
+│   ├── Filament/                 # Admin Panel (Filament CMS)
+│   │   ├── Resources/            # Resource Management
+│   │   │   ├── BookResource.php
+│   │   │   ├── LoanResource.php
+│   │   │   ├── UserResource.php
+│   │   │   └── ...
+│   │   ├── Widgets/              # Dashboard Widgets
+│   │   └── Pages/                # Custom Pages
+│   │
+│   ├── Services/                 # Business Logic Services
+│   │   ├── PaymentService.php    # Handle Payment
+│   │   └── ...
+│   │
+│   └── Providers/                # Service Providers
+│
+├── resources/                    # Frontend Assets
+│   ├── views/                    # Blade Templates
+│   │   ├── frontend/             # Public Pages
+│   │   │   ├── home.blade.php
+│   │   │   ├── books/
+│   │   │   └── digital/
+│   │   ├── user/                 # User Dashboard
+│   │   │   ├── dashboard.blade.php
+│   │   │   └── ...
+│   │   └── auth/                 # Auth Pages
+│   │
+│   ├── css/                      # CSS (TailwindCSS)
+│   │   └── app.css
+│   │
+│   └── js/                       # JavaScript
+│       └── app.js
+│
+├── database/
+│   ├── migrations/               # Database Schema
+│   │   ├── create_users_table.php
+│   │   ├── create_books_table.php
+│   │   └── ...
+│   │
+│   ├── seeders/                  # Initial Data
+│   │   ├── BookSeeder.php
+│   │   └── ...
+│   │
+│   └── factories/                # Fake Data Generators
+│
+├── routes/
+│   ├── web.php                   # Frontend Routes
+│   └── auth.php                  # Auth Routes
+│
+├── tests/                        # Unit & Feature Tests
+│   ├── Unit/
+│   └── Feature/
+│
+├── public/                       # Public Assets
+│   ├── index.php                 # Entry Point
+│   ├── css/                      # Compiled CSS
+│   ├── js/                       # Compiled JS
+│   └── images/
+│
+├── storage/                      # Storage (Logs, Cache, etc)
+│   ├── app/                      # Application Storage
+│   ├── logs/                     # Log Files
+│   └── framework/
+│
+├── .env                          # Environment Variables
+├── .env.example                  # Example ENV
+├── composer.json                 # PHP Dependencies
+├── package.json                  # Node Dependencies
+├── artisan                        # Laravel CLI
+└── vite.config.js                # Vite Config (Asset Bundler)</pre>
+
+<h2>3.4 Modul Sistem (High-Level Overview)</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Modul</th>
+            <th>Fungsi</th>
+            <th>File Utama</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>User Management</strong></td>
+            <td>Manajemen pengguna, role, permission</td>
+            <td>User.php, UserResource.php</td>
+        </tr>
+        <tr>
+            <td><strong>Book Catalog</strong></td>
+            <td>CRUD buku, kategorisasi, stok tracking</td>
+            <td>Book.php, BookResource.php</td>
+        </tr>
+        <tr>
+            <td><strong>Book Items</strong></td>
+            <td>Manajemen copy buku, barcode, QR code</td>
+            <td>BookItem.php, BookItemResource.php</td>
+        </tr>
+        <tr>
+            <td><strong>Loan Management</strong></td>
+            <td>Request, checkout, return, extend</td>
+            <td>Loan.php, LoanResource.php</td>
+        </tr>
+        <tr>
+            <td><strong>Booking System</strong></td>
+            <td>Antrian booking, priority, notification</td>
+            <td>Booking.php, BookingResource.php</td>
+        </tr>
+        <tr>
+            <td><strong>Fine Management</strong></td>
+            <td>Calculate denda, payment tracking</td>
+            <td>Fine.php, FineResource.php</td>
+        </tr>
+        <tr>
+            <td><strong>Digital Collection</strong></td>
+            <td>Upload e-book, metadata, access control</td>
+            <td>DigitalCollection.php, DigitalCollectionResource.php</td>
+        </tr>
+        <tr>
+            <td><strong>Payment Service</strong></td>
+            <td>Handle pembayaran denda</td>
+            <td>PaymentService.php</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="section-divider"></div>
+
+<!-- ============================================
+    4. PENGGUNA & PERAN (ROLE MANAGEMENT)
+    ============================================ -->
+<h1>4. Pengguna & Peran Sistem (Role Management)</h1>
+
+<h2>4.1 Empat Role Utama Sistem</h2>
+
+<p>SIPERPUS Fasilkom memiliki 4 role utama dengan hak akses dan fitur yang berbeda sesuai dengan kebutuhan mereka:</p>
+
+<h2>4.2 Role: ADMIN</h2>
+
+<div class="feature-box">
+    <h4>👨‍💼 Admin - Pimpinan Perpustakaan</h4>
+    <p><strong>Deskripsi:</strong> Memiliki akses penuh ke semua fitur sistem. Bertanggung jawab atas konfigurasi dan manajemen keseluruhan.</p>
+    
+    <h4>Hak Akses:</h4>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li>✓ Akses Admin Panel (Filament CMS)</li>
+        <li>✓ Manajemen User (CRUD, assign role)</li>
+        <li>✓ Manajemen Buku & Koleksi (CRUD lengkap)</li>
+        <li>✓ Manajemen Peminjaman (override, modify)</li>
+        <li>✓ Manajemen Denda (waive, modify)</li>
+        <li>✓ View Laporan & Analytics</li>
+        <li>✓ Konfigurasi Sistem</li>
+        <li>✓ Audit Log & History</li>
+    </ul>
+
+    <h4>Workflow Utama:</h4>
+    <ol style="margin: 0; padding-left: 20px;">
+        <li>Login dengan credentials admin</li>
+        <li>Akses Admin Panel di <code>/admin</code></li>
+        <li>Kelola resource melalui Filament interface</li>
+        <li>View analytics dan laporan</li>
+        <li>Configure sistem settings</li>
+    </ol>
+</div>
+
+<h2>4.3 Role: STAFF PERPUSTAKAAN</h2>
+
+<div class="feature-box">
+    <h4>👨‍💻 Staff Perpustakaan - Operator</h4>
+    <p><strong>Deskripsi:</strong> Mengelola operasional harian perpustakaan. Handle proses peminjaman, pengembalian, booking, dan denda.</p>
+    
+    <h4>Hak Akses:</h4>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li>✓ Access Admin Panel (read-only untuk beberapa bagian)</li>
+        <li>✓ View & Process Loans (checkout, return)</li>
+        <li>✓ View & Process Bookings</li>
+        <li>✓ Manage Fines (record payment, waive dengan approval)</li>
+        <li>✓ View Book Inventory</li>
+        <li>✓ Generate Reports</li>
+        <li>✗ Tidak bisa edit user</li>
+        <li>✗ Tidak bisa konfigurasi sistem</li>
+    </ul>
+
+    <h4>Workflow Utama:</h4>
+    <ol style="margin: 0; padding-left: 20px;">
+        <li>User datang ke perpustakaan dengan QR code</li>
+        <li>Staff scan QR code untuk verify request</li>
+        <li>Staff process checkout (set loan_date)</li>
+        <li>Saat user return: record return & kondisi buku</li>
+        <li>Sistem auto-calculate denda jika overdue</li>
+        <li>Record pembayaran denda</li>
+        <li>Generate laporan harian/bulanan</li>
+    </ol>
+</div>
+
+<h2>4.4 Role: DOSEN</h2>
+
+<div class="feature-box">
+    <h4>👨‍🏫 Dosen - Pengajar/Akademisi</h4>
+    <p><strong>Deskripsi:</strong> Pengguna dengan privilege lebih tinggi dibanding mahasiswa. Mendapat benefit special untuk penelitian dan pengajaran.</p>
+    
+    <h4>Hak Akses:</h4>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li>✓ Access User Dashboard</li>
+        <li>✓ Search & Browse Katalog Buku</li>
+        <li>✓ Request/Pinjam Buku (PRIORITAS TINGGI)</li>
+        <li>✓ Booking Buku (PRIORITY QUEUE)</li>
+        <li>✓ Access Koleksi Digital</li>
+        <li>✓ View Profile & Riwayat Peminjaman</li>
+        <li>✓ Perpanjangan Buku (Extended Duration)</li>
+        <li>✗ Tidak bisa akses admin panel</li>
+    </ul>
+
+    <h4>Privilege Khusus Dosen:</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Privilege</th>
+                <th>Dosen</th>
+                <th>Mahasiswa</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Durasi Peminjaman</strong></td>
+                <td>21 hari (3 minggu)</td>
+                <td>14 hari (2 minggu)</td>
+            </tr>
+            <tr>
+                <td><strong>Max Loan (Kuota)</strong></td>
+                <td>10 buku</td>
+                <td>3 buku</td>
+            </tr>
+            <tr>
+                <td><strong>Perpanjangan</strong></td>
+                <td>2x (bisa extend 2 kali)</td>
+                <td>1x (hanya 1x extend)</td>
+            </tr>
+            <tr>
+                <td><strong>Booking Priority</strong></td>
+                <td>HIGH (posisi awal)</td>
+                <td>NORMAL (first-come)</td>
+            </tr>
+            <tr>
+                <td><strong>Late Fee Waive</strong></td>
+                <td>Bisa dipertimbangkan admin</td>
+                <td>Harus bayar penuh</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4>Workflow Peminjaman Dosen:</h4>
+    <ol style="margin: 0; padding-left: 20px;">
+        <li>Login ke dashboard user</li>
+        <li>Search buku di katalog</li>
+        <li>Click "Request Buku" atau "Booking"</li>
+        <li>Sistem akan prioritize request (durasi lebih lama)</li>
+        <li>Dapatkan notif untuk pickup</li>
+        <li>Bisa perpanjang 2x selama belum overdue</li>
+        <li>Return buku sesuai due date</li>
+    </ol>
+</div>
+
+<h2>4.5 Role: MAHASISWA</h2>
+
+<div class="feature-box">
+    <h4>👨‍🎓 Mahasiswa - User Utama</h4>
+    <p><strong>Deskripsi:</strong> Role default untuk pengguna regular. Bisa meminjam buku dengan kuota dan durasi standar.</p>
+    
+    <h4>Hak Akses:</h4>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li>✓ Access User Dashboard</li>
+        <li>✓ Search & Browse Katalog Buku</li>
+        <li>✓ Request/Pinjam Buku (STANDARD)</li>
+        <li>✓ Booking Buku (FIRST-COME BASIS)</li>
+        <li>✓ Access Koleksi Digital</li>
+        <li>✓ View Profile & Riwayat Peminjaman</li>
+        <li>✓ Perpanjangan Buku (Limited Duration)</li>
+        <li>✗ Tidak bisa akses admin panel</li>
+    </ul>
+
+    <h4>Validasi Peminjaman Mahasiswa:</h4>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li>✓ Status: Active (tidak suspended/graduated)</li>
+        <li>✓ Total Fines: = 0 (semua denda sudah lunas)</li>
+        <li>✓ Active Loans: < 3 (belum capai kuota)</li>
+        <li>✓ Credit Score: >= 50 (kredibilitas cukup)</li>
+    </ul>
+
+    <h4>Workflow Peminjaman Mahasiswa:</h4>
+    <ol style="margin: 0; padding-left: 20px;">
+        <li>Login dengan NIM & password</li>
+        <li>Browse katalog buku atau search</li>
+        <li>Click "Request" pada buku yang ingin dipinjam</li>
+        <li>Sistem validasi (cek kuota, denda, status)</li>
+        <li>Jika OK: Generate QR code, terima notif</li>
+        <li>Pergi ke perpustakaan dengan QR code</li>
+        <li>Staff scan QR, terima buku</li>
+        <li>Punya 14 hari untuk return (atau perpanjang 1x)</li>
+        <li>Return buku, settle denda jika ada</li>
+    </ol>
+</div>
+
+<h2>4.6 Perbandingan Hak Akses Antar Role</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Fitur</th>
+            <th>Admin</th>
+            <th>Staff</th>
+            <th>Dosen</th>
+            <th>Mahasiswa</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Admin Panel</strong></td>
+            <td>✓ Penuh</td>
+            <td>✓ Terbatas</td>
+            <td>✗</td>
+            <td>✗</td>
+        </tr>
+        <tr>
+            <td><strong>CRUD User</strong></td>
+            <td>✓</td>
+            <td>✗</td>
+            <td>✗</td>
+            <td>✗</td>
+        </tr>
+        <tr>
+            <td><strong>CRUD Book</strong></td>
+            <td>✓</td>
+            <td>✗</td>
+            <td>✗</td>
+            <td>✗</td>
+        </tr>
+        <tr>
+            <td><strong>Process Loan</strong></td>
+            <td>✓ Override</td>
+            <td>✓ Standard</td>
+            <td>✗</td>
+            <td>✗</td>
+        </tr>
+        <tr>
+            <td><strong>Request Pinjam</strong></td>
+            <td>✗</td>
+            <td>✗</td>
+            <td>✓ Priority</td>
+            <td>✓ Standard</td>
+        </tr>
+        <tr>
+            <td><strong>Perpanjangan</strong></td>
+            <td>✓ Override</td>
+            <td>✗</td>
+            <td>✓ 2x Max</td>
+            <td>✓ 1x Max</td>
+        </tr>
+        <tr>
+            <td><strong>View Reports</strong></td>
+            <td>✓</td>
+            <td>✓</td>
+            <td>✗</td>
+            <td>✗</td>
+        </tr>
+        <tr>
+            <td><strong>Waive Fine</strong></td>
+            <td>✓</td>
+            <td>✗</td>
+            <td>✗</td>
+            <td>✗</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>4.7 Permission Model (Spatie Laravel Permission)</h2>
+
+<p>System menggunakan Spatie Laravel Permission package untuk granular permission control. Setiap role memiliki permissions yang tersusun dari:</p>
+
+<div class="highlight highlight-info">
+    <h4>🔹 Permission Struktur:</h4>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li><code>view_*</code> - Hak untuk melihat resource</li>
+        <li><code>create_*</code> - Hak untuk membuat resource baru</li>
+        <li><code>edit_*</code> - Hak untuk edit resource</li>
+        <li><code>delete_*</code> - Hak untuk delete resource</li>
+        <li><code>*_any</code> - Bisa action resource milik user lain</li>
+        <li><code>*_own</code> - Hanya bisa action resource milik sendiri</li>
+    </ul>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ============================================
+    5. FITUR MANAJEMEN BUKU & KOLEKSI
+    ============================================ -->
+<h1>5. Fitur Manajemen Buku & Koleksi</h1>
+
+<h2>5.1 Katalog Buku Fisik</h2>
+
+<h3>Informasi Buku yang Disimpan:</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Field</th>
+            <th>Tipe</th>
+            <th>Deskripsi</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>ISBN</code></td>
+            <td>String (Unique)</td>
+            <td>International Standard Book Number</td>
+        </tr>
+        <tr>
+            <td><code>Judul</code></td>
+            <td>String</td>
+            <td>Nama buku</td>
+        </tr>
+        <tr>
+            <td><code>Penulis</code></td>
+            <td>String</td>
+            <td>Nama author</td>
+        </tr>
+        <tr>
+            <td><code>Penerbit</code></td>
+            <td>String</td>
+            <td>Penerbit/Publisher</td>
+        </tr>
+        <tr>
+            <td><code>Tahun Terbit</code></td>
+            <td>Year</td>
+            <td>Tahun publikasi</td>
+        </tr>
+        <tr>
+            <td><code>Halaman</code></td>
+            <td>Integer</td>
+            <td>Total halaman buku</td>
+        </tr>
+        <tr>
+            <td><code>Bahasa</code></td>
+            <td>String</td>
+            <td>Bahasa penulis (English, Indonesia, dll)</td>
+        </tr>
+        <tr>
+            <td><code>Cover Image</code></td>
+            <td>File (Optional)</td>
+            <td>Foto cover buku</td>
+        </tr>
+        <tr>
+            <td><code>Deskripsi</code></td>
+            <td>Text</td>
+            <td>Sinopsis atau deskripsi buku</td>
+        </tr>
+        <tr>
+            <td><code>Kategori</code></td>
+            <td>Many-to-Many</td>
+            <td>Buku bisa punya multiple kategori</td>
+        </tr>
+        <tr>
+            <td><code>Featured</code></td>
+            <td>Boolean</td>
+            <td>Apakah buku ditampilkan di home (recommended)</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>Kategori Buku yang Tersedia:</h3>
+
+<p>Sistem memiliki 14 kategori buku yang spesifik untuk Fasilkom:</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>Kategori</th>
+            <th>Deskripsi</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>1</td>
+            <td><strong>Programming</strong></td>
+            <td>Bahasa pemrograman (Python, Java, C++, PHP, etc)</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td><strong>Web Development</strong></td>
+            <td>Web dev (HTML, CSS, JavaScript, React, Laravel)</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td><strong>Database</strong></td>
+            <td>Database (SQL, NoSQL, MySQL, MongoDB)</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td><strong>Mobile Development</strong></td>
+            <td>Mobile app (Android, iOS, Flutter, React Native)</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td><strong>Artificial Intelligence</strong></td>
+            <td>AI & Machine Learning</td>
+        </tr>
+        <tr>
+            <td>6</td>
+            <td><strong>Data Science</strong></td>
+            <td>Data analysis, visualization, Big Data</td>
+        </tr>
+        <tr>
+            <td>7</td>
+            <td><strong>Cyber Security</strong></td>
+            <td>Security, hacking, encryption</td>
+        </tr>
+        <tr>
+            <td>8</td>
+            <td><strong>Software Engineering</strong></td>
+            <td>Software design, architecture, testing</td>
+        </tr>
+        <tr>
+            <td>9</td>
+            <td><strong>Operating Systems</strong></td>
+            <td>OS, kernel, Linux, Windows</td>
+        </tr>
+        <tr>
+            <td>10</td>
+            <td><strong>Computer Architecture</strong></td>
+            <td>Hardware, processor, memory</td>
+        </tr>
+        <tr>
+            <td>11</td>
+            <td><strong>Cloud Computing</strong></td>
+            <td>AWS, Google Cloud, Azure</td>
+        </tr>
+        <tr>
+            <td>12</td>
+            <td><strong>UI/UX Design</strong></td>
+            <td>User interface, user experience design</td>
+        </tr>
+        <tr>
+            <td>13</td>
+            <td><strong>Algorithm & Data Structure</strong></td>
+            <td>Algoritma, struktur data, complexity</td>
+        </tr>
+        <tr>
+            <td>14</td>
+            <td><strong>General IT</strong></td>
+            <td>IT general topics, IT career, etc</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>5.2 Item/Copy Buku & QR Code Integration</h2>
+
+<h3>Konsep Item Buku:</h3>
+
+<div class="highlight highlight-info">
+    <h4>🔹 Perbedaan Book vs BookItem:</h4>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li><strong>Book</strong> = Katalog/metadata buku (judul, penulis, penerbit, dll) - Hanya 1 record per judul unik</li>
+        <li><strong>BookItem</strong> = Physical copy/eksemplar buku - Bisa banyak (misal, 3 copy dari buku yang sama)</li>
+    </ul>
+</div>
+
+<div class="highlight highlight-success">
+    <h4>✅ Contoh Praktis:</h4>
+    <p><strong>Book:</strong> "Clean Code" by Robert Martin (hanya 1 record)</p>
+    <p><strong>BookItem:</strong></p>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li>Copy #1: Barcode BOOK-2024-00001, QR Code {QR-1}, Status: Available</li>
+        <li>Copy #2: Barcode BOOK-2024-00002, QR Code {QR-2}, Status: On Loan</li>
+        <li>Copy #3: Barcode BOOK-2024-00003, QR Code {QR-3}, Status: Damaged</li>
+    </ul>
+</p>
+</div>
+
+<h3>Data Item Buku:</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Field</th>
+            <th>Tipe</th>
+            <th>Deskripsi</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>Barcode</code></td>
+            <td>String (Auto)</td>
+            <td>Format: BOOK-YYYY-XXXXX (contoh: BOOK-2024-00001)</td>
+        </tr>
+        <tr>
+            <td><code>QR Code</code></td>
+            <td>Image (Auto)</td>
+            <td>Generate otomatis saat item dibuat</td>
+        </tr>
+        <tr>
+            <td><code>Status</code></td>
+            <td>Enum</td>
+            <td>Available | On Loan | Maintenance | Lost | Damaged</td>
+        </tr>
+        <tr>
+            <td><code>Kondisi</code></td>
+            <td>Enum</td>
+            <td>Excellent | Good | Fair | Poor | Damaged</td>
+        </tr>
+        <tr>
+            <td><code>Lokasi</code></td>
+            <td>String</td>
+            <td>Rak/lokasi buku di perpustakaan (contoh: A-12-3)</td>
+        </tr>
+        <tr>
+            <td><code>Tgl Akuisisi</code></td>
+            <td>Date</td>
+            <td>Kapan buku ini diadakan/dibeli</td>
+        </tr>
+        <tr>
+            <td><code>Harga</code></td>
+            <td>Decimal</td>
+            <td>Harga perolehan buku</td>
+        </tr>
+        <tr>
+            <td><code>Catatan</code></td>
+            <td>Text</td>
+            <td>Catatan khusus (rusak halaman ke-X, dll)</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>Cara Kerja QR Code:</h3>
+
+<div class="workflow">
+┌──────────────────────────────────────┐
+│    Admin/Staff Buat Book Item        │
+│  (Sistem auto-generate QR Code)      │
+└────────────┬───────────────────────┘
+             │
+             ▼
+┌──────────────────────────────────────┐
+│   QR Code berisi:                    │
+│  - Book Item ID                      │
+│  - Barcode                           │
+│  - Book Title                        │
+│  - Unique Token                      │
+└────────────┬───────────────────────┘
+             │
+             ▼
+┌──────────────────────────────────────┐
+│  User Request Buku & Terima QR       │
+│  (Email / Print)                     │
+└────────────┬───────────────────────┘
+             │
+             ▼
+┌──────────────────────────────────────┐
+│  User Datang ke Perpustakaan         │
+│  Tunjukkan QR Code pada Staff        │
+└────────────┬───────────────────────┘
+             │
+             ▼
+┌──────────────────────────────────────┐
+│  Staff Scan QR dengan Device/Scanner │
+│  Verifikasi Data                     │
+└────────────┬───────────────────────┘
+             │
+             ▼
+┌──────────────────────────────────────┐
+│  Checkout: Record Loan Date          │
+│  Buku Status: On Loan                │
+│  User Terima Buku                    │
+└──────────────────────────────────────┘
+</div>
+
+<h2>5.3 Koleksi Digital (E-Book & Resources)</h2>
+
+<h3>Tipe Konten Digital yang Didukung:</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Tipe</th>
+            <th>Format File</th>
+            <th>Deskripsi</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>E-Book</strong></td>
+            <td>PDF, EPUB</td>
+            <td>Buku elektronik lengkap (full book)</td>
+        </tr>
+        <tr>
+            <td><strong>Jurnal</strong></td>
+            <td>PDF</td>
+            <td>Paper/jurnal ilmiah, proceedings</td>
+        </tr>
+        <tr>
+            <td><strong>Skripsi</strong></td>
+            <td>PDF</td>
+            <td>Tugas akhir mahasiswa Fasilkom</td>
+        </tr>
+        <tr>
+            <td><strong>Modul</strong></td>
+            <td>PDF, DOCX</td>
+            <td>Modul pembelajaran, handout kuliah</td>
+        </tr>
+        <tr>
+            <td><strong>Paper</strong></td>
+            <td>PDF</td>
+            <td>Research paper, artikel penelitian</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>Metadata Koleksi Digital:</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Field</th>
+            <th>Tipe</th>
+            <th>Deskripsi</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>Judul</code></td>
+            <td>String</td>
+            <td>Judul dokumen</td>
+        </tr>
+        <tr>
+            <td><code>Tipe</code></td>
+            <td>Enum</td>
+            <td>E-Book | Jurnal | Skripsi | Modul | Paper</td>
+        </tr>
+        <tr>
+            <td><code>File</code></td>
+            <td>File</td>
+            <td>Upload file (max 50MB)</td>
+        </tr>
+        <tr>
+            <td><code>Thumbnail</code></td>
+            <td>Image</td>
+            <td>Cover/preview image</td>
+        </tr>
+        <tr>
+            <td><code>Penulis</code></td>
+            <td>String</td>
+            <td>Author/penulis</td>
+        </tr>
+        <tr>
+            <td><code>Tahun</code></td>
+            <td>Year</td>
+            <td>Tahun publikasi/upload</td>
+        </tr>
+        <tr>
+            <td><code>ISBN</code></td>
+            <td>String (Optional)</td>
+            <td>ISBN jika ada</td>
+        </tr>
+        <tr>
+            <td><code>Penerbit</code></td>
+            <td>String</td>
+            <td>Penerbit/sumber publikasi</td>
+        </tr>
+        <tr>
+            <td><code>Deskripsi</code></td>
+            <td>Text</td>
+            <td>Sinopsis atau deskripsi konten</td>
+        </tr>
+        <tr>
+            <td><code>Keywords</code></td>
+            <td>Array</td>
+            <td>Tags untuk search & filter</td>
+        </tr>
+        <tr>
+            <td><code>Akses</code></td>
+            <td>Enum</td>
+            <td>Public | Private (restricted to major/role)</td>
+        </tr>
+        <tr>
+            <td><code>Major</code></td>
+            <td>Foreign Key</td>
+            <td>Program studi terkait (untuk skripsi/modul)</td>
+        </tr>
+        <tr>
+            <td><code>View Count</code></td>
+            <td>Integer</td>
+            <td>Jumlah orang yang view</td>
+        </tr>
+        <tr>
+            <td><code>Download Count</code></td>
+            <td>Integer</td>
+            <td>Jumlah orang yang download</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>User Interface Koleksi Digital:</h3>
+
+<ul style="margin-left: 30px;">
+    <li><strong>Browse Page:</strong> Grid view semua koleksi dengan filter & search</li>
+    <li><strong>Detail Page:</strong> View metadata, stats, dan action buttons</li>
+    <li><strong>PDF Viewer:</strong> In-app PDF reader dengan zoom, navigation, fullscreen</li>
+    <li><strong>Download:</strong> Direct download file asli</li>
+    <li><strong>Share:</strong> Generate shareable link dengan permission control</li>
+</ul>
+
+<div class="section-divider"></div>
+
+<!-- ============================================
+    6. ALUR PEMINJAMAN (LOAN FLOW)
+    ============================================ -->
+<h1>6. Alur Peminjaman Lengkap (Loan Flow)</h1>
+
+<h2>6.1 Workflow Peminjaman Komprehensif</h2>
+
+<p>Berikut adalah alur lengkap dari request peminjaman hingga pengembalian buku dengan semua validasi dan business rules yang diterapkan:</p>
+
+<h3>TAHAP 1: REQUEST PEMINJAMAN</h3>
+
+<div class="workflow">
+┌───────────────────────────────────────────────────┐
+│                   USER LIHAT BUKU                 │
+│                                                   │
+│  - Browse katalog atau search spesifik buku      │
+│  - Click detail buku untuk lihat deskripsi       │
+│  - View availability status & copy count         │
+└────────────────┬────────────────────────────────┘
+                 │
+                 ▼
+┌───────────────────────────────────────────────────┐
+│             CLICK BUTTON "REQUEST"                │
+│                                                   │
+│  - System show modal/form confirmation           │
+│  - User review detail peminjaman                 │
+│  - User confirm request                          │
+└────────────────┬────────────────────────────────┘
+                 │
+                 ▼
+┌───────────────────────────────────────────────────┐
+│          SYSTEM VALIDASI KELAYAKAN USER           │
+│                                                   │
+│  ✓ Status User = 'active'?                       │
+│    (bukan suspended/graduated)                   │
+│                                                   │
+│  ✓ Total Fines = 0?                              │
+│    (semua denda harus sudah lunas)               │
+│                                                   │
+│  ✓ Active Loans < max_loans?                     │
+│    (Dosen: max 10, Mahasiswa: max 3)             │
+│                                                   │
+│  ✓ Credit Score >= 50?                           │
+│    (kredibilitas user cukup)                     │
+│                                                   │
+│  ✓ Copy Tersedia?                                │
+│    (minimal 1 copy status available)             │
+└────────────────┬────────────────────────────────┘
+                 │
+          ┌──────┴──────┐
+          │             │
+       VALID          INVALID
+          │             │
+          ▼             ▼
+     ┌────────┐  ┌─────────────────┐
+     │ LOLOS  │  │ GAGAL VALIDASI  │
+     │        │  │                 │
+     │ Continue   Show Error Msg   │
+     └────┬───┘  Askuser PayFine   │
+          │      atau Extend quota │
+          │      └─────────────────┘
+          │
+          ▼
+┌───────────────────────────────────────────────────┐
+│         CREATE LOAN RECORD DI DATABASE            │
+│                                                   │
+│  - Generate unique Loan ID                       │
+│  - Set Status = 'pending' (waiting for pickup)   │
+│  - Calculate due_date berdasarkan role:          │
+│    * Dosen: 21 hari                              │
+│    * Mahasiswa: 14 hari                          │
+│  - Generate QR code untuk checkout               │
+│  - Select available book item dari pool          │
+└────────────────┬────────────────────────────────┘
+                 │
+                 ▼
+┌───────────────────────────────────────────────────┐
+│      SEND NOTIFICATION KE USER & STAFF            │
+│                                                   │
+│  EMAIL:                                          │
+│  - To: User email                                │
+│  - Subject: "Buku Siap Diambil"                  │
+│  - Body: Info buku, QR code image, due date      │
+│  - Attachment: QR code printable version         │
+│                                                   │
+│  DASHBOARD:                                      │
+│  - User lihat notif di dashboard                 │
+│  - Staff lihat pending pickup di admin           │
+└───────────────────────────────────────────────────┘
+</div>
+
+<h3>TAHAP 2: PICKUP / CHECKOUT</h3>
+
+<div class="workflow">
+┌───────────────────────────────────────────────────┐
+│     USER DATANG KE PERPUSTAKAAN                   │
+│                                                   │
+│  - Bawa QR code (dari email atau print)          │
+│  - atau cukup bilang nama/NIM                    │
+│  - Staff cari di pending loans                   │
+└────────────────┬────────────────────────────────┘
+                 │
+                 ▼
+┌───────────────────────────────────────────────────┐
+│          STAFF SCAN QR CODE / VERIFY              │
+│                                                   │
+│  - Gunakan scanner atau mobile app               │
+│  - Verify Loan ID & User Identity                │
+│  - System pull up loan detail                    │
+└────────────────┬────────────────────────────────┘
+                 │
+                 ▼
+┌───────────────────────────────────────────────────┐
+│         STAFF CONFIRM CHECKOUT                    │
+│                                                   │
+│  Click "Checkout" button di admin panel:         │
+│                                                   │
+│  - Set loan_date = today()                       │
+│  - Update Loan.status = 'active'                 │
+│  - Update BookItem.status = 'on_loan'            │
+│  - Lock loan untuk prevent duplicate             │
+└────────────────┬────────────────────────────────┘
+                 │
+                 ▼
+┌───────────────────────────────────────────────────┐
+│         SYSTEM CONFIRM TO USER                    │
+│                                                   │
+│  Dashboard:                                      │
+│  - Loan appear di "Active Loans"                 │
+│  - Show due date & remaining days               │
+│  - Show button untuk extend (jika eligible)     │
+│                                                   │
+│  Email:                                          │
+│  - Confirm checkout receipt                      │
+│  - Ingatkan due date & late fee info             │
+└───────────────────────────────────────────────────┘
+</div>
+
+<h3>TAHAP 3: SELAMA PEMINJAMAN (ACTIVE STATUS)</h3>
+
+<div class="workflow">
+┌───────────────────────────────────────────────────┐
+│     USER GUNAKAN BUKU SELAMA 14-21 HARI          │
+│                                                   │
+│  Option 1: Perpanjang (jika eligible)            │
+│  ┌─────────────────────────────────────┐        │
+│  │ Click "Extend" di dashboard         │        │
+│  │                                     │        │
+│  │ Validasi:                          │        │
+│  │ - Status = 'active' ✓              │        │
+│  │ - Belum pernah extend ✓            │        │
+│  │ - Belum overdue ✓                  │        │
+│  │ - No booking dari user lain ✓      │        │
+│  │                                     │        │
+│  │ If OK:                              │        │
+│  │ - is_extended = true               │        │
+│  │ - due_date += 7 hari               │        │
+│  │ - Send notif ke user               │        │
+│  └─────────────────────────────────────┘        │
+│                                                   │
+│  Option 2: Terlewat due date (AUTO-CHECK)       │
+│  ┌─────────────────────────────────────┐        │
+│  │ System job scheduler cek setiap hari│        │
+│  │                                     │        │
+│  │ If today > due_date AND not returned│        │
+│  │ - status = 'overdue'                │        │
+│  │ - Calculate days_overdue            │        │
+│  │ - Create Fine record:               │        │
+│  │   * amount = days_overdue * 5000   │        │
+│  │   * status = 'unpaid'               │        │
+│  │ - Send reminder email               │        │
+│  │ - User cannot borrow new book       │        │
+│  └─────────────────────────────────────┘        │
+└───────────────────────────────────────────────────┘
+</div>
+
+<h3>TAHAP 4: RETURN / PENGEMBALIAN BUKU</h3>
+
+<div class="workflow">
+┌───────────────────────────────────────────────────┐
+│    USER DATANG KE PERPUSTAKAAN KEMBALIKAN BUKU   │
+│                                                   │
+│  - Bawa buku yang akan dikembalikan              │
+│  - User juga bisa notify staff dulu              │
+└────────────────┬────────────────────────────────┘
+                 │
+                 ▼
+┌───────────────────────────────────────────────────┐
+│       STAFF MENERIMA & INSPECT BUKU               │
+│                                                   │
+│  - Lihat kondisi fisik buku                      │
+│  - Cek halaman, cover, dll                       │
+│  - Tentukan return_condition:                    │
+│    * Excellent (sempurna)                        │
+│    * Good (normal)                               │
+│    * Fair (ada lecet/lipatan)                    │
+│    * Poor (parah)                                │
+│    * Damaged (rusak/hilang halaman)              │
+└────────────────┬────────────────────────────────┘
+                 │
+                 ▼
+┌───────────────────────────────────────────────────┐
+│         STAFF RECORD RETURN DI SISTEM             │
+│                                                   │
+│  Click "Return" di admin panel:                  │
+│                                                   │
+│  - Set return_date = today()                     │
+│  - Set return_condition (dropdown)               │
+│  - (Optional) Add return_notes                   │
+│  - Click "Confirm Return"                        │
+└────────────────┬────────────────────────────────┘
+                 │
+                 ▼
+┌───────────────────────────────────────────────────┐
+│        SYSTEM AUTO-PROCESSING                     │
+│                                                   │
+│  Database update:                                │
+│  - Update Loan.return_date = today()             │
+│  - Update Loan.status = 'returned'               │
+│  - Update BookItem.status = 'available'          │
+│  - Update BookItem.condition (dari input staff)  │
+│                                                   │
+│  Fine processing:                                │
+│  - Check if loan was overdue                     │
+│  - If yes: Fine already exist (dari auto-check)  │
+│  - If no: No fine                                │
+│                                                   │
+│  Booking processing:                             │
+│  - Check booking queue untuk buku ini            │
+│  - If ada booking exist:                         │
+│    * Status booking = 'ready'                    │
+│    * Set expires_at = today + 3 hari             │
+│    * Send notification ke booking user           │
+│    * Wait untuk user pickup                      │
+└────────────────┬────────────────────────────────┘
+                 │
+                 ▼
+┌───────────────────────────────────────────────────┐
+│        FINE SETTLEMENT (jika ada)                 │
+│                                                   │
+│  If Loan was overdue:                            │
+│  - User lihat unpaid fine di dashboard           │
+│  - User bisa bayar via cash/transfer/QRIS        │
+│  - Staff record payment                          │
+│  - Fine status = 'paid'                          │
+│                                                   │
+│  If Loan tepat waktu:                            │
+│  - No fine, process complete                     │
+└───────────────────────────────────────────────────┘
+</div>
+
+<h2>6.2 Status Peminjaman (State Machine)</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Status</th>
+            <th>Deskripsi</th>
+            <th>Transisi Ke</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>pending</strong></td>
+            <td>Request sudah dibuat, menunggu user pickup</td>
+            <td>→ active (setelah checkout) / → expired (jika timeout)</td>
+        </tr>
+        <tr>
+            <td><strong>active</strong></td>
+            <td>Buku sedang dipinjam user</td>
+            <td>→ extended (jika diperpanjang) / → overdue (jika lewat due_date) / → returned (saat return)</td>
+        </tr>
+        <tr>
+            <td><strong>extended</strong></td>
+            <td>Peminjaman telah diperpanjang</td>
+            <td>→ overdue (jika lewat new due_date) / → returned</td>
+        </tr>
+        <tr>
+            <td><strong>overdue</strong></td>
+            <td>Buku belum dikembalikan setelah due_date</td>
+            <td>→ returned (saat return, fine akan auto-calculate)</td>
+        </tr>
+        <tr>
+            <td><strong>returned</strong></td>
+            <td>Buku telah dikembalikan ke perpustakaan</td>
+            <td>----- (Final state)</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>6.3 Validasi & Business Rules Peminjaman</h2>
+
+<div class="highlight highlight-warning">
+    <h4>⚠️ Kondisi User BISA Pinjam:</h4>
+    <pre>✓ Status = 'active' (tidak suspended, graduated, atau inactive)
+✓ Total unpaid fines = 0 (semua denda harus sudah lunas)
+✓ Active loans < max_loans (tidak over quota):
+  - Dosen: max 10 books
+  - Mahasiswa: max 3 books
+✓ Credit score >= 50 (kredibilitas minimal)
+✓ Minimal 1 copy buku tersedia (status = 'available')</pre>
+</div>
+
+<div class="highlight highlight-warning">
+    <h4>⚠️ Kondisi User BISA Perpanjang:</h4>
+    <pre>✓ Loan status = 'active' (sedang dipinjam)
+✓ is_extended = false (belum pernah extend)
+✓ today < due_date (belum overdue)
+✓ Tidak ada booking dari user lain untuk buku ini
+✓ Max perpanjangan:
+  - Dosen: 2x perpanjangan
+  - Mahasiswa: 1x perpanjangan</pre>
+</div>
+
+<div class="highlight highlight-success">
+    <h4>✅ Durasi Peminjaman (Auto-Calculate):</h4>
+    <pre>Dosen:
+  - Initial: 21 hari
+  - Per extension: +7 hari (max 2x = 35 hari total)
+
+Mahasiswa:
+  - Initial: 14 hari
+  - Per extension: +7 hari (max 1x = 21 hari total)</pre>
+</div>
+
+<h2>6.4 Contoh Skenario Peminjaman</h2>
+
+<h3>Skenario A: Peminjaman Normal (Tepat Waktu)</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Tanggal</th>
+            <th>Event</th>
+            <th>Status</th>
+            <th>Keterangan</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>2026-04-13</td>
+            <td>Request</td>
+            <td>pending</td>
+            <td>Mahasiswa request buku "Clean Code"</td>
+        </tr>
+        <tr>
+            <td>2026-04-13</td>
+            <td>Checkout</td>
+            <td>active</td>
+            <td>Staff scan QR, set due_date = 2026-04-27</td>
+        </tr>
+        <tr>
+            <td>2026-04-25</td>
+            <td>Extend</td>
+            <td>extended</td>
+            <td>Mahasiswa extend (belum overdue), new due_date = 2026-05-04</td>
+        </tr>
+        <tr>
+            <td>2026-05-04</td>
+            <td>Return</td>
+            <td>returned</td>
+            <td>Return tepat waktu, no fine</td>
+        </tr>
+    </tbody>
+</table>
+
+<p><strong>Result:</strong> Proses sukses, user bisa pinjam lagi</p>
+
+<h3>Skenario B: Peminjaman Overdue (Terlambat & Bayar Denda)</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Tanggal</th>
+            <th>Event</th>
+            <th>Status</th>
+            <th>Keterangan</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>2026-04-13</td>
+            <td>Request</td>
+            <td>pending</td>
+            <td>Mahasiswa request "Python Programming"</td>
+        </tr>
+        <tr>
+            <td>2026-04-13</td>
+            <td>Checkout</td>
+            <td>active</td>
+            <td>Staff scan, due_date = 2026-04-27</td>
+        </tr>
+        <tr>
+            <td>2026-04-28</td>
+            <td>Auto-Check</td>
+            <td>overdue</td>
+            <td>Sistem auto-generate fine: 1 hari × Rp 5.000 = Rp 5.000</td>
+        </tr>
+        <tr>
+            <td>2026-05-02</td>
+            <td>Return</td>
+            <td>returned</td>
+            <td>User return buku 5 hari terlambat</td>
+        </tr>
+        <tr>
+            <td>2026-05-02</td>
+            <td>Fine Update</td>
+            <td>unpaid</td>
+            <td>Fine recalculate: 5 hari × Rp 5.000 = Rp 25.000</td>
+        </tr>
+        <tr>
+            <td>2026-05-03</td>
+            <td>Payment</td>
+            <td>paid</td>
+            <td>User transfer Rp 25.000, staff record payment</td>
+        </tr>
+        <tr>
+            <td>2026-05-03</td>
+            <td>Ready to Borrow</td>
+            <td>-</td>
+            <td>User bisa pinjam buku lagi</td>
+        </tr>
+    </tbody>
+</table>
+
+<p><strong>Result:</strong> Denda dibayar, user kembali normal status</p>
+
+<div class="section-divider"></div>
+
+<!-- ============================================
+    7. SISTEM BOOKING & ANTRIAN
+    ============================================ -->
+<h1>7. Sistem Booking & Antrian Buku</h1>
+
+<h2>7.1 Konsep Booking</h2>
+
+<div class="highlight highlight-info">
+    <h4>🔹 Apa itu Booking?</h4>
+    <p>Booking adalah fitur untuk mengantri buku yang sedang dipinjam oleh user lain. Saat user ingin pinjam buku tetapi semua copy sedang on_loan, user bisa booking untuk mendapatkan notifikasi saat buku tersedia.</p>
+</div>
+
+<h3>Workflow Booking Lengkap:</h3>
+
+<div class="workflow">
+┌─────────────────────────────────────────────────┐
+│   USER LIHAT BUKU (SEMUA COPY TERPINJAM)        │
+│                                                 │
+│  - Browse katalog                               │
+│  - Lihat buku: Available Stock = 0              │
+│  - Available buttons: "Booking" atau "Waitlist" │
+└────────────────┬─────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────────┐
+│        CLICK "BOOKING" BUTTON                    │
+│                                                 │
+│  System confirm:                                │
+│  - "Apakah ingin antri untuk buku ini?"         │
+│  - Show estimasi waktu tunggu (based on loans)  │
+│  - Click "Yes" untuk confirm                    │
+└────────────────┬─────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────────┐
+│      CREATE BOOKING RECORD                       │
+│                                                 │
+│  Database:                                      │
+│  - user_id: siapa yang booking                  │
+│  - book_id: buku yang di-booking                │
+│  - booking_date: 2026-04-13 (hari ini)          │
+│  - status: 'pending' (menunggu)                 │
+│  - is_priority:                                 │
+│    * true (jika user adalah dosen)              │
+│    * false (jika user adalah mahasiswa)         │
+│  - expires_at: (akan di-set saat buku ready)    │
+└────────────────┬─────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────────┐
+│      SYSTEM SORT BOOKING QUEUE                   │
+│                                                 │
+│  Priority:                                      │
+│  1. is_priority = true (Dosen) POSISI AWAL      │
+│  2. is_priority = false (Mahasiswa)             │
+│  3. Dalam tiap group: FIRST-COME-FIRST-SERVE   │
+│     (sort by booking_date asc)                  │
+│                                                 │
+│  Example:                                       │
+│  [1] Dosen (booking 2026-04-10)                 │
+│  [2] Dosen (booking 2026-04-12)                 │
+│  [3] Mahasiswa (booking 2026-04-11)  ← waiting  │
+│  [4] Mahasiswa (booking 2026-04-13)             │
+│  ...                                            │
+└────────────────┬─────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────────┐
+│     SAAT BUKU DIKEMBALIKAN (RETURN)              │
+│                                                 │
+│  Staff process return:                          │
+│  - Set BookItem status = 'available'            │
+│  - System check: Ada booking untuk buku ini?    │
+└────────────────┬─────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────────┐
+│   SYSTEM AMBIL BOOKING PALING DEPAN (PRIORITY)  │
+│                                                 │
+│  - Get first booking dari queue                 │
+│  - Update Booking.status = 'ready'              │
+│  - Set expires_at = today + 3 hari              │
+│  - Update BookItem status tetap 'available'     │
+│  - SEND NOTIFICATION KE USER                    │
+└────────────────┬─────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────────┐
+│    USER NOTIF: BUKU SIAP DIAMBIL                │
+│                                                 │
+│  EMAIL:                                         │
+│  Subject: "Buku yang Anda booking siap!"        │
+│  Body:                                          │
+│    "Buku '[Title]' sekarang tersedia"           │
+│    "Silakan ambil dalam 3 hari (sampai tgl X)"  │
+│                                                 │
+│  DASHBOARD:                                     │
+│  - Status booking = 'ready'                     │
+│  - Show "Ambil Sekarang" button                 │
+│  - Show countdown 3 hari                        │
+└────────────────┬─────────────────────────────┘
+                 │
+        ┌────────┴────────┐
+        │                 │
+     OPTION 1          OPTION 2
+        │                 │
+        ▼                 ▼
+   USER AMBIL       TIMEOUT 3 HARI
+   ┌───────────┐    ┌──────────────┐
+   │ User ke   │    │ Auto-cancel  │
+   │ perpus &  │    │              │
+   │ request   │    │ Booking.status│
+   │ dengan    │    │ = 'expired'  │
+   │ booking   │    │              │
+   │ ID        │    │ Buku kembali │
+   │           │    │ available    │
+   │ Staff:    │    │              │
+   │ - Process │    │ Notif user   │
+   │   sebagai │    │ booking      │
+   │   normal  │    │ expired      │
+   │   loan    │    │              │
+   │ - Booking │    │ Next booking │
+   │   convert │    │ dari queue   │
+   │   to loan │    │ di-notify    │
+   │           │    │              │
+   │ Booking.  │    │              │
+   │ status=   │    │              │
+   │ fulfilled │    │              │
+   └───────────┘    └──────────────┘
+</div>
+
+<h2>7.2 Priority System (Dosen vs Mahasiswa)</h2>
+
+<h3>Perbedaan Priority Booking:</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Aspek</th>
+            <th>Dosen (is_priority=true)</th>
+            <th>Mahasiswa (is_priority=false)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Posisi Queue</strong></td>
+            <td>Prioritas tinggi (awal)</td>
+            <td>First-come-first-serve</td>
+        </tr>
+        <tr>
+            <td><strong>Urutan Notif</strong></td>
+            <td>Langsung di-notify saat ready</td>
+            <td>Menunggu booking dosen sebelumnya selesai</td>
+        </tr>
+        <tr>
+            <td><strong>Pickup Window</strong></td>
+            <td>3 hari</td>
+            <td>3 hari (sama)</td>
+        </tr>
+        <tr>
+            <td><strong>Contoh Kasus</strong></td>
+            <td colspan="2">
+                <strong>Booking Queue untuk buku "Clean Code":</strong><br>
+                [1] Dosen A (booking 2026-04-10) ← akan di-notify duluan<br>
+                [2] Mahasiswa X (booking 2026-04-11)<br>
+                [3] Dosen B (booking 2026-04-12)<br>
+                [4] Mahasiswa Y (booking 2026-04-13)<br><br>
+                Saat buku return → Dosen A di-notify<br>
+                Saat Dosen A timeout/fulfill → Dosen B di-notify<br>
+                Saat Dosen B timeout/fulfill → Mahasiswa X di-notify<br>
+                dst...
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>7.3 Status Booking</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Status</th>
+            <th>Deskripsi</th>
+            <th>User Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>pending</strong></td>
+            <td>Menunggu buku tersedia (dalam antrian)</td>
+            <td>User bisa cancel booking</td>
+        </tr>
+        <tr>
+            <td><strong>ready</strong></td>
+            <td>Buku siap diambil (3 hari window)</td>
+            <td>User harus ambil atau booking akan expired</td>
+        </tr>
+        <tr>
+            <td><strong>fulfilled</strong></td>
+            <td>Booking sudah dikonversi menjadi loan</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td><strong>expired</strong></td>
+            <td>User tidak pickup dalam 3 hari</td>
+            <td>Booking dibatalkan, buku kembali ke available</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>7.4 Notifikasi Booking</h2>
+
+<p>User menerima 2 jenis notifikasi untuk booking:</p>
+
+<h3>Notif 1: Booking Confirmed</h3>
+<div class="feature-box">
+    <h4>📧 Email</h4>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li>Confirmation bahwa booking berhasil dibuat</li>
+        <li>Info buku (judul, penulis, penerbit)</li>
+        <li>Posisi queue (misal: "Anda adalah no. 3 dalam antrian")</li>
+        <li>Estimasi waktu tunggu</li>
+    </ul>
+</div>
+
+<h3>Notif 2: Buku Ready Pickup</h3>
+<div class="feature-box">
+    <h4>📧 Email + 📱 Dashboard</h4>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li>Urgent notif: "Buku sudah siap diambil!"</li>
+        <li>Countdown 3 hari pickup window</li>
+        <li>Info di mana harus ambil</li>
+        <li>Reminder email sebelum expired</li>
+    </ul>
+</div>
+
+<div class="section-divider"></div>
+
+<!-- ============================================
+    8. SISTEM DENDA & PEMBAYARAN
+    ============================================ -->
+<h1>8. Sistem Denda & Pembayaran</h1>
+
+<h2>8.1 Kalkulasi Denda Otomatis</h2>
+
+<h3>Rumus Denda:</h3>
+
+<div class="highlight highlight-warning">
+    <h4>⚠️ Formula Perhitungan Denda:</h4>
+    <pre><strong>DENDA = Days Overdue × Daily Rate</strong>
+
+Contoh:
+- Daily Rate: Rp 5.000 / hari
+- Buku dikembalikan 3 hari terlambat
+- Denda = 3 × Rp 5.000 = Rp 15.000</pre>
+</div>
+
+<h3>Cara Kerja Auto-Generate Denda:</h3>
+
+<div class="workflow">
+┌──────────────────────────────────────┐
+│  SYSTEM JOB SCHEDULER (Harian)        │
+│  Berjalan otomatis setiap hari       │
+└────────────┬───────────────────────┘
+             │
+             ▼
+┌──────────────────────────────────────┐
+│  QUERY: Semua Loan dengan kondisi:    │
+│  - status = 'active' atau 'extended'  │
+│  - return_date = NULL (belum return)  │
+│  - today > due_date (terlewat)        │
+│  - NO existing fine (prevent duplicate)
+└────────────┬───────────────────────┘
+             │
+             ▼
+┌──────────────────────────────────────┐
+│  UNTUK SETIAP LOAN YANG MATCH:        │
+│                                      │
+│  1. Calculate:                       │
+│     days_overdue = today - due_date  │
+│     amount = days_overdue × 5000     │
+│                                      │
+│  2. Create Fine Record:              │
+│     - loan_id: referensi loan        │
+│     - user_id: siapa yang bayar      │
+│     - days_overdue: nilai hitung     │
+│     - daily_rate: 5000               │
+│     - amount: total denda            │
+│     - status: 'unpaid'               │
+│                                      │
+│  3. Update Loan:                     │
+│     - status = 'overdue'             │
+│     - Add flag untuk fine exist      │
+│                                      │
+│  4. Notify User:                     │
+│     - Email reminder                 │
+│     - Dashboard notification         │
+│     - Include fine amount            │
+│     - Payment instructions           │
+└──────────────────────────────────────┘

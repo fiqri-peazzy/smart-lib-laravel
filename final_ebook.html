@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Smart-Lib Final Guide - Sistem Informasi Perpustakaan Digital
+        </title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            @media print {
+                body {
+                    margin: 0;
+                    background: white;
+                }
+                .container {
+                    box-shadow: none;
+                    max-width: 100%;
+                    margin: 0;
+                }
+                .page-break {
+                    page-break-after: always;
+                }
+                .no-print {
+                    display: none;
+                }
+            }
+
+            @page {
+                size: A4;
+                margin: 0;
+            }
+
+            body {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                line-height: 1.6;
+                color: #333;
+                font-size: 11pt;
+                background: #f0f2f5;
+            }
+
+            .container {
+                max-width: 210mm;
+                margin: 20px auto;
+                background: white;
+                box-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
+            }
+
+            .page {
+                padding: 2.5cm;
+                min-height: 297mm;
+                position: relative;
+            }
+
+            .page-break {
+                page-break-after: always;
+            }
+
+            /* Cover Page */
+            .cover {
+                text-align: center;
+                background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+                color: white;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                min-height: 297mm;
+            }
+
+            .cover h1 {
+                font-size: 42pt;
+                letter-spacing: 2px;
+                margin-bottom: 0.5cm;
+                text-transform: uppercase;
+            }
+
+            .cover .subtitle {
+                font-size: 20pt;
+                opacity: 0.9;
+                margin-bottom: 2cm;
+                font-weight: 300;
+            }
+
+            .cover .decoration {
+                width: 120px;
+                height: 4px;
+                background: #ffcc00;
+                margin-bottom: 2cm;
+            }
+
+            .cover .meta {
+                font-size: 14pt;
+                line-height: 1.8;
+            }
+
+            .cover .version-badge {
+                background: rgba(255, 255, 255, 0.2);
+                padding: 5px 15px;
+                border-radius: 20px;
+                display: inline-block;
+                margin-bottom: 1cm;
+                font-size: 10pt;
+            }
+
+            /* Typography */
+            h1 {
+                color: #1e3c72;
+                font-size: 24pt;
+                margin-bottom: 0.8cm;
+                border-bottom: 2px solid #1e3c72;
+                padding-bottom: 10px;
+            }
+            h2 {
+                color: #2a5298;
+                font-size: 18pt;
+                margin-top: 1cm;
+                margin-bottom: 0.5cm;
+            }
+            h3 {
+                color: #444;
+                font-size: 14pt;
+                margin-top: 0.8cm;
+                margin-bottom: 0.4cm;
+            }
+            p {
+                margin-bottom: 0.5cm;
+                text-align: justify;
+            }
+
+            /* Tables */
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 0.8cm;
+                font-size: 10pt;
+            }
+            th,
+            td {
+                border: 1px solid #ddd;
+                padding: 12px;
+                text-align: left;
+            }
+            th {
+                background: #f8f9fa;
+                color: #1e3c72;
+            }
+            tr:nth-child(even) {
+                background: #fdfdfd;
+            }
+
+            /* Boxes */
+            .box {
+                padding: 20px;
+                border-radius: 8px;
+                margin-bottom: 0.8cm;
+                border-left: 5px solid;
+            }
+            .box-info {
+                background: #e7f3ff;
+                border-left-color: #007bff;
+            }
+            .box-success {
+                background: #e6ffed;
+                border-left-color: #28a745;
+            }
+            .box-warning {
+                background: #fff9db;
+                border-left-color: #ffc107;
+            }
+
+            /* Workflow */
+            .workflow {
+                background: #f8f9fa;
+                border: 1px dashed #ccc;
+                padding: 20px;
+                text-align: center;
+                font-weight: bold;
+                color: #1e3c72;
+                margin-bottom: 0.8cm;
+                border-radius: 5px;
+            }
+
+            /* Lists */
+            ul,
+            ol {
+                margin-left: 20px;
+                margin-bottom: 0.5cm;
+            }
+            li {
+                margin-bottom: 8px;
+            }
+
+            /* TOC */
+            .toc-list {
+                list-style: none;
+                margin-left: 0;
+            }
+            .toc-list li {
+                margin-bottom: 12px;
+                border-bottom: 1px dotted #ccc;
+                display: flex;
+                justify-content: space-between;
+            }
+            .toc-list a {
+                text-decoration: none;
+                color: #1e3c72;
+            }
+
+            /* Code */
+            code {
+                background: #eee;
+                padding: 2px 5px;
+                border-radius: 4px;
+                font-family: monospace;
+                color: #d63384;
+                font-size: 95%;
+            }
+            pre {
+                background: #2d3436;
+                color: white;
+                padding: 15px;
+                border-radius: 6px;
+                overflow-x: auto;
+                margin-bottom: 0.8cm;
+                font-size: 9pt;
+            }
+
+            /* Footer */
+            .footer {
+                margin-top: 2cm;
+                padding-top: 10px;
+                border-top: 1px solid #eee;
+                text-align: center;
+                font-size: 9pt;
+                color: #888;
+            }
+
+            .img-placeholder {
+                width: 100%;
+                height: 200px;
+                background: #eee;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 0.5cm;
+                border-radius: 5px;
+                color: #888;
+                font-style: italic;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <!-- COVER -->
+            <div class="page cover page-break">
+                <div class="version-badge">OFFICIAL DOCUMENTATION v1.0</div>
+                <h1>SMART-LIB</h1>
+                <p class="subtitle">Sistem Informasi Perpustakaan Digital</p>
+                <div class="decoration"></div>
+                <div class="meta">
+                    <strong>Panduan Penggunaan & Alur Sistem</strong><br />
+                    Fakultas Ilmu Komputer (Fasilkom)<br />
+                    <br />
+                    <br />
+                    Diterbitkan: April 2026<br />
+                    Disusun Oleh: Antigravity AI
+                </div>
+            </div>
+
+            <!-- DAFTAR ISI -->
+            <div class="page page-break">
+                <h1>Daftar Isi</h1>
+                <ul class="toc-list">
+                    <li>
+                        <a href="#setup"
+                            >1. Cara Menjalankan Project (Instalasi)</a
+                        >
+                        <span>3</span>
+                    </li>
+                    <li>
+                        <a href="#overview">2. Overview & Fitur Utama</a>
+                        <span>5</span>
+                    </li>
+                    <li>
+                        <a href="#flow">3. Alur Sistem untuk Pengguna Awam</a>
+                        <span>7</span>
+                    </li>
+                    <li>
+                        <a href="#role">4. Manajemen Pengguna & Peran (Role)</a>
+                        <span>9</span>
+                    </li>
+                    <li>
+                        <a href="#catalog"
+                            >5. Modul Katalog & Koleksi Digital</a
+                        >
+                        <span>11</span>
+                    </li>
+                    <li>
+                        <a href="#loan">6. Modul Peminjaman & Booking</a>
+                        <span>13</span>
+                    </li>
+                    <li>
+                        <a href="#fine">7. Modul Denda & Pembayaran</a>
+                        <span>15</span>
+                    </li>
+                    <li>
+                        <a href="#admin">8. Modul Admin Panel (Filament)</a>
+                        <span>17</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- CARA MENJALANKAN -->
+            <div class="page page-break" id="setup">
+                <h1>1. Cara Menjalankan Project</h1>
+                <p>
+                    Ikuti langkah-langkah di bawah ini untuk menjalankan sistem
+                    di komputer lokal Anda. Panduan ini dirancang agar mudah
+                    diikuti bahkan jika Anda bukan seorang programmer.
+                </p>
+
+                <h2>1.1 Persiapan Software</h2>
+                <ul>
+                    <li>
+                        <strong>XAMPP atau Laragon:</strong> Untuk menjalankan
+                        server database.
+                    </li>
+                    <li>
+                        <strong>Visual Studio Code:</strong> Untuk membuka
+                        folder project.
+                    </li>
+                    <li>
+                        <strong>PHP 8.2+:</strong> Versi PHP minimal yang
+                        dibutuhkan.
+                    </li>
+                </ul>
+
+                <h2>1.2 Langkah-langkah Detail</h2>
+
+                <div class="box box-warning">
+                    <h4>Langkah 1: Jalankan Server (Laragon/XAMPP)</h4>
+                    <p>
+                        Buka Laragon atau XAMPP Anda. Klik tombol
+                        <strong>Start All</strong> atau pastikan layanan
+                        <strong>Apache</strong> dan <strong>MySQL</strong> sudah
+                        menyala (berwarna hijau).
+                    </p>
+                </div>
+
+                <div class="box box-info">
+                    <h4>Langkah 2: Buka Folder di VS Code</h4>
+                    <p>
+                        Buka Visual Studio Code, klik menu <code>File</code> >
+                        <code>Open Folder</code>, lalu pilih folder
+                        <code>smart-lib</code>.
+                    </p>
+                </div>
+
+                <div class="box box-info">
+                    <h4>Langkah 3: Buka Terminal Bash</h4>
+                    <p>
+                        Di VS Code, tekan tombol
+                        <code>Ctrl + `</code> (backtick) untuk membuka terminal.
+                        Pastikan di pojok kanan bawah terminal tertulis
+                        <strong>bash</strong>. Jika tidak, klik tanda panah ke
+                        bawah dan pilih <strong>Git Bash</strong>.
+                    </p>
+                </div>
+
+                <div class="box box-success">
+                    <h4>Langkah 4: Jalankan Perintah Setup</h4>
+                    <p>Ketik perintah berikut satu per satu dan tekan Enter:</p>
+                    <pre>
+composer install
+php artisan key:generate
+php artisan migrate --seed
+npm install
+npm run dev</pre
+                    >
+                </div>
+
+                <div class="box box-success">
+                    <h4>Langkah 5: Akses Aplikasi</h4>
+                    <p>Buka terminal satu lagi, jalankan perintah:</p>
+                    <pre>php artisan serve</pre>
+                    <p>
+                        Lalu buka browser (Chrome/Edge) dan ketik:
+                        <code>http://localhost:8000</code>
+                    </p>
+                </div>
+            </div>
+
+            <!-- ALUR SISTEM AWAM -->
+            <div class="page page-break" id="flow">
+                <h1>3. Alur Sistem untuk Pengguna Awam</h1>
+                <p>
+                    Sistem ini dirancang untuk memudahkan proses pinjam-meminjam
+                    buku di perpustakaan. Berikut adalah gambaran alurnya secara
+                    sederhana.
+                </p>
+
+                <h2>3.1 Alur Peminjaman Buku</h2>
+                <div class="workflow">
+                    Cari Buku di Katalog ➔ Klik Request ➔ Datang ke Perpustakaan
+                    ➔ Scan QR Code ➔ Selesai
+                </div>
+                <ol>
+                    <li>
+                        <strong>Cari:</strong> Anda mencari buku yang diinginkan
+                        di website.
+                    </li>
+                    <li>
+                        <strong>Pesan:</strong> Setelah ketemu, klik tombol
+                        <strong>Pinjam</strong>. Anda akan mendapat tiket berupa
+                        QR Code.
+                    </li>
+                    <li>
+                        <strong>Ambil:</strong> Datang ke perpustakaan,
+                        tunjukkan tiket tadi ke petugas.
+                    </li>
+                    <li>
+                        <strong>Verifikasi:</strong> Petugas menscan tiket Anda,
+                        dan memberikan bukunya.
+                    </li>
+                </ol>
+
+                <h2>3.2 Alur Pengembalian Buku</h2>
+                <div class="workflow">
+                    Bawa Buku ke Petugas ➔ Petugas Scan Buku ➔ Selesai (Bayar
+                    Denda jika Telat)
+                </div>
+                <p>
+                    Sangat mudah! Cukup bawa bukunya, petugas akan menscan
+                    barcode di buku, dan status pinjaman Anda akan otomatis
+                    selesai.
+                </p>
+
+                <div class="box box-warning">
+                    <h4>⚠️ Info Penting tentang Denda:</h4>
+                    <p>
+                        Jika Anda telat mengembalikan, sistem akan memberikan
+                        denda Rp 5.000 per hari. Anda tidak bisa meminjam buku
+                        lagi sebelum denda dilunasi.
+                    </p>
+                </div>
+            </div>
+
+            <!-- MODUL USAGE -->
+            <div class="page page-break" id="catalog">
+                <h1>5. Modul Katalog & Koleksi Digital</h1>
+                <p>
+                    Halaman utama adalah tempat Anda mencari semua koleksi, baik
+                    buku fisik maupun buku digital (E-book).
+                </p>
+
+                <h2>5.1 Mencari Buku Fisik</h2>
+                <p>
+                    Cukup ketik judul buku di kolom pencarian. Anda bisa melihat
+                    status buku apakah <strong>Available</strong> (tersedia)
+                    atau sedang dipinjam orang lain.
+                </p>
+                <div class="img-placeholder">
+                    [Gambar: Katalog Utama Smart-Lib]
+                </div>
+
+                <h2>5.2 Akses Koleksi Digital (E-Book)</h2>
+                <p>
+                    Selain buku fisik, Anda bisa membaca buku digital secara
+                    langsung di website.
+                </p>
+                <ul>
+                    <li>Masuk ke menu <strong>Digital Library</strong>.</li>
+                    <li>Pilih buku yang ingin dibaca.</li>
+                    <li>
+                        Klik tombol <strong>Read Online</strong> untuk membuka
+                        viewer PDF bawaan.
+                    </li>
+                    <li>
+                        Anda juga bisa mendownload buku tersebut jika diizinkan
+                        oleh admin.
+                    </li>
+                </ul>
+            </div>
+
+            <!-- ADMIN -->
+            <div class="page page-break" id="admin">
+                <h1>8. Modul Admin Panel (Filament)</h1>
+                <p>
+                    Modul ini digunakan oleh petugas perpustakaan (Staff) dan
+                    Admin untuk mengelola data data perpustakaan.
+                </p>
+
+                <h2>8.1 Cara Menambah Buku (Oleh Admin)</h2>
+                <ol>
+                    <li>
+                        Buka alamat <code>http://localhost:8000/admin</code> dan
+                        login.
+                    </li>
+                    <li>Pilih menu <strong>Books</strong> di sebelah kiri.</li>
+                    <li>
+                        Klik tombol <strong>New Book</strong> di pojok kanan
+                        atas.
+                    </li>
+                    <li>
+                        Isi Nama Buku, ISBN, dan upload
+                        <strong>Cover Image</strong>.
+                    </li>
+                    <li>Klik <strong>Create</strong> untuk menyimpan.</li>
+                </ol>
+
+                <div class="box box-info">
+                    <h4>💡 Tip untuk Admin:</h4>
+                    <p>
+                        Anda bisa melihat statistik peminjaman paling populer di
+                        Dashboard Admin untuk membantu memutuskan pengadaan buku
+                        baru.
+                    </p>
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="page">
+                <div class="footer">
+                    Smart-Lib Digital Guide &copy; 2026 - Fakultas Ilmu
+                    Komputer<br />
+                    Dicetak secara otomatis oleh Sistem Antigravity AI
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

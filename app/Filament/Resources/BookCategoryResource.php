@@ -23,6 +23,10 @@ class BookCategoryResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    protected static ?string $modelLabel = 'Kategori Buku';
+
+    protected static ?string $pluralModelLabel = 'Kategori Buku';
+
     public static function form(Form $form): Form
     {
         return $form

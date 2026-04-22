@@ -23,6 +23,10 @@ class BookItemResource extends Resource
 
     protected static ?int $navigationSort = 3;
 
+    protected static ?string $modelLabel = 'Item Buku';
+
+    protected static ?string $pluralModelLabel = 'Item Buku';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -225,7 +229,7 @@ class BookItemResource extends Resource
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('print_qr')
-                    ->label('Print QR')
+                    ->label('Cetak QR')
                     ->icon('heroicon-o-printer')
                     ->color('info')
                     ->url(
@@ -269,7 +273,7 @@ class BookItemResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\BulkAction::make('bulk_print_qr')
-                        ->label('Print QR Codes')
+                        ->label('Cetak Kode QR')
                         ->icon('heroicon-o-printer')
                         ->color('info')
                         ->action(function ($records) {

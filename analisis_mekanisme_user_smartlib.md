@@ -1,0 +1,14 @@
+# 4.2.5 Mekanisme User
+
+Mekanisme pengguna menjelaskan batasan hak akses serta interaksi data bagi setiap entitas yang terlibat dalam sistem. Berikut adalah rincian fungsionalitas input dan output pada Sistem Manajemen Perpustakaan _Smart-Lib_.
+
+**Tabel Mekanisme User**
+
+| Entitas Pengguna                | Kategori       | Hak Akses Input                                                                                                                                                                                                                                                                         | Hak Akses Output                                                                                                                                                                                                                           |
+| :------------------------------ | :------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Anggota (Mahasiswa / Dosen)** | User Eksternal | 1. Melakukan Registrasi & Edit Pofil<br>2. Mencari & Memfilter Katalog Buku<br>3. Membuat _Booking_ / Pesanan Buku Fisik<br>4. Mengakses / Mengunduh Koleksi Digital<br>5. Mengajukan Perpanjangan Peminjaman<br>6. Mengunggah Bukti Pembayaran Denda<br>7. Membatalkan Tiket _Booking_ | 1. Menampilkan Daftar Katalog Buku<br>2. Detail & Status _Booking_ Pribadi<br>3. Daftar Riwayat Peminjaman Aktif<br>4. Rincian Tagihan Denda Keterlambatan<br>5. Bukti Lunas & Status Pembayaran<br>6. Akses Dokumen / _E-Book_ Digital    |
+| **Admin / Staff Perpustakaan**  | User Internal  | 1. Manage Data Buku & Kategori (CRUD)<br>2. Manage Data Akun Anggota<br>3. Input Nomor Eksemplar & Generate QR<br>4. _Approve/Reject Booking_ Anggota<br>5. _Scan_ & Ubah Status Pengembalian<br>6. Verifikasi Penerimaan Uang Denda<br>7. Manajemen _Setting_ Batas Tenggat Waktu      | 1. _Dashboard_ Statistik Perpustakaan<br>2. Daftar Antrean _Booking_ Masuk<br>3. Laporan Transaksi Sirkulasi Anggota<br>4. Laporan Rekapitulasi Uang Denda<br>5. Cetak _Barcode/QR Code_ Eksemplar<br>6. Log Aktivitas & Ketersediaan Stok |
+
+---
+
+_**Catatan Format:** Struktur tabel di atas sudah disesuaikan persis dengan gaya \_Microsoft Word_ pada draf skripsi Anda. Anda cukup menyalin _(copy)_ tabel di atas dan menempelkannya _(paste)_ secara langsung ke dalam dokumen MS Word Anda, tabel akan terbentuk secara rapi.\_
