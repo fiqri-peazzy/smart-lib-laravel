@@ -6,6 +6,8 @@ use App\Filament\Resources\LoanResource\Pages;
 use App\Models\BookItem;
 use App\Models\Loan;
 use App\Models\User;
+use App\Models\PaymentTransaction;
+use App\Services\PaymentService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -418,6 +420,239 @@ class LoanResource extends Resource
                             ->success()
                             ->send();
                     }),
+
+                // MANAJEMEN DENDA
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('generateQRIS')
+                        ->label('Buat QRIS')
+                        ->icon('heroicon-o-qr-code')
+                        ->color('info')
+                        ->visible(fn(\App\Models\Loan $record) => $record->fine !== null && $record->fine->status === 'unpaid')
+                        ->requiresConfirmation()
+                        ->modalHeading('Generate QRIS Payment')
+                        ->modalDescription(fn(\App\Models\Loan $record) => "Generate QRIS untuk pembayaran denda Rp " . number_format((float)$record->fine->amount, 0, ',', '.'))
+                        ->modalSubmitActionLabel('Generate QRIS')
+                        ->action(function (\App\Models\Loan $record) {
+                            try {
+                                $paymentService = app(\App\Services\PaymentService::class);
+                                $transaction = $paymentService->generateQRIS($record->fine);
+
+                                \Filament\Notifications\Notification::make()
+                                    ->title('Pembayaran Dibuat')
+                                    ->body("Silakan selesaikan pembayaran melalui portal Midtrans.")
+                                    ->success()
+                                    ->send();
+
+                                $snapUrl = data_get($transaction->metadata, 'snap_url');
+                                if ($snapUrl) {
+                                    return redirect()->away($snapUrl);
+                                }
+                            } catch (\Exception $e) {
+                                \Filament\Notifications\Notification::make()
+                                    ->title('Gagal Generate QRIS')
+                                    ->body($e->getMessage())
+                                    ->danger()
+                                    ->send();
+                            }
+                        }),
+
+                    Tables\Actions\Action::make('generateVA')
+                        ->label('Buat VA')
+                        ->icon('heroicon-o-credit-card')
+                        ->color('warning')
+                        ->visible(fn(\App\Models\Loan $record) => $record->fine !== null && $record->fine->status === 'unpaid')
+                        ->form([
+                            Forms\Components\Select::make('bank')
+                                ->label('Bank')
+                                ->options([
+                                    'bca' => 'BCA',
+                                    'bni' => 'BNI',
+                                    'bri' => 'BRI',
+                                    'mandiri' => 'Mandiri',
+                                    'permata' => 'Permata',
+                                ])
+                                ->required()
+                                ->default('bca')
+                                ->helperText('Pilih bank untuk Virtual Account'),
+                        ])
+                        ->action(function (\App\Models\Loan $record, array $data) {
+                            try {
+                                $paymentService = app(\App\Services\PaymentService::class);
+                                $transaction = $paymentService->generateVA($record->fine, $data['bank']);
+
+                                \Filament\Notifications\Notification::make()
+                                    ->title('VA Berhasil Dibuat')
+                                    ->body("Silakan selesaikan pembayaran melalui portal Midtrans.")
+                                    ->success()
+                                    ->send();
+
+                                $snapUrl = data_get($transaction->metadata, 'snap_url');
+                                if ($snapUrl) {
+                                    return redirect()->away($snapUrl);
+                                }
+                            } catch (\Exception $e) {
+                                \Filament\Notifications\Notification::make()
+                                    ->title('Gagal Generate VA')
+                                    ->body($e->getMessage())
+                                    ->danger()
+                                    ->send();
+                            }
+                        }),
+
+                    Tables\Actions\Action::make('checkPaymentStatus')
+                        ->label('Cek Status Pembayaran')
+                        ->icon('heroicon-o-arrow-path')
+                        ->color('gray')
+                        ->visible(function (\App\Models\Loan $record) {
+                            return $record->fine !== null && $record->fine->status === 'unpaid' &&
+                                PaymentTransaction::where('fine_id', $record->fine->id)
+                                ->where('status', 'pending')
+                                ->exists();
+                        })
+                        ->action(function (\App\Models\Loan $record) {
+                            try {
+                                $transaction = PaymentTransaction::where('fine_id', $record->fine->id)
+                                    ->where('status', 'pending')
+                                    ->latest()
+                                    ->first();
+
+                                if (!$transaction) {
+                                    \Filament\Notifications\Notification::make()
+                                        ->title('Tidak Ada Transaksi Pending')
+                                        ->warning()
+                                        ->send();
+                                    return;
+                                }
+
+                                $paymentService = app(\App\Services\PaymentService::class);
+                                $status = $paymentService->checkPaymentStatus($transaction);
+
+                                if ($status['success']) {
+                                    $transactionStatus = $status['status'];
+
+                                    if (in_array($transactionStatus, ['settlement', 'capture'])) {
+                                        $transactionId = data_get($status['data'], 'transaction_id');
+                                        $transaction->markAsSuccess($transactionId);
+
+                                        $record->fine->processPayment(
+                                            amount: (float) $transaction->amount,
+                                            method: $transaction->payment_method,
+                                            reference: $transactionId
+                                        );
+
+                                        \Filament\Notifications\Notification::make()
+                                            ->title('Pembayaran Berhasil')
+                                            ->body("Pembayaran telah diverifikasi dan denda telah lunas.")
+                                            ->success()
+                                            ->send();
+                                    } else {
+                                        \Filament\Notifications\Notification::make()
+                                            ->title('Status Pembayaran')
+                                            ->body("Status saat ini: " . strtoupper($transactionStatus))
+                                            ->info()
+                                            ->send();
+                                    }
+                                } else {
+                                    \Filament\Notifications\Notification::make()
+                                        ->title('Gagal Check Status')
+                                        ->body($status['message'])
+                                        ->danger()
+                                        ->send();
+                                }
+                            } catch (\Exception $e) {
+                                \Filament\Notifications\Notification::make()
+                                    ->title('Error')
+                                    ->body($e->getMessage())
+                                    ->danger()
+                                    ->send();
+                            }
+                        }),
+
+                    Tables\Actions\Action::make('payFineManual')
+                        ->label('Bayar Manual')
+                        ->icon('heroicon-o-currency-dollar')
+                        ->color('success')
+                        ->visible(fn(\App\Models\Loan $record) => $record->fine !== null && $record->fine->status === 'unpaid')
+                        ->form([
+                            Forms\Components\TextInput::make('paid_amount')
+                                ->label('Jumlah Dibayar')
+                                ->numeric()
+                                ->prefix('Rp')
+                                ->required()
+                                ->default(fn(\App\Models\Loan $record) => $record->fine->amount)
+                                ->minValue(0)
+                                ->helperText(fn(\App\Models\Loan $record) => 'Total denda: Rp ' . number_format((float) $record->fine->amount, 0)),
+
+                            Forms\Components\Select::make('payment_method')
+                                ->label('Metode Pembayaran')
+                                ->options([
+                                    'cash' => 'Tunai',
+                                    'transfer' => 'Transfer Bank',
+                                    'other' => 'Lainnya',
+                                ])
+                                ->required()
+                                ->default('cash'),
+
+                            Forms\Components\TextInput::make('payment_reference')
+                                ->label('Referensi Pembayaran')
+                                ->placeholder('No. Bukti / Referensi (optional)'),
+
+                            Forms\Components\Textarea::make('notes')
+                                ->label('Catatan')
+                                ->rows(2),
+                        ])
+                        ->action(function (\App\Models\Loan $record, array $data) {
+                            $record->fine->processPayment(
+                                $data['paid_amount'],
+                                $data['payment_method'],
+                                $data['payment_reference'] ?? null,
+                                Auth::id()
+                            );
+
+                            \Filament\Notifications\Notification::make()
+                                ->title('Pembayaran Berhasil')
+                                ->body('Denda telah dibayar. Credit score user telah diupdate.')
+                                ->success()
+                                ->send();
+                        }),
+
+                    Tables\Actions\Action::make('waiveFine')
+                        ->label('Bebaskan')
+                        ->icon('heroicon-o-shield-check')
+                        ->color('info')
+                        ->visible(fn(\App\Models\Loan $record) => collect(Auth::user()->roles->pluck('name'))->contains('admin') && $record->fine !== null && $record->fine->status === 'unpaid')
+                        ->requiresConfirmation()
+                        ->form([
+                            Forms\Components\Textarea::make('waive_reason')
+                                ->label('Alasan Pembebasan')
+                                ->required()
+                                ->rows(3)
+                                ->placeholder('Jelaskan alasan pembebasan denda...'),
+                        ])
+                        ->action(function (\App\Models\Loan $record, array $data) {
+                            $record->fine->waive($data['waive_reason'], Auth::id());
+
+                            \Filament\Notifications\Notification::make()
+                                ->title('Denda Dibebaskan')
+                                ->body('Denda telah dibebaskan oleh admin.')
+                                ->success()
+                                ->send();
+                        }),
+
+                    Tables\Actions\Action::make('viewFineTransactions')
+                        ->label('Log Transaksi')
+                        ->icon('heroicon-o-list-bullet')
+                        ->color('gray')
+                        ->visible(fn(\App\Models\Loan $record) => $record->fine !== null && PaymentTransaction::where('fine_id', $record->fine->id)->exists())
+                        ->modalHeading('Riwayat Transaksi Gateway')
+                        ->modalContent(fn(\App\Models\Loan $record) => view('filament.resources.fines.transactions-modal', [
+                            'transactions' => PaymentTransaction::where('fine_id', $record->fine->id)->latest()->get()
+                        ])),
+                ])
+                    ->label('Kelola Denda')
+                    ->icon('heroicon-o-banknotes')
+                    ->color('danger')
+                    ->visible(fn(\App\Models\Loan $record) => $record->fine !== null),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

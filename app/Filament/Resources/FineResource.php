@@ -26,6 +26,8 @@ class FineResource extends Resource
 
     protected static ?int $navigationSort = 6;
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $modelLabel = 'Denda';
 
     protected static ?string $pluralModelLabel = 'Denda';
