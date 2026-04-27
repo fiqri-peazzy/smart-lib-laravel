@@ -28,12 +28,12 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->brandName('SIPERPUS Fasilkom Ichsan')
-            ->brandLogo(asset('images/logo.png'))
-            ->brandLogoHeight('2.5rem')
+            ->brandName('FIKOM SIPERPUS')
+            ->brandLogo(asset('images/logofikom.png'))
+            ->brandLogoHeight('3rem')
             // ->favicon(asset('images/favicon.png')) 
             ->colors([
-                'primary' => Color::Indigo,
+                'primary' => Color::hex('#1e3a8a'),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')

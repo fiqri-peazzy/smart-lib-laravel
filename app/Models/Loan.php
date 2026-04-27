@@ -171,6 +171,9 @@ class Loan extends Model
         if ($this->return_date) {
             return false;
         }
+        if (!$this->due_date) {
+            return false;
+        }
         return now()->isAfter($this->due_date);
     }
 
@@ -210,6 +213,10 @@ class Loan extends Model
         $returnDate = $this->return_date;
         $dueDate = $this->due_date;
 
+        if (!$dueDate) {
+            return 0;
+        }
+
         if (!$returnDate) {
             if (now()->isAfter($dueDate)) {
                 return (int) abs(now()->diffInDays($dueDate, false));
@@ -229,6 +236,10 @@ class Loan extends Model
      */
     public function calculateFine(): float
     {
+        if ($this->user && $this->user->isDosen()) {
+            return 0;
+        }
+
         $daysOverdue = abs($this->getDaysOverdue());
         if ($daysOverdue <= 0) {
             return 0;
@@ -245,7 +256,7 @@ class Loan extends Model
      */
     public function canBeExtended(): bool
     {
-        if ($this->is_extended) {
+        if ($this->is_extended || !$this->due_date) {
             return false;
         }
 
@@ -283,12 +294,12 @@ class Loan extends Model
     /**
      * Confirm pickup (staff action)
      */
-    public function confirmPickup(int $processedBy, int $loanDays = 14): void
+    public function confirmPickup(int $processedBy, ?int $loanDays = 14): void
     {
         $this->update([
             'status' => 'active',
             'loan_date' => now(),
-            'due_date' => now()->addDays((int) $loanDays),
+            'due_date' => $loanDays ? now()->addDays((int) $loanDays) : null,
             'processed_by' => $processedBy,
             'pickup_deadline' => null,
         ]);
@@ -327,12 +338,14 @@ class Loan extends Model
     ): void {
         $returnDate = now();
         $daysLate = 0;
-        if ($returnDate->isAfter($this->due_date)) {
+        if ($this->due_date && $returnDate->isAfter($this->due_date)) {
             $daysLate = (int) abs($returnDate->diffInDays($this->due_date, false));
         }
 
         $fineAmount = 0;
-        if ($daysLate > 0) {
+        if ($this->user && $this->user->isDosen()) {
+            $fineAmount = 0;
+        } elseif ($daysLate > 0) {
             $finePerDay = 1000;
             $maxFine = 50000;
             $fineAmount = min($daysLate * $finePerDay, $maxFine);
@@ -405,10 +418,10 @@ class Loan extends Model
     /**
      * Get days until due (negative if overdue)
      */
-    public function getDaysUntilDueAttribute(): int
+    public function getDaysUntilDueAttribute(): ?int
     {
-        if ($this->return_date) {
-            return 0;
+        if ($this->return_date || !$this->due_date) {
+            return null; // or handle dynamically
         }
         return now()->diffInDays($this->due_date, false);
     }

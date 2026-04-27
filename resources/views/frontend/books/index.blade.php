@@ -5,11 +5,11 @@
 @section('content')
 
     <!-- Page Header -->
-    <section class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-16">
+    <section class="bg-primary-600 text-white py-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center">
-                <h1 class="text-4xl md:text-5xl font-bold mb-4">Katalog Buku</h1>
-                <p class="text-xl text-indigo-100 mb-8">Jelajahi koleksi lengkap perpustakaan Fasilkom</p>
+                <h1 class="text-4xl md:text-5xl font-extrabold mb-4 tracking-tight">Katalog Buku</h1>
+                <p class="text-xl text-primary-100 mb-8 font-medium">Jelajahi koleksi lengkap perpustakaan Fasilkom</p>
 
                 <!-- Search Bar -->
                 <form action="{{ route('books.index') }}" method="GET" class="max-w-3xl mx-auto">
@@ -20,10 +20,10 @@
                             </span>
                             <input type="text" name="search" value="{{ request('search') }}"
                                 placeholder="Cari judul, penulis, atau ISBN..."
-                                class="w-full pl-12 pr-4 py-4 rounded-xl text-gray-900 focus:ring-4 focus:ring-indigo-300 border-0">
+                                class="w-full pl-12 pr-4 py-4 rounded-xl text-gray-900 focus:ring-4 focus:ring-primary-500/30 border-0 shadow-sm">
                         </div>
                         <button type="submit"
-                            class="px-8 py-4 bg-white text-indigo-600 rounded-xl font-semibold hover:bg-indigo-50 transition-colors">
+                            class="px-8 py-4 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-colors shadow-sm">
                             Cari
                         </button>
                     </div>
@@ -46,7 +46,7 @@
                                 Filter
                             </h3>
                             @if (request()->hasAny(['category', 'year', 'search']))
-                                <a href="{{ route('books.index') }}" class="text-sm text-indigo-600 hover:underline">
+                                <a href="{{ route('books.index') }}" class="text-sm text-primary-600 hover:underline">
                                     Reset
                                 </a>
                             @endif
@@ -70,7 +70,7 @@
                                             <input type="radio" name="category" value="{{ $cat->id }}"
                                                 {{ request('category') == $cat->id ? 'checked' : '' }}
                                                 onchange="this.form.submit()"
-                                                class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                                                class="w-4 h-4 text-primary-600 focus:ring-primary-500">
                                             <span class="ml-3 text-sm text-gray-700 dark:text-gray-300 flex-1">
                                                 {{ $cat->name }}
                                             </span>
@@ -89,7 +89,7 @@
                                     <i class="bi bi-calendar-event mr-1"></i> Tahun Terbit
                                 </label>
                                 <select name="year" onchange="this.form.submit()"
-                                    class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                    class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-sm focus:ring-primary-500 focus:border-primary-500">
                                     <option value="">Semua Tahun</option>
                                     @foreach ($years as $year)
                                         <option value="{{ $year }}"
@@ -106,7 +106,7 @@
                                     <i class="bi bi-sort-down mr-1"></i> Urutkan
                                 </label>
                                 <select name="sort" onchange="this.form.submit()"
-                                    class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                    class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-sm focus:ring-primary-500 focus:border-primary-500">
                                     <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Terbaru
                                     </option>
                                     <option value="title" {{ request('sort') == 'title' ? 'selected' : '' }}>Judul (A-Z)
@@ -153,7 +153,7 @@
                             <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Tidak ada buku ditemukan</h3>
                             <p class="text-gray-600 dark:text-gray-400 mb-6">Coba ubah filter atau kata kunci pencarian</p>
                             <a href="{{ route('books.index') }}"
-                                class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                                class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg font-bold hover:bg-primary-700">
                                 <i class="bi bi-arrow-clockwise mr-2"></i>
                                 Reset Filter
                             </a>
@@ -167,7 +167,7 @@
                                     <a href="{{ route('books.show', $book) }}" class="block">
                                         <!-- Book Cover -->
                                         <div
-                                            class="relative aspect-w-16 aspect-h-9 bg-gradient-to-br from-indigo-500 to-purple-600 overflow-hidden">
+                                            class="relative aspect-w-16 aspect-h-9 bg-primary-100 dark:bg-gray-700 overflow-hidden">
                                             @if ($book->cover_image)
                                                 <img src="{{ $book->cover_url }}" alt="{{ $book->title }}"
                                                     class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500">
@@ -211,7 +211,7 @@
 
                                             <!-- Title -->
                                             <h3
-                                                class="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                                class="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                                                 {{ $book->title }}
                                             </h3>
 

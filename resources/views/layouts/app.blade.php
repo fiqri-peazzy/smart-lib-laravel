@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ darkMode: false }" :class="{ 'dark': darkMode }">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     <meta charset="utf-8">
@@ -10,7 +10,7 @@
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=space-grotesk:300,400,500,600,700&display=swap" rel="stylesheet" />
 
     {{-- icon --}}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
@@ -61,6 +61,14 @@
     </style>
 
     @stack('styles')
+
+    <!-- Prevent FOUC for Dark Mode -->
+    <script>
+        if (localStorage.getItem('darkMode') === 'true' || (!('darkMode' in localStorage) && window.matchMedia(
+                '(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 </head>
 
 <body class="antialiased bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
@@ -73,37 +81,36 @@
 
                 <!-- Logo -->
                 <div class="flex items-center space-x-8">
-                    <a href="{{ route('home') }}" class="flex items-center space-x-3">
-                        <div
-                            class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                            </svg>
-                        </div>
-                        <div class="hidden md:block">
+                    <a href="{{ route('home') }}" class="flex items-center space-x-3 group pr-2">
+                        <img src="{{ asset('images/logofikom2.png') }}"
+                            class="h-10 w-auto transform group-hover:scale-105 transition-all duration-300"
+                            alt="Logo FIKOM">
+                        <div class="hidden md:block border-l-2 border-gray-300 dark:border-gray-700 pl-3">
                             <div
-                                class="text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                                SIPERPUS
+                                class="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider leading-tight">
+                                Universitas Ichsan Gorontalo
                             </div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400">FIKOM Ichsan</div>
+                            <div
+                                class="text-sm font-extrabold text-primary-900 dark:text-white tracking-tight uppercase leading-none mt-0.5">
+                                Fakultas Ilmu Komputer
+                            </div>
                         </div>
                     </a>
 
                     <!-- Desktop Menu -->
                     <div class="hidden lg:flex items-center space-x-1">
                         <a href="{{ route('books.index') }}"
-                            class="px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800 {{ request()->routeIs('books.*') ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20' : 'text-gray-700 dark:text-gray-300' }}">
-                            <i class="bi bi-book me-1"></i> Browse Books
+                            class="px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800 {{ request()->routeIs('books.*') ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20' : 'text-gray-700 dark:text-gray-300' }}">
+                            <i class="bi bi-book me-1"></i> Telusuri Buku
                         </a>
                         <a href="{{ route('digital.index') }}"
-                            class="px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800 {{ request()->routeIs('digital.*') ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20' : 'text-gray-700 dark:text-gray-300' }}">
-                            <i class="bi bi-laptop me-1"></i> Digital Library
+                            class="px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800 {{ request()->routeIs('digital.*') ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20' : 'text-gray-700 dark:text-gray-300' }}">
+                            <i class="bi bi-laptop me-1"></i> Perpustakaan Digital
                         </a>
                         @auth
                             <a href="{{ route('dashboard') }}"
-                                class="px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800 {{ request()->routeIs('dashboard') ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20' : 'text-gray-700 dark:text-gray-300' }}">
-                                <i class="bi bi-house-door me-1"></i> Dashboard
+                                class="px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800 {{ request()->routeIs('dashboard') ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20' : 'text-gray-700 dark:text-gray-300' }}">
+                                <i class="bi bi-house-door me-1"></i> Dasbor
                             </a>
                         @endauth
                     </div>
@@ -113,15 +120,32 @@
                 <div class="flex items-center space-x-3">
 
                     <!-- Dark Mode Toggle -->
-                    <button @click="darkMode = !darkMode"
-                        class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
-                        <svg x-show="!darkMode" class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
+                    <button x-data="{
+                        darkMode: document.documentElement.classList.contains('dark'),
+                        toggleTheme() {
+                            this.darkMode = !this.darkMode;
+                            if (this.darkMode) {
+                                document.documentElement.classList.add('dark');
+                                localStorage.setItem('darkMode', 'true');
+                            } else {
+                                document.documentElement.classList.remove('dark');
+                                localStorage.setItem('darkMode', 'false');
+                            }
+                        }
+                    }" @click="toggleTheme()" aria-label="Toggle Dark Mode"
+                        class="relative w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 hover:scale-110 active:scale-95 overflow-hidden">
+                        <svg x-show="!darkMode" x-transition:enter="transition ease-out duration-500"
+                            x-transition:enter-start="-translate-y-full opacity-0"
+                            x-transition:enter-end="translate-y-0 opacity-100" class="absolute w-5 h-5 text-gray-600"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                         </svg>
-                        <svg x-show="darkMode" class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" x-cloak>
+                        <svg x-show="darkMode" x-cloak x-transition:enter="transition ease-out duration-500"
+                            x-transition:enter-start="translate-y-full opacity-0"
+                            x-transition:enter-end="translate-y-0 opacity-100"
+                            class="absolute w-5 h-5 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
@@ -130,11 +154,11 @@
                     @guest
                         <!-- Guest -->
                         <a href="{{ route('login') }}"
-                            class="hidden md:block px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">
+                            class="hidden md:block px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400">
                             Login
                         </a>
                         <a href="{{ route('register') }}"
-                            class="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg hover:shadow-lg hover:shadow-indigo-500/50 transform hover:-translate-y-0.5 transition-all">
+                            class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:shadow-lg hover:shadow-primary-500/50 transform hover:-translate-y-0.5 transition-all">
                             Register
                         </a>
                     @else
@@ -143,7 +167,7 @@
                             <button @click="open = !open"
                                 class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
                                 <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}"
-                                    class="w-8 h-8 rounded-full ring-2 ring-indigo-500">
+                                    class="w-8 h-8 rounded-full ring-2 ring-primary-500">
                                 <div class="hidden md:block text-left">
                                     <div class="text-sm font-medium">{{ auth()->user()->name }}</div>
                                     <div class="text-xs text-gray-500">{{ auth()->user()->nim }}</div>
@@ -195,7 +219,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
-                                    My Bookings
+                                    Peminjaman Saya
                                 </a>
                                 <a href="{{ route('payment.index') }}"
                                     class="flex items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -203,7 +227,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                     </svg>
-                                    Payment
+                                    Pembayaran
                                 </a>
                                 <a href="{{ route('profile') }}"
                                     class="flex items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -211,7 +235,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                     </svg>
-                                    Profile
+                                    Profil
                                 </a>
 
                                 <div class="border-t border-gray-200 dark:border-gray-700 mt-2 pt-2">
@@ -224,7 +248,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                             </svg>
-                                            Logout
+                                            Keluar
                                         </button>
                                     </form>
                                 </div>
@@ -249,16 +273,16 @@
             class="lg:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
             <a href="{{ route('books.index') }}"
                 class="block px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800">
-                <i class="bi bi-book me-2"></i> Browse Books
+                <i class="bi bi-book me-2"></i> Telusuri Buku
             </a>
             <a href="{{ route('digital.index') }}"
                 class="block px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800">
-                <i class="bi bi-laptop me-2"></i> Digital Library
+                <i class="bi bi-laptop me-2"></i> Perpustakaan Digital
             </a>
             @auth
                 <a href="{{ route('dashboard') }}"
                     class="block px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800">
-                    <i class="bi bi-house-door me-2"></i> Dashboard
+                    <i class="bi bi-house-door me-2"></i> Dasbor
                 </a>
             @endauth
         </div>
@@ -268,7 +292,7 @@
     <main class="min-h-[60vh]">
         <!-- Flash Messages -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-            @if (session('success'))
+            {{-- @if (session('success'))
                 <div class="mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-r-xl shadow-sm flex items-center" role="alert">
                     <i class="bi bi-check-circle-fill mr-3 text-xl"></i>
                     <p class="font-medium">{{ session('success') }}</p>
@@ -280,7 +304,7 @@
                     <i class="bi bi-exclamation-triangle-fill mr-3 text-xl"></i>
                     <p class="font-medium">{{ session('error') }}</p>
                 </div>
-            @endif
+            @endif --}}
         </div>
 
         @yield('content')
@@ -292,17 +316,10 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div class="col-span-1 md:col-span-2">
                     <div class="flex items-center space-x-3 mb-4">
-                        <div
-                            class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                            </svg>
-                        </div>
+                        <img src="{{ asset('images/logofikom2.png') }}" class="h-12 w-auto" alt="Logo FIKOM">
                         <div>
-                            <div class="text-lg font-bold text-white">SIPERPUS FIKOM</div>
-                            <div class="text-sm">Universitas Ichsan Gorontalo</div>
+                            <div class="text-lg font-bold text-white leading-tight">Fakultas Ilmu Komputer</div>
+                            <div class="text-sm text-gray-400">Universitas Ichsan Gorontalo</div>
                         </div>
                     </div>
                     <p class="text-sm text-gray-400 mb-4">
@@ -314,11 +331,13 @@
                 <div>
                     <h3 class="text-white font-semibold mb-4">Quick Links</h3>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="{{ route('books.index') }}" class="hover:text-indigo-400">Browse Books</a></li>
-                        <li><a href="{{ route('digital.index') }}" class="hover:text-indigo-400">Digital Library</a>
+                        <li><a href="{{ route('books.index') }}" class="hover:text-primary-400">Telusuri Buku</a>
                         </li>
-                        <li><a href="{{ route('about') }}" class="hover:text-indigo-400">About Us</a></li>
-                        <li><a href="{{ route('contact') }}" class="hover:text-indigo-400">Contact</a></li>
+                        <li><a href="{{ route('digital.index') }}" class="hover:text-primary-400">Perpustakaan
+                                Digital</a>
+                        </li>
+                        <li><a href="{{ route('about') }}" class="hover:text-primary-400">About Us</a></li>
+                        <li><a href="{{ route('contact') }}" class="hover:text-primary-400">Contact</a></li>
                     </ul>
                 </div>
 

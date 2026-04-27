@@ -5,89 +5,67 @@
 @section('content')
 
     <!-- Hero Section -->
-    <section class="relative bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 text-white overflow-hidden">
-        <!-- Animated Background -->
-        <div class="absolute inset-0 opacity-20">
-            <div
-                class="absolute top-20 left-20 w-72 h-72 bg-white rounded-full mix-blend-multiply filter blur-xl animate-blob">
+    <section
+        class="relative bg-white dark:bg-gray-900 text-gray-900 dark:text-white overflow-hidden pt-12 pb-20 md:pt-20 md:pb-28">
+        <!-- Abstract Background Decoration representing Kampus Identity -->
+        <div class="absolute inset-0 z-0 opacity-100 pointer-events-none">
+            <!-- Top Left Pattern/Wave -->
+            <div class="absolute top-0 left-0 w-64 h-64 bg-primary-100 dark:bg-primary-900/30 rounded-br-full opacity-60">
             </div>
+            <!-- Bottom Right Shape -->
             <div
-                class="absolute top-40 right-20 w-72 h-72 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000">
+                class="absolute bottom-0 right-0 w-96 h-96 bg-secondary-100 dark:bg-secondary-900/30 rounded-tl-full opacity-60">
             </div>
-            <div
-                class="absolute bottom-20 left-40 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000">
-            </div>
+            <!-- Dots -->
+            <div class="absolute top-20 right-20 w-32 h-32 opacity-20"
+                style="background-image: radial-gradient(#1e3a8a 2px, transparent 2px); background-size: 16px 16px;"></div>
+            <div class="absolute bottom-10 left-10 w-40 h-32 opacity-20"
+                style="background-image: radial-gradient(#c89b4f 2px, transparent 2px); background-size: 16px 16px;"></div>
         </div>
 
-        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                <div class="space-y-8" data-aos="fade-right">
-                    <h1 class="text-4xl md:text-6xl font-bold leading-tight">
-                        Perpustakaan Digital
-                        <span class="block bg-gradient-to-r from-yellow-200 to-pink-200 bg-clip-text text-transparent">
-                            Masa Depan
-                        </span>
-                    </h1>
-                    <p class="text-xl text-indigo-100">
-                        Akses ribuan buku dan jurnal dari perpustakaan Fakultas Ilmu Komputer. Pinjam, baca, dan kembangkan
-                        ilmu Anda kapan saja, di mana saja.
-                    </p>
-                    <div class="flex flex-wrap gap-4">
-                        <a href="{{ route('books.index') }}"
-                            class="px-8 py-4 bg-white text-indigo-600 rounded-xl font-semibold hover:shadow-2xl hover:shadow-white/50 transform hover:-translate-y-1 transition-all">
-                            <i class="bi bi-book me-2"></i> Browse Books
-                        </a>
-                        <a href="{{ route('digital.index') }}"
-                            class="px-8 py-4 bg-indigo-500/30 backdrop-blur-lg border border-white/20 rounded-xl font-semibold hover:bg-indigo-500/50 transition-all">
-                            <i class="bi bi-laptop me-2"></i> Digital Library
-                        </a>
-                    </div>
+        <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
+            <div space-y-6 data-aos="fade-up">
+                <!-- Main Typography -->
+                <h1
+                    class="text-4xl md:text-6xl font-black tracking-tight text-primary-900 dark:text-white uppercase leading-none drop-shadow-sm">
+                    Fakultas Ilmu Komputer
+                    <br />
+                    <span class="text-3xl md:text-secondary-900 dark:text-secondary-400 mt-2 block tracking-wide">
+                        Universitas Ichsan Gorontalo
+                    </span>
+                </h1>
 
-                    <!-- Stats -->
-                    <div class="grid grid-cols-3 gap-4 pt-8">
-                        <div class="text-center">
-                            <div class="text-3xl font-bold">{{ $stats['total_books'] }}+</div>
-                            <div class="text-sm text-indigo-200">Total Buku</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold">{{ $stats['total_digital'] }}+</div>
-                            <div class="text-sm text-indigo-200">E-Books</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold">{{ $stats['available_books'] }}+</div>
-                            <div class="text-sm text-indigo-200">Tersedia</div>
-                        </div>
-                    </div>
+                <p
+                    class="mt-6 text-lg md:text-xl text-primary-800 dark:text-primary-200 font-medium max-w-3xl mx-auto leading-relaxed">
+                    Menjadi Fakultas Berdaya Saing di Bidang Ilmu Komputer dan Desain Berbasis <span
+                        class="italic font-bold">Technopreneur</span> pada Tahun 2044
+                </p>
+
+                <div class="mt-10 flex flex-wrap justify-center gap-4">
+                    <a href="{{ route('books.index') }}"
+                        class="px-8 py-4 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 hover:shadow-xl hover:shadow-primary-500/30 transform hover:-translate-y-1 transition-all">
+                        <i class="bi bi-book me-2"></i> Telusuri Buku
+                    </a>
+                    <a href="{{ route('digital.index') }}"
+                        class="px-8 py-4 bg-secondary-500 text-white rounded-xl font-bold hover:bg-secondary-600 hover:shadow-xl hover:shadow-secondary-500/30 transform hover:-translate-y-1 transition-all">
+                        <i class="bi bi-laptop me-2"></i> Perpustakaan Digital
+                    </a>
                 </div>
 
-                <div class="relative" data-aos="fade-left">
-                    <div class="relative z-10">
-                        <img src="{{ asset('images/hero.png') }}" alt="Library" class="rounded-2xl shadow-2xl">
-                    </div>
-                    <!-- Floating Cards -->
+                <!-- Stats -->
+                <div class="mt-12 grid grid-cols-2 gap-4 max-w-xl mx-auto">
                     <div
-                        class="absolute top-10 -right-5 bg-white text-gray-900 rounded-xl p-4 shadow-xl transform rotate-3 animate-float">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
-                                <i class="bi bi-book-half text-indigo-600 text-2xl"></i>
-                            </div>
-                            <div>
-                                <div class="font-bold">Clean Code</div>
-                                <div class="text-sm text-gray-500">Available</div>
-                            </div>
-                        </div>
+                        class="flex flex-col items-center justify-center bg-white/80 dark:bg-gray-800/80 backdrop-blur-md p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <div class="text-3xl font-black text-primary-900 dark:text-white">{{ $stats['total_books'] }}+</div>
+                        <div class="text-sm font-bold text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-wider">Total
+                            Buku</div>
                     </div>
                     <div
-                        class="absolute bottom-10 -left-5 bg-white text-gray-900 rounded-xl p-4 shadow-xl transform -rotate-3 animate-float animation-delay-2000">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                                <i class="bi bi-database text-purple-600 text-2xl"></i>
-                            </div>
-                            <div>
-                                <div class="font-bold">Data Science</div>
-                                <div class="text-sm text-gray-500">4 copies</div>
-                            </div>
-                        </div>
+                        class="flex flex-col items-center justify-center bg-white/80 dark:bg-gray-800/80 backdrop-blur-md p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <div class="text-3xl font-black text-secondary-600 dark:text-secondary-400">
+                            {{ $stats['available_books'] }}+</div>
+                        <div class="text-sm font-bold text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-wider">
+                            Tersedia</div>
                     </div>
                 </div>
             </div>
@@ -163,7 +141,7 @@
                                                 style="color: {{ $category->color }};"></i>
                                         </div>
                                         <h3
-                                            class="text-sm font-semibold text-center text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                            class="text-sm font-bold text-center text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                                             {{ $category->name }}
                                         </h3>
                                         <p class="text-xs text-center text-gray-500 dark:text-gray-400 mt-1">
@@ -218,7 +196,7 @@
                     </p>
                 </div>
                 <a href="{{ route('books.index') }}"
-                    class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold" data-aos="fade-left">
+                    class="text-primary-600 dark:text-primary-400 hover:underline font-bold" data-aos="fade-left">
                     Lihat Semua →
                 </a>
             </div>
@@ -228,8 +206,7 @@
                     <a href="{{ route('books.show', $book) }}"
                         class="group bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300"
                         data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
-                        <div
-                            class="aspect-w-16 aspect-h-9 bg-gradient-to-br from-indigo-500 to-purple-600 relative overflow-hidden">
+                        <div class="aspect-w-16 aspect-h-9 bg-primary-100 dark:bg-gray-700 relative overflow-hidden">
                             @if ($book->cover_image)
                                 <img src="{{ $book->cover_url }}" alt="{{ $book->title }}"
                                     class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500">
@@ -261,7 +238,7 @@
                                 @endforeach
                             </div>
                             <h3
-                                class="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                class="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                                 {{ $book->title }}
                             </h3>
                             <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -271,7 +248,7 @@
                                 <span class="text-gray-500 dark:text-gray-400 font-medium">
                                     <i class="bi bi-geo-alt me-1"></i> {{ $book->rack_location }}
                                 </span>
-                                <span class="font-bold text-indigo-600 dark:text-indigo-400">
+                                <span class="font-bold text-primary-600 dark:text-primary-400">
                                     {{ $book->available_stock }}/{{ $book->total_stock }} available
                                 </span>
                             </div>
@@ -295,7 +272,7 @@
                     </p>
                 </div>
                 <a href="{{ route('digital.index') }}"
-                    class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold" data-aos="fade-left">
+                    class="text-primary-600 dark:text-primary-400 hover:underline font-bold" data-aos="fade-left">
                     Lihat Semua →
                 </a>
             </div>
@@ -303,10 +280,10 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach ($latestDigital as $digital)
                     <a href="{{ route('digital.show', $digital) }}"
-                        class="group bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-800/50 rounded-2xl p-6 hover:shadow-xl transform hover:-translate-y-2 transition-all"
-                        data-aos="flip-left" data-aos-delay="{{ $loop->index * 100 }}">
+                        class="group bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-6 hover:shadow-xl transform hover:-translate-y-1 transition-all"
+                        data-aos="flip-up" data-aos-delay="{{ $loop->index * 100 }}">
                         <div
-                            class="w-16 h-16 bg-white dark:bg-gray-700 rounded-xl flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">
+                            class="w-16 h-16 bg-primary-50 dark:bg-primary-900/30 rounded-xl flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">
                             @php
                                 $digitalIcons = [
                                     'bi-file-earmark-text',
@@ -315,7 +292,8 @@
                                     'bi-pencil-square',
                                 ];
                             @endphp
-                            <i class="bi {{ $digitalIcons[$loop->index % 4] }} text-indigo-600 dark:text-indigo-400"></i>
+                            <i
+                                class="bi {{ $digitalIcons[$loop->index % 4] }} text-primary-600 dark:text-primary-400"></i>
                         </div>
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
                             {{ $digital->title }}
@@ -324,7 +302,8 @@
                             {{ $digital->author }}
                         </p>
                         <div class="flex items-center justify-between text-xs">
-                            <span class="px-2 py-1 bg-indigo-100 text-indigo-600 rounded-full font-semibold">
+                            <span
+                                class="px-2 py-1 bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded-md font-bold">
                                 {{ strtoupper($digital->type) }}
                             </span>
                             <span class="text-gray-500">
@@ -338,22 +317,28 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="py-20 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
-        <div class="max-w-4xl mx-auto text-center px-4" data-aos="zoom-in">
-            <h2 class="text-3xl md:text-5xl font-bold mb-6">
+    <section class="py-20 bg-primary-600 text-white relative overflow-hidden">
+        <!-- Decoration -->
+        <div class="absolute inset-0 z-0 opacity-20 pointer-events-none">
+            <div
+                class="absolute top-0 right-0 w-96 h-96 bg-white rounded-full mix-blend-overlay filter blur-3xl rounded-none transform translate-x-1/2 -translate-y-1/2">
+            </div>
+        </div>
+        <div class="max-w-4xl mx-auto text-center px-4 relative z-10" data-aos="zoom-in">
+            <h2 class="text-3xl md:text-5xl font-extrabold tracking-tight mb-6">
                 Siap Memulai Perjalanan Literasi?
             </h2>
-            <p class="text-xl text-indigo-100 mb-8">
+            <p class="text-xl text-primary-100 mb-8 font-medium">
                 Bergabunglah dengan ribuan mahasiswa yang sudah merasakan kemudahan akses perpustakaan digital
             </p>
             @guest
                 <a href=""
-                    class="inline-block px-8 py-4 bg-white text-indigo-600 rounded-xl font-bold hover:shadow-2xl hover:shadow-white/50 transform hover:-translate-y-1 transition-all">
+                    class="inline-block px-8 py-4 bg-gray-900 text-white rounded-xl font-bold hover:shadow-2xl transform hover:-translate-y-1 transition-all">
                     Daftar Sekarang - Gratis!
                 </a>
             @else
                 <a href="{{ route('books.index') }}"
-                    class="inline-block px-8 py-4 bg-white text-indigo-600 rounded-xl font-bold hover:shadow-2xl hover:shadow-white/50 transform hover:-translate-y-1 transition-all">
+                    class="inline-block px-8 py-4 bg-gray-900 text-white rounded-xl font-bold hover:shadow-2xl transform hover:-translate-y-1 transition-all border border-gray-700 hover:border-gray-600">
                     Mulai Jelajahi Koleksi
                 </a>
             @endguest

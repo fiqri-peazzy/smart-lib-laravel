@@ -61,6 +61,10 @@ class LoanResource extends Resource
                                         // Show user info
                                         $activeLoans = $user->activeLoans()->count();
                                         $set('user_info', "Credit Score: {$user->credit_score} | Max Loans: {$user->max_loans} | Active: {$activeLoans} | Denda: Rp " . number_format((float) $user->total_fines, 0));
+
+                                        if ($user->isDosen()) {
+                                            $set('due_date', null);
+                                        }
                                     }
                                 }
                             })
@@ -115,7 +119,9 @@ class LoanResource extends Resource
 
                         Forms\Components\DatePicker::make('due_date')
                             ->label('Tanggal Jatuh Tempo')
-                            ->required()
+                            ->required(fn(callable $get) => !(User::find($get('user_id'))?->isDosen()))
+                            ->disabled(fn(callable $get) => User::find($get('user_id'))?->isDosen())
+                            ->dehydrated(fn(callable $get) => !(User::find($get('user_id'))?->isDosen()))
                             ->minDate(now())
                             ->reactive()
                             ->afterStateUpdated(function ($state, callable $get, callable $set) {
@@ -123,7 +129,11 @@ class LoanResource extends Resource
                                 $userId = $get('user_id');
                                 if ($loanDate && $state && $userId) {
                                     $user = User::find($userId);
-                                    $maxDays = $user && $user->isDosen() ? 30 : 14;
+                                    if ($user && $user->isDosen()) {
+                                        $set('due_date', null);
+                                        return;
+                                    }
+                                    $maxDays = 14;
                                     $diffDays = \Carbon\Carbon::parse($loanDate)->diffInDays($state);
                                     if ($diffDays > $maxDays) {
                                         $set('due_date', \Carbon\Carbon::parse($loanDate)->addDays((int) $maxDays));
@@ -139,10 +149,12 @@ class LoanResource extends Resource
                                 $userId = $get('user_id');
                                 if ($userId) {
                                     $user = User::find($userId);
-                                    $maxDays = $user && $user->isDosen() ? 30 : 14;
-                                    return "Maksimal {$maxDays} hari untuk user ini";
+                                    if ($user && $user->isDosen()) {
+                                        return 'Dosen tidak memiliki batas waktu peminjaman';
+                                    }
+                                    return "Maksimal 14 hari untuk mahasiswa";
                                 }
-                                return 'Mahasiswa: max 14 hari, Dosen: max 30 hari';
+                                return 'Mahasiswa: max 14 hari, Dosen: tanpa batas';
                             }),
 
                         Forms\Components\Textarea::make('notes')
@@ -191,7 +203,7 @@ class LoanResource extends Resource
                     ->label('Jatuh Tempo')
                     ->date('d M Y')
                     ->sortable()
-                    ->placeholder('Belum diambil')
+                    ->placeholder(fn(Loan $record) => $record->loan_date === null ? 'Belum diambil' : 'Tanpa batas')
                     ->color(fn(Loan $record) => $record->isOverdue() ? 'danger' : 'success'),
 
                 Tables\Columns\TextColumn::make('days_until_due')
@@ -200,13 +212,14 @@ class LoanResource extends Resource
                     ->color(fn(Loan $record) => match (true) {
                         $record->status === 'pending_pickup' => 'warning',
                         $record->return_date !== null => 'gray',
+                        $record->due_date === null => 'success',
                         $record->days_until_due < 0 => 'danger',
                         $record->days_until_due <= 2 => 'warning',
                         default => 'success',
                     })
                     ->formatStateUsing(
                         fn(Loan $record) =>
-                        $record->status === 'pending_pickup' ? 'Pending Pickup' : ($record->return_date ? 'Returned' : ($record->days_until_due < 0 ? 'OVERDUE ' . abs($record->days_until_due) . 'd' : $record->days_until_due . ' hari'))
+                        $record->status === 'pending_pickup' ? 'Pending Pickup' : ($record->return_date ? 'Returned' : ($record->due_date === null ? 'Tanpa batas' : ($record->days_until_due < 0 ? 'OVERDUE ' . abs((int) $record->days_until_due) . 'd' : $record->days_until_due . ' hari')))
                     ),
 
                 Tables\Columns\TextColumn::make('status')
@@ -306,29 +319,31 @@ class LoanResource extends Resource
                                 7 => '7 hari',
                                 14 => '14 hari (default)',
                                 21 => '21 hari',
-                                30 => '30 hari (dosen)',
                             ])
                             ->default(14)
-                            ->required()
+                            ->visible(fn(Loan $record) => !$record->user->isDosen())
+                            ->required(fn(Loan $record) => !$record->user->isDosen())
                             ->helperText('Pilih durasi sesuai kebijakan'),
                     ])
                     ->action(function (Loan $record, array $data) {
+                        $loanDays = $record->user->isDosen() ? null : (int) ($data['loan_duration'] ?? 14);
+
                         $record->confirmPickup(
                             processedBy: Auth::id(),
-                            loanDays: (int) ($data['loan_duration'] ?? 14)
+                            loanDays: $loanDays
                         );
 
                         // Update loan_date if specified
                         if (isset($data['loan_date'])) {
                             $record->update([
                                 'loan_date' => $data['loan_date'],
-                                'due_date' => \Carbon\Carbon::parse($data['loan_date'])->addDays((int) ($data['loan_duration'] ?? 14)),
+                                'due_date' => $loanDays ? \Carbon\Carbon::parse($data['loan_date'])->addDays($loanDays) : null,
                             ]);
                         }
 
                         \Filament\Notifications\Notification::make()
                             ->title('Pickup Berhasil Dikonfirmasi')
-                            ->body("Loan untuk {$record->user->name} telah aktif. Jatuh tempo: " . $record->due_date->format('d M Y'))
+                            ->body("Loan untuk {$record->user->name} telah aktif. Jatuh tempo: " . ($record->due_date ? $record->due_date->format('d M Y') : 'Tanpa batas'))
                             ->success()
                             ->send();
                     }),

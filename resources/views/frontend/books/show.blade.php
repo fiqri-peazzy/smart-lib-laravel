@@ -4,7 +4,7 @@
 
 @section('content')
     <!-- Hero Section -->
-    <section class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-12">
+    <section class="bg-primary-600 text-white py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col lg:flex-row gap-8 items-start">
                 <!-- Book Cover -->
@@ -15,8 +15,8 @@
                             <img src="{{ $book->cover_url }}" alt="{{ $book->title }}" class="w-full h-auto">
                         @else
                             <div
-                                class="w-full aspect-[2/3] bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                                <i class="bi bi-book text-white text-8xl opacity-50"></i>
+                                class="w-full aspect-[2/3] bg-primary-100 dark:bg-gray-700 flex items-center justify-center">
+                                <i class="bi bi-book text-primary-300 dark:text-gray-500 text-8xl opacity-50"></i>
                             </div>
                         @endif
                     </div>
@@ -26,7 +26,7 @@
                 <div class="lg:w-3/4">
                     <!-- Breadcrumb -->
                     <nav class="mb-4">
-                        <ol class="flex items-center space-x-2 text-sm text-indigo-200">
+                        <ol class="flex items-center space-x-2 text-sm text-primary-200">
                             <li><a href="{{ route('home') }}" class="hover:text-white"><i class="bi bi-house-door"></i>
                                     Home</a></li>
                             <li><i class="bi bi-chevron-right text-xs"></i></li>
@@ -37,13 +37,13 @@
                     </nav>
 
                     <!-- Title -->
-                    <h1 class="text-3xl md:text-4xl font-bold mb-3">{{ $book->title }}</h1>
+                    <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-3">{{ $book->title }}</h1>
                     @if ($book->subtitle)
-                        <p class="text-xl text-indigo-100 mb-4">{{ $book->subtitle }}</p>
+                        <p class="text-xl text-primary-100 mb-4 font-medium">{{ $book->subtitle }}</p>
                     @endif
 
                     <!-- Author & Publisher -->
-                    <div class="flex flex-wrap gap-4 mb-6 text-indigo-100">
+                    <div class="flex flex-wrap gap-4 mb-6 text-primary-100">
                         <div class="flex items-center">
                             <i class="bi bi-person-fill mr-2"></i>
                             <span>{{ $book->author }}</span>
@@ -73,19 +73,19 @@
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
                             <div class="text-3xl font-bold mb-1">{{ $book->available_stock }}</div>
-                            <div class="text-sm text-indigo-100">Tersedia</div>
+                            <div class="text-sm text-primary-100">Tersedia</div>
                         </div>
                         <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
                             <div class="text-3xl font-bold mb-1">{{ $book->total_stock }}</div>
-                            <div class="text-sm text-indigo-100">Total Eksemplar</div>
+                            <div class="text-sm text-primary-100">Total Eksemplar</div>
                         </div>
                         <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
                             <div class="text-3xl font-bold mb-1">{{ $book->pages ?? 'N/A' }}</div>
-                            <div class="text-sm text-indigo-100">Halaman</div>
+                            <div class="text-sm text-primary-100">Halaman</div>
                         </div>
                         <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
                             <div class="text-3xl font-bold mb-1">{{ $book->language ?? 'ID' }}</div>
-                            <div class="text-sm text-indigo-100">Bahasa</div>
+                            <div class="text-sm text-primary-100">Bahasa</div>
                         </div>
                     </div>
                 </div>
@@ -165,7 +165,7 @@
                             @guest
                                 <!-- Not Logged In -->
                                 <a href="{{ route('login') }}"
-                                    class="w-full flex items-center justify-center px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors">
+                                    class="w-full flex items-center justify-center px-6 py-3 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 transition-colors">
                                     <i class="bi bi-box-arrow-in-right mr-2"></i>
                                     Login untuk Meminjam
                                 </a>
@@ -339,8 +339,7 @@
                                 @foreach ($relatedBooks as $relatedBook)
                                     <a href="{{ route('books.show', $relatedBook) }}"
                                         class="group bg-gray-50 dark:bg-gray-700 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                                        <div
-                                            class="relative aspect-w-16 aspect-h-9 bg-gradient-to-br from-indigo-500 to-purple-600">
+                                        <div class="relative aspect-w-16 aspect-h-9 bg-primary-100 dark:bg-gray-700">
                                             @if ($relatedBook->cover_image)
                                                 <img src="{{ $relatedBook->cover_url }}" alt="{{ $relatedBook->title }}"
                                                     class="w-full h-32 object-cover">
@@ -366,7 +365,7 @@
                                         </div>
                                         <div class="p-3">
                                             <h3
-                                                class="font-semibold text-sm text-gray-900 dark:text-white line-clamp-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 mb-1">
+                                                class="font-semibold text-sm text-gray-900 dark:text-white line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-1">
                                                 {{ $relatedBook->title }}
                                             </h3>
                                             <p class="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
@@ -505,7 +504,8 @@
                     <div class="flex items-start">
                         <i class="bi bi-info-circle-fill text-yellow-600 dark:text-yellow-400 text-xl mr-3 mt-0.5"></i>
                         <div class="flex-1">
-                            <h5 class="text-yellow-900 dark:text-yellow-300 font-bold mb-2">Sistem Antrian Perpustakaan:</h5>
+                            <h5 class="text-yellow-900 dark:text-yellow-300 font-bold mb-2">Sistem Antrian Perpustakaan:
+                            </h5>
                             <ul class="text-sm text-yellow-800 dark:text-yellow-300 space-y-1 list-disc list-inside">
                                 <li>Anda akan masuk ke dalam <strong>daftar tunggu</strong> peminjaman</li>
                                 <li>Kami akan memberikan notifikasi saat buku sudah tersedia kembali</li>

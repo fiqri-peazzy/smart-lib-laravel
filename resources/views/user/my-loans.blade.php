@@ -4,12 +4,12 @@
 
 @section('content')
     <!-- Page Header -->
-    <section class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-12">
+    <section class="bg-primary-600 text-white py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-3xl md:text-4xl font-bold mb-2">Peminjaman Saya</h1>
-                    <p class="text-indigo-100">Kelola semua peminjaman buku Anda</p>
+                    <h1 class="text-3xl md:text-4xl font-extrabold mb-2">Peminjaman Saya</h1>
+                    <p class="text-primary-100 font-medium">Kelola semua peminjaman buku Anda</p>
                 </div>
                 <a href="{{ route('dashboard') }}"
                     class="hidden md:inline-flex items-center px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white rounded-xl transition-colors">
@@ -111,7 +111,7 @@
                             <p class="text-gray-600 dark:text-gray-400 mb-6">Anda belum memiliki request peminjaman yang
                                 menunggu pickup</p>
                             <a href="{{ route('books.index') }}"
-                                class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors">
+                                class="inline-flex items-center px-6 py-3 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 transition-colors shadow-sm">
                                 <i class="bi bi-collection mr-2"></i>
                                 Browse Buku
                             </a>
@@ -241,7 +241,7 @@
                             <p class="text-gray-600 dark:text-gray-400 mb-6">Anda belum memiliki peminjaman buku yang aktif
                             </p>
                             <a href="{{ route('books.index') }}"
-                                class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors">
+                                class="inline-flex items-center px-6 py-3 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 transition-colors shadow-sm">
                                 <i class="bi bi-collection mr-2"></i>
                                 Browse Buku
                             </a>
@@ -572,8 +572,8 @@
 
             // Remove active state from all buttons
             document.querySelectorAll('.tab-button').forEach(btn => {
-                btn.classList.remove('border-indigo-600', 'text-indigo-600', 'dark:border-indigo-400',
-                    'dark:text-indigo-400');
+                btn.classList.remove('border-primary-600', 'text-primary-600', 'dark:border-primary-400',
+                    'dark:text-primary-400');
                 btn.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700',
                     'hover:border-gray-300',
                     'dark:text-gray-400');
@@ -586,8 +586,8 @@
             const activeBtn = document.querySelector(`[data-tab="${tabName}"]`);
             activeBtn.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700',
                 'hover:border-gray-300', 'dark:text-gray-400');
-            activeBtn.classList.add('border-indigo-600', 'text-indigo-600', 'dark:border-indigo-400',
-                'dark:text-indigo-400');
+            activeBtn.classList.add('border-primary-600', 'text-primary-600', 'dark:border-primary-400',
+                'dark:text-primary-400');
         }
 
         // Initialize first tab as active
