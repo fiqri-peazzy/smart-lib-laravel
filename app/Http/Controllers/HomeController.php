@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\BookCategory;
 use App\Models\DigitalCollection;
-use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -19,9 +18,7 @@ class HomeController extends Controller
             'total_books' => Book::count(),
             'total_digital' => DigitalCollection::count(),
             'available_books' => Book::where('is_available', true)
-                ->whereHas('items', function ($q) {
-                    $q->where('status', 'available');
-                })
+                ->where('available_stock', '>', 0)
                 ->count(),
         ];
 
@@ -32,7 +29,7 @@ class HomeController extends Controller
             ->get();
 
         // Featured Books (is_featured = true)
-        $featuredBooks = Book::with(['categories', 'items'])
+        $featuredBooks = Book::with(['categories'])
             ->where('is_featured', true)
             ->where('is_available', true)
             ->take(6)

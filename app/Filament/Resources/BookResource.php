@@ -39,6 +39,37 @@ class BookResource extends Resource
                             ->unique(ignoreRecord: true)
                             ->placeholder('978-xxx-xxx-xxx-x'),
 
+                        Forms\Components\Placeholder::make('barcode_display')
+                            ->label('Barcode Fisik')
+                            ->content(function ($record) {
+                                if (! $record || ! $record->barcode) {
+                                    return new \Illuminate\Support\HtmlString('<span class="text-gray-400 text-sm">Belum ada barcode</span>');
+                                }
+                                $barcodeUrl = route('books.barcode', $record);
+                                $printUrl = route('books.barcode.print', $record);
+
+                                return new \Illuminate\Support\HtmlString('
+                                    <div class="flex items-start gap-4">
+                                        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200" style="width:240px">
+                                            <div class="flex justify-center">
+                                                <img src="'.$barcodeUrl.'" style="width:200px;height:64px;object-fit:fill;image-rendering:pixelated" alt="Barcode">
+                                            </div>
+                                            <div class="text-center mt-2 text-black font-mono font-bold tracking-widest" style="font-size:11px">'.$record->barcode.'</div>
+                                            <div class="text-center text-gray-400 mt-1" style="font-size:11px">Label buku fisik</div>
+                                        </div>
+                                        <div class="flex flex-col gap-2 mt-1">
+                                            <button type="button" onclick="window.open(\''.$printUrl.'\', \'_blank\')" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white" style="background:#4f46e5">
+                                                Print Label
+                                            </button>
+                                            <a href="'.$barcodeUrl.'" download="barcode-'.$record->barcode.'.png" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white" style="background:#16a34a">
+                                                Unduh PNG
+                                            </a>
+                                        </div>
+                                    </div>
+                                ');
+                            })
+                            ->columnSpanFull(),
+
                         Forms\Components\TextInput::make('title')
                             ->label('Judul Buku')
                             ->required()
@@ -144,14 +175,17 @@ class BookResource extends Resource
                             ->default(false)
                             ->helperText('Tampilkan di koleksi unggulan homepage'),
 
-                        Forms\Components\Placeholder::make('stock_info')
-                            ->label('Informasi Stok')
-                            ->content(
-                                fn($record) => $record ?
-                                    "Total: {$record->total_stock} | Available: {$record->available_stock}" :
-                                    'Stok akan otomatis dihitung dari Book Items'
-                            )
-                            ->columnSpanFull(),
+                        Forms\Components\TextInput::make('total_stock')
+                            ->label('Total Stok')
+                            ->numeric()
+                            ->default(1)
+                            ->required(),
+
+                        Forms\Components\TextInput::make('available_stock')
+                            ->label('Stok Tersedia')
+                            ->numeric()
+                            ->default(1)
+                            ->required(),
 
                         Forms\Components\Hidden::make('added_by')
                             ->default(Auth::id()),
@@ -166,8 +200,15 @@ class BookResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('cover_image')
                     ->label('Cover')
-                    ->defaultImageUrl(fn($record) => $record->cover_url)
+                    ->defaultImageUrl(fn ($record) => $record->cover_url)
                     ->size(60),
+
+                Tables\Columns\TextColumn::make('barcode')
+                    ->label('Barcode')
+                    ->searchable()
+                    ->copyable()
+                    ->weight('bold')
+                    ->icon('heroicon-o-qr-code'),
 
                 Tables\Columns\TextColumn::make('isbn')
                     ->label('ISBN')
@@ -217,7 +258,7 @@ class BookResource extends Resource
                     ->label('Tersedia')
                     ->sortable()
                     ->alignCenter()
-                    ->color(fn($state) => $state > 0 ? 'success' : 'danger')
+                    ->color(fn ($state) => $state > 0 ? 'success' : 'danger')
                     ->weight('bold'),
 
                 Tables\Columns\IconColumn::make('is_available')
@@ -263,20 +304,11 @@ class BookResource extends Resource
 
                 Tables\Filters\Filter::make('available_stock')
                     ->label('Stok Habis')
-                    ->query(fn($query) => $query->where('available_stock', 0)),
+                    ->query(fn ($query) => $query->where('available_stock', 0)),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('manage_items')
-                    ->label('Kelola Items')
-                    ->icon('heroicon-o-squares-2x2')
-                    ->color('info')
-                    ->url(fn(Book $record): string => route('filament.admin.resources.book-items.index', [
-                        'tableFilters' => [
-                            'book_id' => ['value' => $record->id]
-                        ]
-                    ])),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -16,6 +16,7 @@ class Book extends Model
 
     protected $fillable = [
         'isbn',
+        'barcode',
         'title',
         'subtitle',
         'author',
@@ -44,6 +45,22 @@ class Book extends Model
         'is_featured' => 'boolean',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($book) {
+            if (empty($book->barcode)) {
+                // Random 16 karakter alphanumeric (huruf kapital + angka)
+                do {
+                    $code = strtoupper(Str::random(16));
+                } while (static::withTrashed()->where('barcode', $code)->exists());
+
+                $book->barcode = $code;
+            }
+        });
+    }
+
     /**
      * Relasi ke categories (many-to-many)
      */
@@ -53,11 +70,11 @@ class Book extends Model
     }
 
     /**
-     * Relasi ke book items (detail per copy)
+     * Relasi ke loans
      */
-    public function items(): HasMany
+    public function loans(): HasMany
     {
-        return $this->hasMany(BookItem::class);
+        return $this->hasMany(Loan::class);
     }
 
     /**
@@ -130,34 +147,30 @@ class Book extends Model
     /**
      * Check apakah buku bisa dipinjam
      */
-    public function canBeBorrowed(): bool
+    public function canBeBorrowed(int $quantity = 1): bool
     {
-        return $this->is_available && $this->available_stock > 0;
+        return $this->is_available && $this->available_stock >= $quantity;
     }
 
     /**
-     * Update stock counts berdasarkan items
+     * Decrement available stock
      */
-    public function updateStockCounts(): void
+    public function decrementStock(int $qty = 1): void
     {
-        $totalStock = $this->items()->count();
-        $availableStock = $this->items()->where('status', 'available')->count();
-
-        $this->update([
-            'total_stock' => $totalStock,
-            'available_stock' => $availableStock,
-            'is_available' => $availableStock > 0,
-        ]);
+        $this->decrement('available_stock', $qty);
+        if ($this->available_stock <= 0) {
+            $this->update(['is_available' => false]);
+        }
     }
 
     /**
-     * Get available items untuk dipinjam
+     * Increment available stock
      */
-    public function getAvailableItems()
+    public function incrementStock(int $qty = 1): void
     {
-        return $this->items()
-            ->where('status', 'available')
-            ->where('condition', '!=', 'damaged')
-            ->get();
+        $this->increment('available_stock', $qty);
+        if ($this->available_stock > 0 && ! $this->is_available) {
+            $this->update(['is_available' => true]);
+        }
     }
 }

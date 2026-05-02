@@ -1,11 +1,13 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\DigitalLibraryController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ScanBorrowController;
 use App\Http\Controllers\UserDashboardController;
 use App\Models\BookItem;
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Frontend Routes
@@ -74,6 +76,11 @@ Route::middleware(['auth', 'user.role'])->group(function () {
     // Profile
     Route::get('/profile', [UserDashboardController::class, 'profile'])->name('profile');
     Route::put('/profile', [UserDashboardController::class, 'updateProfile'])->name('profile.update');
+
+    // Scan & Borrow Self-Service
+    Route::get('/scan-borrow', [ScanBorrowController::class, 'index'])->name('scan-borrow.index');
+    Route::post('/scan-borrow/details', [ScanBorrowController::class, 'fetchBookDetails'])->name('scan-borrow.details');
+    Route::post('/scan-borrow/process', [ScanBorrowController::class, 'process'])->name('scan-borrow.process');
 });
 
 /*
@@ -82,17 +89,38 @@ Route::middleware(['auth', 'user.role'])->group(function () {
 |--------------------------------------------------------------------------
 */
 // /admin/* handled by Filament
-Route::middleware(['auth'])->group(function () {
-    Route::get('/book-items/{bookItem}/print-qr', function (BookItem $bookItem) {
-        return view('book-items.print-qr', [
-            'item' => $bookItem
-        ]);
-    })->name('book-items.print-qr');
-});
+// Route::middleware(['auth'])->group(function () {
+//     Route::get('/book-items/{bookItem}/print-qr', function (BookItem $bookItem) {
+//         return view('book-items.print-qr', [
+//             'item' => $bookItem
+//         ]);
+//     })->name('book-items.print-qr');
+// });
+
+// QR Code image route for admin book detail
+Route::middleware(['auth'])->get('/books/{book}/qrcode.png', function (\App\Models\Book $book) {
+    $options = new \chillerlan\QRCode\QROptions;
+    $options->outputInterface = \chillerlan\QRCode\Output\QRGdImagePNG::class;
+    $options->scale = 8;
+    $options->outputBase64 = false;
+
+    $qr = new \chillerlan\QRCode\QRCode($options);
+    $png = $qr->render($book->barcode);
+
+    return response($png, 200, [
+        'Content-Type' => 'image/png',
+        'Cache-Control' => 'public, max-age=3600',
+    ]);
+})->name('books.qrcode');
+
+// QR Code print page
+Route::middleware(['auth'])->get('/books/{book}/qrcode/print', function (\App\Models\Book $book) {
+    return view('books.qrcode-print', ['book' => $book]);
+})->name('books.qrcode.print');
 
 /*
 |--------------------------------------------------------------------------
 | Auth Routes (Laravel Breeze/Jetstream)
 |--------------------------------------------------------------------------
 */
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

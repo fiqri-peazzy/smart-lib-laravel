@@ -237,96 +237,7 @@
                         </div>
                     @endif
 
-                    <!-- Book Items (Copies) -->
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
-                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
-                            <i class="bi bi-stack mr-2"></i>
-                            Daftar Eksemplar
-                            <span class="ml-3 text-sm font-normal text-gray-500">{{ $book->items->count() }}
-                                eksemplar</span>
-                        </h2>
 
-                        @if ($book->items->isEmpty())
-                            <div class="text-center py-8">
-                                <i class="bi bi-inbox text-4xl text-gray-400 mb-3"></i>
-                                <p class="text-gray-500 dark:text-gray-400">Belum ada eksemplar fisik untuk buku ini</p>
-                            </div>
-                        @else
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-sm">
-                                    <thead class="bg-gray-50 dark:bg-gray-700">
-                                        <tr>
-                                            <th class="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">
-                                                Barcode</th>
-                                            <th class="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">
-                                                Kondisi</th>
-                                            <th class="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">
-                                                Status</th>
-                                            <th class="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-300">
-                                                Lokasi</th>
-                                            <th
-                                                class="px-4 py-3 text-center font-semibold text-gray-700 dark:text-gray-300">
-                                                QR Code</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                        @foreach ($book->items as $item)
-                                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                                                <td class="px-4 py-3 font-mono text-xs text-gray-900 dark:text-white">
-                                                    {{ $item->barcode }}
-                                                </td>
-                                                <td class="px-4 py-3">
-                                                    <span
-                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                        @if ($item->condition === 'excellent') bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400
-                                                        @elseif($item->condition === 'good') bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400
-                                                        @elseif($item->condition === 'fair') bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400
-                                                        @else bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 @endif">
-                                                        <i class="bi bi-star-fill mr-1"></i>
-                                                        {{ ucfirst($item->condition) }}
-                                                    </span>
-                                                </td>
-                                                <td class="px-4 py-3">
-                                                    <span
-                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                        @if ($item->status === 'available') bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400
-                                                        @elseif($item->status === 'on_loan') bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400
-                                                        @else bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 @endif">
-                                                        @if ($item->status === 'available')
-                                                            <i class="bi bi-check-circle-fill mr-1"></i>
-                                                            Available
-                                                        @elseif($item->status === 'on_loan')
-                                                            <i class="bi bi-hourglass-split mr-1"></i>
-                                                            On Loan
-                                                        @else
-                                                            <i class="bi bi-x-circle-fill mr-1"></i>
-                                                            {{ ucfirst($item->status) }}
-                                                        @endif
-                                                    </span>
-                                                </td>
-                                                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">
-                                                    <i class="bi bi-geo-alt text-gray-400 mr-1"></i>
-                                                    {{ $item->current_location ?? 'N/A' }}
-                                                </td>
-                                                <td class="px-4 py-3 text-center">
-                                                    @if ($item->qr_code_url)
-                                                        <a href="{{ $item->qr_code_url }}" target="_blank"
-                                                            class="inline-block p-1 bg-gray-100 dark:bg-gray-700 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                                                            <img src="{{ $item->qr_code_url }}"
-                                                                alt="QR Code {{ $item->barcode }}"
-                                                                class="w-12 h-12 object-contain">
-                                                        </a>
-                                                    @else
-                                                        <span class="text-gray-400 text-xs">No QR</span>
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @endif
-                    </div>
 
                     <!-- Related Books -->
                     @if ($relatedBooks->isNotEmpty())
@@ -385,64 +296,97 @@
 
     <!-- Request Loan Modal -->
     <div id="requestModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full flex flex-col max-h-[90vh] overflow-hidden">
             <!-- Modal Header -->
-            <div class="bg-gradient-to-r from-green-600 to-emerald-600 text-white p-6">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-5">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-2xl font-bold flex items-center">
-                        <i class="bi bi-bookmark-check mr-3"></i>
-                        Request Peminjaman
-                    </h3>
-                    <button onclick="closeRequestModal()" class="text-white hover:text-gray-200 transition-colors">
-                        <i class="bi bi-x-lg text-2xl"></i>
+                    <div>
+                        <h3 class="text-xl font-bold flex items-center gap-2">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            Request Peminjaman
+                        </h3>
+                        <p class="text-blue-100 text-sm mt-0.5">Konfirmasi pengajuan pinjam buku</p>
+                    </div>
+                    <button onclick="closeRequestModal()" class="text-white/70 hover:text-white transition-colors p-1">
+                        <i class="bi bi-x-lg text-xl"></i>
                     </button>
                 </div>
             </div>
 
             <!-- Modal Body -->
-            <div class="p-6 space-y-6">
+            <div class="p-5 space-y-4 overflow-y-auto custom-scrollbar">
                 <!-- Book Info -->
-                <div class="flex items-start space-x-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                <div class="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-100 dark:border-gray-700">
                     <img src="{{ $book->cover_url }}" alt="{{ $book->title }}"
-                        class="w-20 h-28 object-cover rounded-lg shadow">
-                    <div class="flex-1">
-                        <h4 class="font-bold text-gray-900 dark:text-white mb-1 line-clamp-2">{{ $book->title }}</h4>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ $book->author }}</p>
-                        <div class="flex items-center text-sm text-green-600 dark:text-green-400">
-                            <i class="bi bi-check-circle-fill mr-1"></i>
-                            <span class="font-semibold">{{ $book->available_stock }} eksemplar tersedia</span>
+                        class="w-16 h-22 object-cover rounded-lg shadow flex-shrink-0"
+                        onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2264%22 height=%2288%22 viewBox=%220 0 64 88%22%3E%3Crect width=%2264%22 height=%2288%22 fill=%22%23e5e7eb%22 rx=%224%22/%3E%3Ctext x=%2232%22 y=%2248%22 font-size=%2224%22 text-anchor=%22middle%22 fill=%22%239ca3af%22%3E📖%3C/text%3E%3C/svg%3E'">
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-bold text-gray-900 dark:text-white leading-tight line-clamp-2">{{ $book->title }}</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{{ $book->author }}</p>
+                        <div class="flex items-center gap-1.5 mt-2">
+                            <span class="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
+                            <span class="text-sm text-green-600 dark:text-green-400 font-semibold">{{ $book->available_stock }} eksemplar tersedia</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Info Box -->
-                <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-500 rounded-xl p-4">
-                    <div class="flex items-start">
-                        <i class="bi bi-info-circle-fill text-blue-600 dark:text-blue-400 text-xl mr-3 mt-0.5"></i>
-                        <div class="flex-1">
-                            <h5 class="text-blue-900 dark:text-blue-300 font-bold mb-2">Informasi Penting:</h5>
-                            <ul class="text-sm text-blue-800 dark:text-blue-300 space-y-1 list-disc list-inside">
-                                <li>Anda memiliki <strong>3 hari</strong> untuk mengambil buku di perpustakaan</li>
-                                <li>Tunjukkan <strong>QR code</strong> dari halaman "My Loans" ke staff</li>
-                                <li>Masa peminjaman: <strong>14 hari</strong> dari tanggal pengambilan</li>
-                                <li>Request akan otomatis dibatalkan jika tidak diambil dalam 3 hari</li>
-                            </ul>
-                        </div>
-                    </div>
+                <!-- Steps / Alur Baru -->
+                <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-xl p-4">
+                    <h5 class="text-blue-800 dark:text-blue-300 font-bold text-sm mb-3 flex items-center gap-2">
+                        <i class="bi bi-list-ol"></i>
+                        Alur Peminjaman
+                    </h5>
+                    <ol class="space-y-2.5">
+                        <li class="flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
+                            <div class="text-sm text-blue-800 dark:text-blue-300">
+                                <strong>Klik "Konfirmasi Request"</strong> — sistem akan mencatat pengajuan pinjam Anda
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
+                            <div class="text-sm text-blue-800 dark:text-blue-300">
+                                <strong>Datang ke perpustakaan</strong> dalam <strong>3 hari</strong> — bawa kartu mahasiswa/identitas
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
+                            <div class="text-sm text-blue-800 dark:text-blue-300">
+                                <strong>Staff scan QR Code</strong> yang ada di sampul buku untuk mengaktifkan peminjaman
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="w-6 h-6 rounded-full bg-green-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">✓</span>
+                            <div class="text-sm text-blue-800 dark:text-blue-300">
+                                Masa pinjam <strong>14 hari</strong> dihitung mulai saat buku diambil
+                            </div>
+                        </li>
+                    </ol>
                 </div>
 
-                <!-- Your Credit Info -->
+                <!-- Warning: auto-cancel -->
+                <div class="flex items-center gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl px-4 py-3">
+                    <i class="bi bi-exclamation-triangle-fill text-amber-500 text-lg flex-shrink-0"></i>
+                    <p class="text-sm text-amber-800 dark:text-amber-300">
+                        Request akan <strong>otomatis dibatalkan</strong> jika buku tidak diambil dalam 3 hari.
+                    </p>
+                </div>
+
+                <!-- Your Stats -->
                 @auth
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                            <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">Credit Score Anda</div>
-                            <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ Auth::user()->credit_score }}
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-100 dark:border-gray-700">
+                            <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">Credit Score</div>
+                            <div class="text-xl font-bold text-gray-900 dark:text-white">
+                                {{ Auth::user()->credit_score }}
+                                <span class="text-xs font-normal text-gray-400">/100</span>
                             </div>
                         </div>
-                        <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                        <div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-100 dark:border-gray-700">
                             <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">Peminjaman Aktif</div>
-                            <div class="text-2xl font-bold text-gray-900 dark:text-white">
-                                {{ Auth::user()->activeLoans()->count() }}/{{ Auth::user()->max_loans }}
+                            <div class="text-xl font-bold text-gray-900 dark:text-white">
+                                {{ Auth::user()->activeLoans()->count() }}
+                                <span class="text-xs font-normal text-gray-400">/ {{ Auth::user()->max_loans }} maks</span>
                             </div>
                         </div>
                     </div>
@@ -450,16 +394,16 @@
             </div>
 
             <!-- Modal Footer -->
-            <div class="p-6 bg-gray-50 dark:bg-gray-700/50 flex gap-3">
+            <div class="px-5 pb-5 flex gap-3">
                 <button onclick="closeRequestModal()"
-                    class="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors">
+                    class="flex-1 px-5 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                     Batal
                 </button>
                 <form action="{{ route('books.request-loan', $book) }}" method="POST" class="flex-1">
                     @csrf
                     <button type="submit"
-                        class="w-full px-6 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition-colors shadow-lg">
-                        <i class="bi bi-check-circle mr-2"></i>
+                        class="w-full px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-semibold transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
+                        <i class="bi bi-check-circle-fill"></i>
                         Konfirmasi Request
                     </button>
                 </form>
@@ -469,7 +413,7 @@
 
     <!-- Booking Modal -->
     <div id="bookingModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full flex flex-col max-h-[90vh] overflow-hidden">
             <!-- Modal Header -->
             <div class="bg-gradient-to-r from-yellow-600 to-orange-600 text-white p-6">
                 <div class="flex items-center justify-between">
@@ -484,7 +428,7 @@
             </div>
 
             <!-- Modal Body -->
-            <div class="p-6 space-y-6">
+            <div class="p-6 space-y-6 overflow-y-auto custom-scrollbar">
                 <!-- Book Info -->
                 <div class="flex items-start space-x-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
                     <img src="{{ $book->cover_url }}" alt="{{ $book->title }}"

@@ -55,7 +55,7 @@
                 <div
                     class="mb-6 p-4 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg">
                     <p class="text-sm text-primary-800 dark:text-primary-300">
-                        <strong>👨‍💼 Admin/Staf?</strong> Silakan akses
+                        <strong>Admin/Staf?</strong> Silakan akses
                         <a href="/admin" class="font-semibold underline hover:text-primary-600">Panel Admin</a>
                     </p>
                 </div>

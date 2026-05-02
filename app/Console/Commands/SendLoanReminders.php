@@ -40,7 +40,7 @@ class SendLoanReminders extends Command
         foreach ($reminders as $type => $date) {
             $loans = Loan::whereIn('status', ['active', 'extended'])
                 ->whereDate('due_date', $date)
-                ->with(['user', 'bookItem.book'])
+                ->with(['user', 'book'])
                 ->get();
 
             if ($loans->isEmpty()) {
@@ -48,7 +48,7 @@ class SendLoanReminders extends Command
             }
 
             $this->newLine();
-            $this->info("📧 Sending reminders for: " . str_replace('_', ' ', $type) . " ({$date})");
+            $this->info('📧 Sending reminders for: '.str_replace('_', ' ', $type)." ({$date})");
 
             $bar = $this->output->createProgressBar($loans->count());
             $bar->start();
@@ -70,8 +70,8 @@ class SendLoanReminders extends Command
                 ['User', 'Book', 'Due Date'],
                 $loans->map(function ($loan) {
                     return [
-                        $loan->user->name . ' (' . $loan->user->nim . ')',
-                        $loan->bookItem->book->title,
+                        $loan->user->name.' ('.$loan->user->nim.')',
+                        $loan->book->title,
                         $loan->due_date->format('d M Y'),
                     ];
                 })
@@ -95,10 +95,10 @@ class SendLoanReminders extends Command
     {
         // Get message based on type
         $message = match ($type) {
-            'due_today' => "⚠️ REMINDER: Buku \"{$loan->bookItem->book->title}\" harus dikembalikan HARI INI!",
-            'due_tomorrow' => "⏰ REMINDER: Buku \"{$loan->bookItem->book->title}\" harus dikembalikan BESOK ({$loan->due_date->format('d M Y')}).",
-            'due_in_3_days' => "📅 REMINDER: Buku \"{$loan->bookItem->book->title}\" harus dikembalikan dalam 3 hari ({$loan->due_date->format('d M Y')}).",
-            default => "Reminder: Please return your book.",
+            'due_today' => "⚠️ REMINDER: Buku \"{$loan->book->title}\" harus dikembalikan HARI INI!",
+            'due_tomorrow' => "⏰ REMINDER: Buku \"{$loan->book->title}\" harus dikembalikan BESOK ({$loan->due_date->format('d M Y')}).",
+            'due_in_3_days' => "📅 REMINDER: Buku \"{$loan->book->title}\" harus dikembalikan dalam 3 hari ({$loan->due_date->format('d M Y')}).",
+            default => 'Reminder: Please return your book.',
         };
 
         // Implement actual notification sending

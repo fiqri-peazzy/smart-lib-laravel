@@ -17,7 +17,7 @@ class BookController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Book::with(['categories', 'recommendedForMajor', 'items']);
+        $query = Book::with(['categories', 'recommendedForMajor']);
 
         // Search
         if ($request->filled('search')) {
@@ -79,16 +79,14 @@ class BookController extends Controller
      */
     public function show(Book $book)
     {
-        $book->load(['categories', 'recommendedForMajor', 'items' => function ($query) {
-            $query->where('status', 'available');
-        }]);
+        $book->load(['categories', 'recommendedForMajor']);
 
         // Check if user can borrow
         $canBorrow = false;
         $borrowMessage = '';
         if (Auth::check()) {
             $user = Auth::user();
-            if (!$user->canBorrow()) {
+            if (! $user->canBorrow()) {
                 $borrowMessage = 'Anda tidak dapat meminjam. Silakan bayar denda atau hubungi admin.';
             } elseif ($user->activeLoans()->count() >= $user->max_loans) {
                 $borrowMessage = "Anda sudah mencapai limit peminjaman ({$user->max_loans} buku).";
@@ -137,7 +135,7 @@ class BookController extends Controller
             $q->where('book_categories.id', $category->id);
         })
             ->where('is_available', true)
-            ->with(['categories', 'items'])
+            ->with(['categories'])
             ->paginate(12);
 
         return view('frontend.books.category', compact('books', 'category'));
@@ -149,14 +147,14 @@ class BookController extends Controller
     public function requestLoan(Request $request, Book $book)
     {
         // Must be authenticated
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return back()->with('error', 'Silakan login terlebih dahulu untuk meminjam buku.');
         }
 
         $user = Auth::user();
 
         // Validate user can borrow
-        if (!$user->canBorrow()) {
+        if (! $user->canBorrow()) {
             return back()->with('error', 'Anda tidak dapat meminjam buku. Silakan bayar denda terlebih dahulu.');
         }
 
@@ -172,9 +170,7 @@ class BookController extends Controller
 
         // Check if user already has active loan for this book
         $existingLoan = $user->loans()
-            ->whereHas('bookItem', function ($q) use ($book) {
-                $q->where('book_id', $book->id);
-            })
+            ->where('book_id', $book->id)
             ->whereIn('status', ['pending_pickup', 'active', 'extended', 'overdue'])
             ->first();
 
@@ -195,26 +191,17 @@ class BookController extends Controller
         // Use DB transaction
         DB::beginTransaction();
         try {
-            // Auto-assign first available book item
-            $bookItem = $book->getAvailableItems()->first();
-
-            if (!$bookItem) {
-                DB::rollBack();
-                return back()->with('error', 'Tidak ada eksemplar yang tersedia saat ini.');
-            }
-
             // Create loan request with pending_pickup status
             $loan = Loan::create([
                 'user_id' => $user->id,
-                'book_item_id' => $bookItem->id,
+                'book_id' => $book->id,
+                'quantity' => 1,
                 'status' => 'pending_pickup',
                 'requested_at' => now(),
                 'pickup_deadline' => now()->addDays(3), // 3 days to pickup
                 'loan_date' => null, // Will be set when staff confirms pickup
                 'due_date' => null, // Will be set when staff confirms pickup
             ]);
-
-            // Book item status is updated in model boot (markAsBorrowed)
 
             DB::commit();
 
@@ -224,7 +211,8 @@ class BookController extends Controller
             );
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Request loan failed: ' . $e->getMessage());
+            Log::error('Request loan failed: '.$e->getMessage());
+
             return back()->with('error', 'Terjadi kesalahan. Silakan coba lagi.');
         }
     }

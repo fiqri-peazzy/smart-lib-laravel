@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,7 +23,8 @@ class Loan extends Model
 
     protected $fillable = [
         'user_id',
-        'book_item_id',
+        'book_id',
+        'quantity',
         'processed_by',
         'returned_to',
         'loan_date',
@@ -67,12 +67,17 @@ class Loan extends Model
 
         static::creating(function ($loan) {
             // Only set loan_date for non-pending_pickup loans
-            if (!$loan->loan_date && $loan->status !== 'pending_pickup') {
+            if (! $loan->loan_date && $loan->status !== 'pending_pickup') {
                 $loan->loan_date = now();
             }
 
-            // Update book item status
-            $loan->bookItem->markAsBorrowed();
+            // Update book stock
+            if ($loan->book_id) {
+                $book = Book::find($loan->book_id);
+                if ($book) {
+                    $book->decrementStock($loan->quantity ?? 1);
+                }
+            }
         });
 
         static::created(function ($loan) {
@@ -104,11 +109,11 @@ class Loan extends Model
     }
 
     /**
-     * Relasi ke book item
+     * Relasi ke book
      */
-    public function bookItem(): BelongsTo
+    public function book(): BelongsTo
     {
-        return $this->belongsTo(BookItem::class);
+        return $this->belongsTo(Book::class);
     }
 
     /**
@@ -171,9 +176,10 @@ class Loan extends Model
         if ($this->return_date) {
             return false;
         }
-        if (!$this->due_date) {
+        if (! $this->due_date) {
             return false;
         }
+
         return now()->isAfter($this->due_date);
     }
 
@@ -186,7 +192,7 @@ class Loan extends Model
             return false;
         }
 
-        if (!$this->pickup_deadline) {
+        if (! $this->pickup_deadline) {
             return false;
         }
 
@@ -198,7 +204,7 @@ class Loan extends Model
      */
     public function getDaysUntilPickupAttribute(): int
     {
-        if ($this->status !== 'pending_pickup' || !$this->pickup_deadline) {
+        if ($this->status !== 'pending_pickup' || ! $this->pickup_deadline) {
             return 0;
         }
 
@@ -213,14 +219,15 @@ class Loan extends Model
         $returnDate = $this->return_date;
         $dueDate = $this->due_date;
 
-        if (!$dueDate) {
+        if (! $dueDate) {
             return 0;
         }
 
-        if (!$returnDate) {
+        if (! $returnDate) {
             if (now()->isAfter($dueDate)) {
                 return (int) abs(now()->diffInDays($dueDate, false));
             }
+
             return 0;
         }
 
@@ -248,6 +255,7 @@ class Loan extends Model
         $finePerDay = 1000;
         $maxFine = 50000;
         $calculatedFine = $daysOverdue * $finePerDay;
+
         return (float) min($calculatedFine, $maxFine);
     }
 
@@ -256,19 +264,19 @@ class Loan extends Model
      */
     public function canBeExtended(): bool
     {
-        if ($this->is_extended || !$this->due_date) {
+        if ($this->is_extended || ! $this->due_date) {
             return false;
         }
 
-        if (!in_array($this->status, ['active', 'overdue'])) {
+        if (! in_array($this->status, ['active', 'overdue'])) {
             return false;
         }
 
-        $hasPendingBookings = Booking::where('book_id', $this->bookItem->book_id)
+        $hasPendingBookings = Booking::where('book_id', $this->book_id)
             ->where('status', 'pending')
             ->exists();
 
-        return !$hasPendingBookings;
+        return ! $hasPendingBookings;
     }
 
     /**
@@ -276,7 +284,7 @@ class Loan extends Model
      */
     public function extend(int $additionalDays = 7): bool
     {
-        if (!$this->canBeExtended()) {
+        if (! $this->canBeExtended()) {
             return false;
         }
 
@@ -317,12 +325,14 @@ class Loan extends Model
             return;
         }
 
-        // Update book item back to available
-        $this->bookItem->update(['status' => 'available']);
+        // Return book stock
+        if ($this->book) {
+            $this->book->incrementStock($this->quantity ?? 1);
+        }
 
         // Soft delete the loan request
         $this->update([
-            'notes' => $this->notes . "\n" . now()->format('Y-m-d H:i') . ': ' . ($reason ?? 'Pickup expired'),
+            'notes' => $this->notes."\n".now()->format('Y-m-d H:i').': '.($reason ?? 'Pickup expired'),
         ]);
 
         $this->delete();
@@ -351,31 +361,43 @@ class Loan extends Model
             $fineAmount = min($daysLate * $finePerDay, $maxFine);
         }
 
+        // Hitung denda kerusakan otomatis
+        $damageFineAmount = 0;
+        if (in_array($condition, ['poor', 'damaged'])) {
+            $damageFineAmount = 50000; // Contoh denda buku rusak
+        } elseif ($condition === 'lost') {
+            $damageFineAmount = 100000; // Contoh denda buku hilang
+        }
+
+        $totalFineAmount = $fineAmount + $damageFineAmount;
+
         $this->update([
             'return_date' => $returnDate,
             'status' => 'returned',
             'return_condition' => $condition,
             'return_notes' => $notes,
             'returned_to' => $returnedTo ?? Auth::id(),
-            'fine_amount' => $fineAmount,
+            'fine_amount' => $totalFineAmount,
         ]);
 
-        if ($fineAmount > 0) {
+        if ($totalFineAmount > 0) {
             Fine::create([
                 'loan_id' => $this->id,
                 'user_id' => $this->user_id,
-                'amount' => $fineAmount,
+                'amount' => $totalFineAmount,
                 'days_overdue' => $daysLate,
                 'daily_rate' => 1000,
             ]);
 
-            $this->user->increment('total_fines', $fineAmount);
+            $this->user->increment('total_fines', $totalFineAmount);
         }
 
-        $this->bookItem->update([
-            'status' => 'available',
-            'condition' => $condition,
-        ]);
+        if ($this->book) {
+            // Hanya kembalikan stok jika tidak hilang (atau kebijakan bisa dikembalikan lalu mark unavailable)
+            if ($condition !== 'lost') {
+                $this->book->incrementStock($this->quantity ?? 1);
+            }
+        }
 
         $this->user->updateLoanHistory();
         $this->user->recalculateCreditScore();
@@ -389,7 +411,7 @@ class Loan extends Model
      */
     protected function notifyBookings(): void
     {
-        $bookings = Booking::where('book_id', $this->bookItem->book_id)
+        $bookings = Booking::where('book_id', $this->book_id)
             ->where('status', 'pending')
             ->orderBy('is_priority', 'desc')
             ->orderBy('booking_date', 'asc')
@@ -420,9 +442,10 @@ class Loan extends Model
      */
     public function getDaysUntilDueAttribute(): ?int
     {
-        if ($this->return_date || !$this->due_date) {
+        if ($this->return_date || ! $this->due_date) {
             return null; // or handle dynamically
         }
+
         return now()->diffInDays($this->due_date, false);
     }
 }

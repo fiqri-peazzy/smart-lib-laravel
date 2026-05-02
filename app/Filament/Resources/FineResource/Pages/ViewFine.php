@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\FineResource\Pages;
 
 use App\Filament\Resources\FineResource;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewFine extends ViewRecord
 {
@@ -21,7 +21,7 @@ class ViewFine extends ViewRecord
                             ->label('User'),
                         Infolists\Components\TextEntry::make('user.nim')
                             ->label('NIM'),
-                        Infolists\Components\TextEntry::make('loan.bookItem.book.title')
+                        Infolists\Components\TextEntry::make('loan.book.title')
                             ->label('Buku'),
                         Infolists\Components\TextEntry::make('days_overdue')
                             ->label('Hari Terlambat')
@@ -60,7 +60,7 @@ class ViewFine extends ViewRecord
                             ->date('d M Y H:i'),
                     ])
                     ->columns(3)
-                    ->visible(fn($record) => $record->status === 'paid'),
+                    ->visible(fn ($record) => $record->status === 'paid'),
 
                 Infolists\Components\Section::make('Informasi Pembebasan')
                     ->schema([
@@ -77,7 +77,7 @@ class ViewFine extends ViewRecord
                             ->dateTime('d M Y H:i'),
                     ])
                     ->columns(3)
-                    ->visible(fn($record) => $record->is_waived),
+                    ->visible(fn ($record) => $record->is_waived),
             ]);
     }
 }

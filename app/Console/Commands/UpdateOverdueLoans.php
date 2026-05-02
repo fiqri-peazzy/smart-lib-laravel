@@ -32,10 +32,12 @@ class UpdateOverdueLoans extends Command
         $overdueLoans = Loan::whereIn('status', ['active', 'extended'])
             ->where('due_date', '<', now())
             ->whereNull('return_date')
+            ->with(['user', 'book'])
             ->get();
 
         if ($overdueLoans->isEmpty()) {
             $this->info('No overdue loans found.');
+
             return Command::SUCCESS;
         }
 
@@ -60,10 +62,10 @@ class UpdateOverdueLoans extends Command
             ['User', 'Book', 'Due Date', 'Days Overdue'],
             $overdueLoans->map(function ($loan) {
                 return [
-                    $loan->user->name . ' (' . $loan->user->nim . ')',
-                    $loan->bookItem->book->title,
+                    $loan->user->name.' ('.$loan->user->nim.')',
+                    $loan->book->title,
                     $loan->due_date->format('d M Y'),
-                    abs($loan->getDaysOverdue()) . ' days',
+                    abs($loan->getDaysOverdue()).' days',
                 ];
             })
         );

@@ -167,7 +167,7 @@
                                         <div>
                                             <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">Buku</div>
                                             <div class="font-semibold text-gray-900 dark:text-white line-clamp-2">
-                                                {{ $fine->loan->bookItem->book->title }}
+                                                {{ $fine->loan->book->title }}
                                             </div>
                                         </div>
 
@@ -254,7 +254,7 @@
                                                 </td>
                                                 <td class="px-6 py-4">
                                                     <div class="text-sm font-medium text-gray-900 dark:text-white line-clamp-2">
-                                                        {{ $fine->loan->bookItem->book->title }}
+                                                        {{ $fine->loan->book->title }}
                                                     </div>
                                                     <div class="text-xs text-gray-500 dark:text-gray-400">
                                                         Loan #{{ $fine->loan_id }}

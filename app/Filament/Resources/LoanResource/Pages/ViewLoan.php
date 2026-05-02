@@ -4,9 +4,9 @@ namespace App\Filament\Resources\LoanResource\Pages;
 
 use App\Filament\Resources\LoanResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewLoan extends ViewRecord
 {
@@ -16,7 +16,7 @@ class ViewLoan extends ViewRecord
     {
         return [
             Actions\EditAction::make()
-                ->visible(fn() => $this->record->status !== 'returned'),
+                ->visible(fn () => $this->record->status !== 'returned'),
         ];
     }
 
@@ -33,11 +33,11 @@ class ViewLoan extends ViewRecord
                         Infolists\Components\TextEntry::make('user.credit_score')
                             ->label('Credit Score')
                             ->badge()
-                            ->color(fn($state) => $state >= 70 ? 'success' : 'danger'),
-                        Infolists\Components\TextEntry::make('bookItem.book.title')
+                            ->color(fn ($state) => $state >= 70 ? 'success' : 'danger'),
+                        Infolists\Components\TextEntry::make('book.title')
                             ->label('Judul Buku'),
-                        Infolists\Components\TextEntry::make('bookItem.barcode')
-                            ->label('Barcode')
+                        Infolists\Components\TextEntry::make('book.barcode')
+                            ->label('QR Code')
                             ->copyable(),
                     ])
                     ->columns(2),
@@ -51,7 +51,7 @@ class ViewLoan extends ViewRecord
                             ->label('Jatuh Tempo')
                             ->date('d M Y')
                             ->badge()
-                            ->color(fn($record) => $record->isOverdue() ? 'danger' : 'success'),
+                            ->color(fn ($record) => $record->isOverdue() ? 'danger' : 'success'),
                         Infolists\Components\TextEntry::make('return_date')
                             ->label('Tanggal Kembali')
                             ->date('d M Y')
@@ -71,7 +71,7 @@ class ViewLoan extends ViewRecord
                             ->label('Denda')
                             ->money('IDR')
                             ->badge()
-                            ->color(fn($state) => $state > 0 ? 'danger' : 'success'),
+                            ->color(fn ($state) => $state > 0 ? 'danger' : 'success'),
                         Infolists\Components\IconEntry::make('fine_paid')
                             ->label('Denda Dibayar')
                             ->boolean(),
@@ -91,7 +91,7 @@ class ViewLoan extends ViewRecord
                             ->badge(),
                     ])
                     ->columns(3)
-                    ->visible(fn($record) => $record->return_date !== null),
+                    ->visible(fn ($record) => $record->return_date !== null),
             ]);
     }
 }

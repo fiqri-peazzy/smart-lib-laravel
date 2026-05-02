@@ -4,13 +4,13 @@ use App\Models\Loan;
 use App\Models\Fine;
 use App\Models\User;
 
-$loan = Loan::find(7); // ID from previous step
+$loan = Loan::where('status', 'overdue')->latest()->first(); 
 if (!$loan) {
-    echo "Loan #7 not found!\n";
+    echo "No overdue loan found. Run create_test_overdue.php first!\n";
     exit;
 }
 
-echo "Processing return for Loan #7 to generate fine...\n";
+echo "Processing return for Loan #{$loan->id} to generate fine...\n";
 
 // We can just manually create a fine record if we want to test the payment gateway
 $fine = Fine::create([

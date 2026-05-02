@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Loan;
-use App\Models\Booking;
 use App\Models\Book;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
-use Illuminate\Support\Facades\Storage;
+use App\Models\Booking;
+use App\Models\Loan;
 use App\Models\PaymentTransaction;
 use App\Services\PaymentService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rules\Password;
 
 class UserDashboardController extends Controller
 {
@@ -30,7 +30,7 @@ class UserDashboardController extends Controller
 
         // Ambil peminjaman terbaru
         $recentLoans = $user->loans()
-            ->with('bookItem.book')
+            ->with('book')
             ->latest()
             ->take(5)
             ->get();
@@ -47,28 +47,28 @@ class UserDashboardController extends Controller
 
         // Pending Pickup (requested but not picked up yet)
         $pendingPickupLoans = $user->loans()
-            ->with(['bookItem.book.categories'])
+            ->with(['book.categories'])
             ->where('status', 'pending_pickup')
             ->latest('requested_at')
             ->get();
 
         // Active Loans (active + extended)
         $activeLoans = $user->loans()
-            ->with(['bookItem.book.categories'])
+            ->with(['book.categories'])
             ->whereIn('status', ['active', 'extended'])
             ->latest('loan_date')
             ->get();
 
         // Overdue Loans
         $overdueLoans = $user->loans()
-            ->with(['bookItem.book.categories', 'fine'])
+            ->with(['book.categories', 'fine'])
             ->where('status', 'overdue')
             ->latest('due_date')
             ->get();
 
         // History (returned)
         $historyLoans = $user->loans()
-            ->with(['bookItem.book.categories'])
+            ->with(['book.categories'])
             ->where('status', 'returned')
             ->latest('return_date')
             ->paginate(10);
@@ -87,16 +87,16 @@ class UserDashboardController extends Controller
         }
 
         // Check if can be extended
-        if (!$loan->canBeExtended()) {
+        if (! $loan->canBeExtended()) {
             $reason = 'Peminjaman tidak dapat diperpanjang.';
 
             if ($loan->is_extended) {
                 $reason = 'Peminjaman sudah pernah diperpanjang sebelumnya (maksimal 1x).';
-            } elseif (!in_array($loan->status, ['active', 'overdue'])) {
+            } elseif (! in_array($loan->status, ['active', 'overdue'])) {
                 $reason = 'Status peminjaman tidak valid untuk perpanjangan.';
             } else {
                 // Check for pending bookings
-                $hasPendingBookings = \App\Models\Booking::where('book_id', $loan->bookItem->book_id)
+                $hasPendingBookings = \App\Models\Booking::where('book_id', $loan->book_id)
                     ->where('status', 'pending')
                     ->exists();
 
@@ -169,14 +169,16 @@ class UserDashboardController extends Controller
             Log::info('Target Book:', ['id' => $book->id, 'title' => $book->title, 'stock' => $book->available_stock]);
 
             // Check if user can borrow
-            if (!$user->canBorrow()) {
+            if (! $user->canBorrow()) {
                 Log::warning('Booking rejected: User cannot borrow/has fines', ['user_id' => $user->id]);
+
                 return back()->with('error', 'Anda tidak dapat membuat booking. Silakan bayar denda terlebih dahulu.');
             }
 
             // Check if book is available (shouldn't allow booking if available)
             if ($book->available_stock > 0) {
                 Log::warning('Booking rejected: Book is available', ['book_id' => $book->id]);
+
                 return back()->with('error', 'Buku ini masih tersedia. Anda bisa langsung meminjam tanpa booking.');
             }
 
@@ -188,18 +190,18 @@ class UserDashboardController extends Controller
 
             if ($existingBooking) {
                 Log::warning('Booking rejected: Existing active booking', ['user_id' => $user->id, 'book_id' => $book->id]);
+
                 return back()->with('error', 'Anda sudah memiliki booking aktif untuk buku ini.');
             }
 
             // Check if user already borrowed this book
             $activeLoan = $user->activeLoans()
-                ->whereHas('bookItem', function ($q) use ($book) {
-                    $q->where('book_id', $book->id);
-                })
+                ->where('book_id', $book->id)
                 ->first();
 
             if ($activeLoan) {
                 Log::warning('Booking rejected: User already borrowing book', ['user_id' => $user->id, 'book_id' => $book->id]);
+
                 return back()->with('error', 'Anda sedang meminjam buku ini.');
             }
 
@@ -222,9 +224,10 @@ class UserDashboardController extends Controller
         } catch (\Exception $e) {
             Log::error('Booking Creation Failed with Exception:', [
                 'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
-            return back()->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage());
+
+            return back()->with('error', 'Terjadi kesalahan sistem: '.$e->getMessage());
         }
     }
 
@@ -239,8 +242,8 @@ class UserDashboardController extends Controller
         }
 
         // Check if can be cancelled
-        if (!in_array($booking->status, ['pending', 'notified'])) {
-            return back()->with('error', 'Booking dengan status "' . $booking->status . '" tidak dapat dibatalkan.');
+        if (! in_array($booking->status, ['pending', 'notified'])) {
+            return back()->with('error', 'Booking dengan status "'.$booking->status.'" tidak dapat dibatalkan.');
         }
 
         // Cancel booking
@@ -283,7 +286,7 @@ class UserDashboardController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            'email' => 'required|email|unique:users,email,'.$user->id,
             'phone' => 'nullable|string|max:20',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'current_password' => 'nullable|required_with:new_password',
@@ -309,7 +312,7 @@ class UserDashboardController extends Controller
 
         // Handle password change
         if ($request->filled('current_password')) {
-            if (!Hash::check($request->current_password, $user->password)) {
+            if (! Hash::check($request->current_password, $user->password)) {
                 return back()->withErrors(['current_password' => 'Password saat ini tidak sesuai.'])->withInput();
             }
 
@@ -330,14 +333,14 @@ class UserDashboardController extends Controller
 
         // Unpaid fines with loan details
         $unpaidFines = $user->fines()
-            ->with(['loan.bookItem.book'])
+            ->with(['loan.book'])
             ->where('status', 'unpaid')
             ->latest()
             ->get();
 
         // Paid fines (history)
         $paidFines = $user->fines()
-            ->with(['loan.bookItem.book'])
+            ->with(['loan.book'])
             ->whereIn('status', ['paid', 'waived'])
             ->latest()
             ->take(10)
@@ -364,7 +367,7 @@ class UserDashboardController extends Controller
     {
         $orderId = $request->query('order_id');
 
-        if (!$orderId) {
+        if (! $orderId) {
             return redirect()->route('payment.index');
         }
 
@@ -381,11 +384,11 @@ class UserDashboardController extends Controller
                     if (in_array($status['status'], ['settlement', 'capture'])) {
                         session()->flash('success', 'Pembayaran berhasil dikonfirmasi. Terima kasih!');
                     } else {
-                        session()->flash('info', 'Status pembayaran: ' . strtoupper($status['status']));
+                        session()->flash('info', 'Status pembayaran: '.strtoupper($status['status']));
                     }
                 }
             } catch (\Exception $e) {
-                Log::error('Finish payment error: ' . $e->getMessage());
+                Log::error('Finish payment error: '.$e->getMessage());
             }
         }
 

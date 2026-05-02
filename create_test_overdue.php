@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use App\Models\BookItem;
+use App\Models\Book;
 use App\Models\Loan;
 use Carbon\Carbon;
 
@@ -11,19 +11,20 @@ if (!$user) {
     exit;
 }
 
-$item = BookItem::where('status', 'available')->first();
+$item = Book::where('available_stock', '>', 0)->first();
 if (!$item) {
-    echo "No available book item found!\n";
+    echo "No available book found!\n";
     exit;
 }
 
 echo "Creating overdue loan for User: {$user->name} ({$user->email})\n";
-echo "Book Item: #{$item->id}\n";
+echo "Book: #{$item->id}\n";
 
 // Create loan
 $loan = Loan::create([
     'user_id' => $user->id,
-    'book_item_id' => $item->id,
+    'book_id' => $item->id,
+    'quantity' => 1,
     'loan_date' => Carbon::now()->subDays(20),
     'due_date' => Carbon::now()->subDays(5), // Overdue by 5 days
     'status' => 'active',

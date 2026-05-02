@@ -4,9 +4,9 @@ namespace App\Filament\Resources\BookResource\Pages;
 
 use App\Filament\Resources\BookResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewBook extends ViewRecord
 {
@@ -16,11 +16,6 @@ class ViewBook extends ViewRecord
     {
         return [
             Actions\EditAction::make(),
-            Actions\Action::make('add_item')
-                ->label('Tambah Copy buku')
-                ->icon('heroicon-o-plus-circle')
-                ->color('success')
-                ->url(fn() => route('filament.admin.resources.book-items.create', ['book' => $this->record->id]))
         ];
     }
 
@@ -32,7 +27,7 @@ class ViewBook extends ViewRecord
                     ->schema([
                         Infolists\Components\ImageEntry::make('cover_image')
                             ->label('Cover')
-                            ->defaultImageUrl(fn($record) => $record->cover_url)
+                            ->defaultImageUrl(fn ($record) => $record->cover_url)
                             ->height(200),
                         Infolists\Components\TextEntry::make('full_title')
                             ->label('Judul Lengkap')
@@ -43,6 +38,10 @@ class ViewBook extends ViewRecord
                         Infolists\Components\TextEntry::make('isbn')
                             ->label('ISBN')
                             ->copyable(),
+                        Infolists\Components\ViewEntry::make('barcode')
+                            ->label('Barcode Fisik')
+                            ->view('filament.infolists.components.barcode')
+                            ->columnSpanFull(),
                         Infolists\Components\TextEntry::make('publisher')
                             ->label('Penerbit'),
                         Infolists\Components\TextEntry::make('publication_year')
@@ -84,7 +83,7 @@ class ViewBook extends ViewRecord
                         Infolists\Components\TextEntry::make('available_stock')
                             ->label('Tersedia')
                             ->badge()
-                            ->color(fn($state) => $state > 0 ? 'success' : 'danger'),
+                            ->color(fn ($state) => $state > 0 ? 'success' : 'danger'),
                         Infolists\Components\IconEntry::make('is_available')
                             ->label('Status')
                             ->boolean(),

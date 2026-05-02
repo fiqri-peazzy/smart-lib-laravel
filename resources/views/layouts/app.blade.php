@@ -108,8 +108,12 @@
                             <i class="bi bi-laptop me-1"></i> Perpustakaan Digital
                         </a>
                         @auth
+                            <a href="{{ route('scan-borrow.index') }}"
+                                class="px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800 {{ request()->routeIs('scan-borrow.*') ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20' : 'text-gray-700 dark:text-gray-300' }}">
+                                <i class="bi bi-upc-scan me-1"></i> Scan & Pinjam
+                            </a>
                             <a href="{{ route('dashboard') }}"
-                                class="px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800 {{ request()->routeIs('dashboard') ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20' : 'text-gray-700 dark:text-gray-300' }}">
+                                class="px-4 py-2 rounded-lg text-sm font-medium hover:bg-bg-gray-100 dark:hover:bg-gray-800 {{ request()->routeIs('dashboard') ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20' : 'text-gray-700 dark:text-gray-300' }}">
                                 <i class="bi bi-house-door me-1"></i> Dasbor
                             </a>
                         @endauth
@@ -280,6 +284,10 @@
                 <i class="bi bi-laptop me-2"></i> Perpustakaan Digital
             </a>
             @auth
+                <a href="{{ route('scan-borrow.index') }}"
+                    class="block px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800">
+                    <i class="bi bi-upc-scan me-2"></i> Scan & Pinjam
+                </a>
                 <a href="{{ route('dashboard') }}"
                     class="block px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800">
                     <i class="bi bi-house-door me-2"></i> Dasbor
