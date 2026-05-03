@@ -118,22 +118,7 @@ Route::middleware(['auth'])->get('/books/{book}/qrcode/print', function (\App\Mo
     return view('books.qrcode-print', ['book' => $book]);
 })->name('books.qrcode.print');
 
-// Barcode image route for admin book detail
-Route::middleware(['auth'])->get('/books/{book}/barcode.png', function (\App\Models\Book $book) {
-    $generator = new \Picqer\Barcode\BarcodeGeneratorPNG();
-    // Generate code 128 barcode
-    $barcode = $generator->getBarcode($book->barcode, $generator::TYPE_CODE_128, 3, 64);
 
-    return response($barcode, 200, [
-        'Content-Type' => 'image/png',
-        'Cache-Control' => 'public, max-age=3600',
-    ]);
-})->name('books.barcode');
-
-// Barcode print page
-Route::middleware(['auth'])->get('/books/{book}/barcode/print', function (\App\Models\Book $book) {
-    return view('books.barcode-print', ['book' => $book]);
-})->name('books.barcode.print');
 
 /*
 |--------------------------------------------------------------------------
