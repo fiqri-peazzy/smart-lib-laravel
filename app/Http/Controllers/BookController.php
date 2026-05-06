@@ -17,13 +17,15 @@ class BookController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Book::with(['categories', 'recommendedForMajor']);
+        $query = Book::with(['categories', 'recommendedForMajor'])
+            ->where('is_digital',false);
 
         // Search
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
+                ->where('is_digital',false)
                     ->orWhere('author', 'like', "%{$search}%")
                     ->orWhere('isbn', 'like', "%{$search}%");
             });
@@ -32,13 +34,15 @@ class BookController extends Controller
         // Filter by category
         if ($request->filled('category')) {
             $query->whereHas('categories', function ($q) use ($request) {
-                $q->where('book_categories.id', $request->category);
+                $q->where('book_categories.id', $request->category)
+                    ->where('is_digital',false);
             });
         }
 
         // Filter by year
         if ($request->filled('year')) {
-            $query->where('publication_year', $request->year);
+            $query->where('publication_year', $request->year)
+                ->where('is_digital',false);
         }
 
         // Sort
@@ -68,6 +72,7 @@ class BookController extends Controller
         // Get years for filter
         $years = Book::selectRaw('DISTINCT publication_year')
             ->whereNotNull('publication_year')
+            ->where('is_digital',false)
             ->orderBy('publication_year', 'desc')
             ->pluck('publication_year');
 
