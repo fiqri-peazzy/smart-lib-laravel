@@ -2,7 +2,7 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\DigitalCollection;
+use App\Models\Book;
 use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -16,9 +16,10 @@ class StatsOverview extends BaseWidget
         $totalDosen = User::role('dosen')->count();
         $activeUsers = User::where('status', 'active')->count();
 
-        $totalDigitalCollections = DigitalCollection::count();
-        $totalSkripsi = DigitalCollection::where('type', 'skripsi')->count();
-        $totalEbooks = DigitalCollection::where('type', 'ebook')->count();
+        $totalDigitalCollections = Book::digital()->count();
+        $totalSkripsi = Book::digital()->where('digital_file_type', 'skripsi')->count();
+        $totalEbooks = Book::digital()->where('digital_file_type', 'ebook')->count();
+
 
         $usersWithFines = User::where('total_fines', '>', 0)->count();
         $totalFines = User::sum('total_fines');

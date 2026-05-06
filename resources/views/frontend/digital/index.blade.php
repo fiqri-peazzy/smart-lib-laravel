@@ -141,75 +141,76 @@
                         </div>
                     @else
                         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                            @foreach ($collections as $item)
-                                <article class="group bg-white dark:bg-gray-800 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden transform hover:-translate-y-2 border border-gray-100 dark:border-gray-700">
-                                    <div class="p-6">
-                                        <!-- Header Item -->
-                                        <div class="flex justify-between items-start mb-4">
-                                            <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 transition-colors">
-                                                @php
-                                                    $icon = match($item->type) {
-                                                        'skripsi' => 'bi-mortarboard',
-                                                        'journal' => 'bi-journal-medical',
-                                                        'ebook' => 'bi-book',
-                                                        'paper' => 'bi-file-earmark-text',
-                                                        default => 'bi-journal-text'
-                                                    };
-                                                @endphp
-                                                <i class="bi {{ $icon }} text-2xl"></i>
-                                            </div>
-                                            <span class="px-3 py-1 bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-[10px] font-bold uppercase tracking-wider rounded-lg">
-                                                {{ $item->type }}
-                                            </span>
-                                        </div>
-
-                                        <!-- Content -->
-                                        <a href="{{ route('digital.show', $item) }}" class="block group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                                            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 leading-tight">
-                                                {{ $item->title }}
-                                            </h3>
-                                        </a>
-                                        
-                                        <p class="text-xs text-gray-600 dark:text-gray-400 mb-4 flex items-center">
-                                            <i class="bi bi-person mr-2 text-indigo-400"></i>
-                                            {{ $item->author }}
-                                        </p>
-
-                                        <div class="flex flex-wrap gap-2 mb-6">
-                                            <span class="text-[10px] bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-2 py-1 rounded-md font-medium">
-                                                {{ $item->year }}
-                                            </span>
-                                            @if($item->major)
-                                                <span class="text-[10px] bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 px-2 py-1 rounded-md font-medium">
-                                                    {{ $item->major->name }}
+                                @foreach ($collections as $item)
+                                    <article class="group bg-white dark:bg-gray-800 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden transform hover:-translate-y-2 border border-gray-100 dark:border-gray-700">
+                                        <div class="p-6">
+                                            <!-- Header Item -->
+                                            <div class="flex justify-between items-start mb-4">
+                                                <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 transition-colors">
+                                                    @php
+                                                        $icon = match($item->digital_file_type) {
+                                                            'skripsi' => 'bi-mortarboard',
+                                                            'jurnal', 'journal' => 'bi-journal-medical',
+                                                            'ebook' => 'bi-book',
+                                                            'paper' => 'bi-file-earmark-text',
+                                                            default => 'bi-journal-text'
+                                                        };
+                                                    @endphp
+                                                    <i class="bi {{ $icon }} text-2xl"></i>
+                                                </div>
+                                                <span class="px-3 py-1 bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-[10px] font-bold uppercase tracking-wider rounded-lg">
+                                                    {{ $item->digital_file_type }}
                                                 </span>
-                                            @endif
-                                        </div>
+                                            </div>
 
-                                        <!-- Footer Meta -->
-                                        <div class="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
-                                            <div class="flex space-x-4">
-                                                <div class="flex items-center text-[10px] text-gray-400">
-                                                    <i class="bi bi-eye mr-1"></i> {{ number_format($item->view_count) }}
-                                                </div>
-                                                <div class="flex items-center text-[10px] text-gray-400">
-                                                    <i class="bi bi-download mr-1"></i> {{ number_format($item->download_count) }}
-                                                </div>
+                                            <!-- Content -->
+                                            <a href="{{ route('digital.show', $item) }}" class="block group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 leading-tight">
+                                                    {{ $item->title }}
+                                                </h3>
+                                            </a>
+                                            
+                                            <p class="text-xs text-gray-600 dark:text-gray-400 mb-4 flex items-center">
+                                                <i class="bi bi-person mr-2 text-indigo-400"></i>
+                                                {{ $item->authorMaster->name ?? $item->author }}
+                                            </p>
+
+                                            <div class="flex flex-wrap gap-2 mb-6">
+                                                <span class="text-[10px] bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-2 py-1 rounded-md font-medium">
+                                                    {{ $item->publication_year }}
+                                                </span>
+                                                @if($item->recommendedForMajor)
+                                                    <span class="text-[10px] bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 px-2 py-1 rounded-md font-medium">
+                                                        {{ $item->recommendedForMajor->name }}
+                                                    </span>
+                                                @endif
                                             </div>
-                                            <div class="flex items-center text-[10px] text-gray-400">
-                                                <i class="bi bi-hdd mr-1"></i> {{ $item->file_size_readable }}
+
+                                            <!-- Footer Meta -->
+                                            <div class="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
+                                                <div class="flex space-x-4">
+                                                    <div class="flex items-center text-[10px] text-gray-400">
+                                                        <i class="bi bi-eye mr-1"></i> {{ number_format($item->digital_view_count) }}
+                                                    </div>
+                                                    <div class="flex items-center text-[10px] text-gray-400">
+                                                        <i class="bi bi-download mr-1"></i> {{ number_format($item->digital_download_count) }}
+                                                    </div>
+                                                </div>
+                                                <div class="flex items-center text-[10px] text-gray-400">
+                                                    <i class="bi bi-hdd mr-1"></i> {{ $item->digital_file_size_readable }}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    
-                                    <!-- Action Button Overlay -->
-                                    <div class="px-6 pb-6 pt-0">
-                                        <a href="{{ route('digital.show', $item) }}" class="w-full flex items-center justify-center py-2 bg-gray-50 dark:bg-gray-700/50 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white dark:text-gray-300 rounded-xl text-xs font-bold transition-all duration-300">
-                                            Lihat Selengkapnya
-                                        </a>
-                                    </div>
-                                </article>
-                            @endforeach
+                                        
+                                        <!-- Action Button Overlay -->
+                                        <div class="px-6 pb-6 pt-0">
+                                            <a href="{{ route('digital.show', $item) }}" class="w-full flex items-center justify-center py-2 bg-gray-50 dark:bg-gray-700/50 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white dark:text-gray-300 rounded-xl text-xs font-bold transition-all duration-300">
+                                                Lihat Selengkapnya
+                                            </a>
+                                        </div>
+                                    </article>
+                                @endforeach
+
                         </div>
 
                         <!-- Pagination -->

@@ -85,14 +85,32 @@ class BookResource extends Resource
                             ->maxLength(255)
                             ->columnSpanFull(),
 
-                        Forms\Components\TextInput::make('author')
+                        Forms\Components\Select::make('author_id')
                             ->label('Penulis')
+                            ->relationship('authorMaster', 'name')
+                            ->searchable()
+                            ->preload()
                             ->required()
-                            ->maxLength(255),
+                            ->createOptionForm([
+                                Forms\Components\TextInput::make('name')
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\Textarea::make('biography')
+                                    ->rows(3),
+                            ]),
 
-                        Forms\Components\TextInput::make('publisher')
+                        Forms\Components\Select::make('publisher_id')
                             ->label('Penerbit')
-                            ->maxLength(255),
+                            ->relationship('publisherMaster', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->createOptionForm([
+                                Forms\Components\TextInput::make('name')
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('email')
+                                    ->email(),
+                            ]),
 
                         Forms\Components\TextInput::make('publication_year')
                             ->label('Tahun Terbit')
@@ -107,6 +125,57 @@ class BookResource extends Resource
                             ->placeholder('Contoh: 1st, 2nd, 3rd'),
                     ])
                     ->columns(2),
+
+                Forms\Components\Section::make('Konten Digital')
+                    ->description('Pengaturan jika buku ini tersedia dalam format digital (E-Book/PDF)')
+                    ->schema([
+                        Forms\Components\Toggle::make('is_digital')
+                            ->label('Tersedia Format Digital')
+                            ->default(false)
+                            ->reactive()
+                            ->helperText('Jika aktif, user bisa langsung membaca file secara digital'),
+
+                        Forms\Components\Group::make([
+                            Forms\Components\FileUpload::make('digital_file_path')
+                                ->label('File Digital (PDF)')
+                                ->directory('digital-books')
+                                ->acceptedFileTypes(['application/pdf'])
+                                ->maxSize(51200) // 50MB
+                                ->required()
+                                ->live()
+                                ->afterStateUpdated(fn ($state, Forms\Set $set) => $set('digital_file_size', $state?->getSize())),
+
+                            Forms\Components\Select::make('digital_file_type')
+                                ->label('Tipe Dokumen Digital')
+                                ->options([
+                                    'ebook' => 'E-Book',
+                                    'skripsi' => 'Skripsi',
+                                    'jurnal' => 'Jurnal',
+                                    'modul' => 'Modul',
+                                    'paper' => 'Paper/Karya Ilmiah',
+                                ])
+                                ->required(),
+
+                            Forms\Components\Hidden::make('digital_file_size'),
+
+                            Forms\Components\TextInput::make('keywords')
+                                ->label('Kata Kunci')
+                                ->placeholder('Pemisah koma (contoh: laravel, php, web)'),
+
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    Forms\Components\TextInput::make('nim')
+                                        ->label('NIM (Khusus Skripsi)')
+                                        ->maxLength(20),
+                                    Forms\Components\TextInput::make('supervisor')
+                                        ->label('Dosen Pembimbing')
+                                        ->maxLength(255),
+                                ])
+                                ->visible(fn ($get) => $get('digital_file_type') === 'skripsi'),
+                        ])
+                        ->visible(fn ($get) => $get('is_digital')),
+                    ]),
+
 
                 Forms\Components\Section::make('Detail Fisik')
                     ->schema([
@@ -156,7 +225,8 @@ class BookResource extends Resource
                             ->label('Lokasi Rak')
                             ->maxLength(50)
                             ->placeholder('Contoh: RAK-A-01')
-                            ->helperText('Format: RAK-[A-Z]-[01-99]'),
+                            ->helperText('Format: RAK-[A-Z]-[01-99]')
+                            ->hidden(fn ($get) => $get('is_digital')),
 
                         Forms\Components\Select::make('recommended_for_major_id')
                             ->label('Rekomendasi untuk Prodi')
@@ -172,7 +242,8 @@ class BookResource extends Resource
                         Forms\Components\Toggle::make('is_available')
                             ->label('Tersedia untuk Dipinjam')
                             ->default(true)
-                            ->helperText('Nonaktifkan jika buku tidak boleh dipinjam'),
+                            ->helperText('Nonaktifkan jika buku tidak boleh dipinjam')
+                            ->hidden(fn ($get) => $get('is_digital')),
 
                         Forms\Components\Toggle::make('is_featured')
                             ->label('Buku Unggulan')
@@ -183,13 +254,15 @@ class BookResource extends Resource
                             ->label('Total Stok')
                             ->numeric()
                             ->default(1)
-                            ->required(),
+                            ->required()
+                            ->hidden(fn ($get) => $get('is_digital')),
 
                         Forms\Components\TextInput::make('available_stock')
                             ->label('Stok Tersedia')
                             ->numeric()
                             ->default(1)
-                            ->required(),
+                            ->required()
+                            ->hidden(fn ($get) => $get('is_digital')),
 
                         Forms\Components\Hidden::make('added_by')
                             ->default(Auth::id()),
@@ -204,21 +277,22 @@ class BookResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('cover_image')
                     ->label('Cover')
-                    ->defaultImageUrl(fn ($record) => $record->cover_url)
+                    ->defaultImageUrl(asset('images/default-book-cover.png'))
                     ->size(60),
 
-                Tables\Columns\TextColumn::make('barcode')
-                    ->label('Barcode')
-                    ->searchable()
-                    ->copyable()
-                    ->weight('bold')
-                    ->icon('heroicon-o-qr-code'),
+                Tables\Columns\TextColumn::make('is_digital')
+                    ->label('Tipe')
+                    ->badge()
+                    ->formatStateUsing(fn (bool $state) => $state ? 'Digital' : 'Fisik')
+                    ->color(fn (bool $state) => $state ? 'info' : 'warning'),
 
-                Tables\Columns\TextColumn::make('isbn')
-                    ->label('ISBN')
-                    ->searchable()
-                    ->toggleable()
-                    ->copyable(),
+                // Tables\Columns\TextColumn::make('barcode')
+                //     ->label('Barcode')
+                //     ->searchable()
+                //     ->copyable()
+                //     ->weight('bold')
+                //     ->icon('heroicon-o-qr-code')
+                //     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('title')
                     ->label('Judul')
@@ -228,33 +302,33 @@ class BookResource extends Resource
                     ->limit(50)
                     ->weight('bold'),
 
-                Tables\Columns\TextColumn::make('author')
-                    ->label('Penulis')
-                    ->searchable()
-                    ->sortable()
-                    ->wrap()
-                    ->limit(30),
+                // Tables\Columns\TextColumn::make('authorMaster.name')
+                //     ->label('Penulis')
+                //     ->searchable()
+                //     ->sortable()
+                //     ->placeholder('-'),
 
-                Tables\Columns\TextColumn::make('categories.name')
-                    ->label('Kategori')
-                    ->badge()
-                    ->separator(',')
-                    ->limit(2)
-                    ->searchable(),
+                // Tables\Columns\TextColumn::make('categories.name')
+                //     ->label('Kategori')
+                //     ->badge()
+                //     ->separator(',')
+                //     ->limit(2),
 
-                Tables\Columns\TextColumn::make('publication_year')
-                    ->label('Tahun')
-                    ->sortable()
-                    ->toggleable(),
+                // Tables\Columns\TextColumn::make('publication_year')
+                //     ->label('Tahun terbit')
+                //     ->sortable()
+                //     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('rack_location')
                     ->label('Lokasi')
                     ->badge()
                     ->color('info')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable()
+                    ->placeholder('-'),
 
                 Tables\Columns\TextColumn::make('total_stock')
-                    ->label('Total')
+                    ->label('Total Stok')
                     ->sortable()
                     ->alignCenter(),
 
@@ -262,7 +336,7 @@ class BookResource extends Resource
                     ->label('Tersedia')
                     ->sortable()
                     ->alignCenter()
-                    ->color(fn ($state) => $state > 0 ? 'success' : 'danger')
+                    ->color(fn ($state) => ($state ?? 0) > 0 ? 'success' : 'danger')
                     ->weight('bold'),
 
                 Tables\Columns\IconColumn::make('is_available')
@@ -294,11 +368,22 @@ class BookResource extends Resource
                     ->searchable()
                     ->preload(),
 
+                Tables\Filters\TernaryFilter::make('is_digital')
+                    ->label('Jenis Koleksi')
+                    ->placeholder('Semua')
+                    ->trueLabel('Hanya Digital')
+                    ->falseLabel('Hanya Fisik'),
+
                 Tables\Filters\TernaryFilter::make('is_available')
                     ->label('Status Ketersediaan')
                     ->placeholder('Semua')
                     ->trueLabel('Tersedia')
-                    ->falseLabel('Tidak Tersedia'),
+                    ->falseLabel('Tidak Tersedia')
+                    ->queries(
+                        true: fn ($query) => $query->where('is_available', true),
+                        false: fn ($query) => $query->where('is_available', false),
+                        blank: fn ($query) => $query,
+                    ),
 
                 Tables\Filters\TernaryFilter::make('is_featured')
                     ->label('Buku Unggulan')
@@ -313,6 +398,7 @@ class BookResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -320,6 +406,7 @@ class BookResource extends Resource
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+
     }
 
     public static function getRelations(): array

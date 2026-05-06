@@ -2,11 +2,14 @@
 
 namespace Database\Seeders;
 
+use App\Models\Author;
+use App\Models\Publisher;
 use App\Models\Book;
 use App\Models\BookCategory;
 use App\Models\Major;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class BookSeeder extends Seeder
 {
@@ -19,7 +22,6 @@ class BookSeeder extends Seeder
         $admin = User::first();
         if (! $admin) {
             $this->command->error('No user found! Please run seeders that create a user first.');
-
             return;
         }
 
@@ -28,12 +30,10 @@ class BookSeeder extends Seeder
 
         if ($categories->isEmpty()) {
             $this->command->error('No book categories found! Please run BookCategorySeeder first.');
-
             return;
         }
 
         $booksData = [
-            /* Programming */
             [
                 'title' => 'Clean Code',
                 'subtitle' => 'A Handbook of Agile Software Craftsmanship',
@@ -64,161 +64,22 @@ class BookSeeder extends Seeder
                 'category' => 'Programming',
                 'description' => 'JavaScript lies at the heart of almost every modern web application.',
             ],
-
-            /* Web Development */
-            [
-                'title' => 'Learning Web Design',
-                'subtitle' => 'A Beginner\'s Guide to HTML, CSS, JavaScript, and Web Graphics',
-                'isbn' => '9781491960301',
-                'author' => 'Jennifer Robbins',
-                'publisher' => 'O\'Reilly Media',
-                'year' => 2018,
-                'category' => 'Web Development',
-                'description' => 'Do you want to build web pages but have no previous experience? This friendly guide is the perfect place to start.',
-            ],
-            [
-                'title' => 'Fullstack Laravel',
-                'subtitle' => 'The Complete Guide to Laravel, Vue, and Tailwind',
-                'isbn' => '9781491960302',
-                'author' => 'Laravel Experts',
-                'publisher' => 'Tech Press',
-                'year' => 2023,
-                'category' => 'Web Development',
-                'description' => 'Learn how to build modern web applications using the TALL stack.',
-            ],
-
-            /* Database */
-            [
-                'title' => 'Database System Concepts',
-                'subtitle' => 'Seventh Edition',
-                'isbn' => '9780073523323',
-                'author' => 'Abraham Silberschatz',
-                'publisher' => 'McGraw-Hill',
-                'year' => 2019,
-                'category' => 'Database',
-                'description' => 'Database System Concepts by Silberschatz, Korth and Sudarshan is now in its 7th edition.',
-            ],
-            [
-                'title' => 'SQL Performance Explained',
-                'subtitle' => 'Everything developers need to know about SQL performance',
-                'isbn' => '9783950307825',
-                'author' => 'Markus Winand',
-                'publisher' => 'Winand',
-                'year' => 2012,
-                'category' => 'Database',
-                'description' => 'A book about indexing and SQL performance for developers.',
-            ],
-
-            /* Artificial Intelligence */
-            [
-                'title' => 'Hands-On Machine Learning',
-                'subtitle' => 'with Scikit-Learn, Keras, and TensorFlow',
-                'isbn' => '9781492032649',
-                'author' => 'Aurélien Géron',
-                'publisher' => 'O\'Reilly Media',
-                'year' => 2019,
-                'category' => 'Artificial Intelligence',
-                'description' => 'Through a series of recent breakthroughs, deep learning has boosted the entire field of machine learning.',
-            ],
-            [
-                'title' => 'Artificial Intelligence',
-                'subtitle' => 'A Modern Approach',
-                'isbn' => '9780136042594',
-                'author' => 'Stuart Russell, Peter Norvig',
-                'publisher' => 'Pearson',
-                'year' => 2020,
-                'category' => 'Artificial Intelligence',
-                'description' => 'The long-anticipated revision of this best-selling text offers the most comprehensive, up-to-date introduction to the theory and practice of artificial intelligence.',
-            ],
-
-            /* Networking & Cyber Security */
-            [
-                'title' => 'Computer Networking',
-                'subtitle' => 'A Top-Down Approach',
-                'isbn' => '9780133594140',
-                'author' => 'James Kurose, Keith Ross',
-                'publisher' => 'Pearson',
-                'year' => 2016,
-                'category' => 'Networking',
-                'description' => 'Focusing on the Internet and the fundamentally important issues of networking.',
-            ],
-            [
-                'title' => 'The Art of Invisibility',
-                'subtitle' => 'The World\'s Most Famous Hacker Teaches You How to Be Safe in the Age of Big Brother and Big Data',
-                'isbn' => '9780316380508',
-                'author' => 'Kevin Mitnick',
-                'publisher' => 'Little, Brown and Company',
-                'year' => 2017,
-                'category' => 'Cyber Security',
-                'description' => 'Kevin Mitnick, the world\'s most famous hacker, teaches you how to keep your life safe and private on the internet.',
-            ],
-
-            /* Software Engineering */
-            [
-                'title' => 'Refactoring',
-                'subtitle' => 'Improving the Design of Existing Code',
-                'isbn' => '9780134757599',
-                'author' => 'Martin Fowler',
-                'publisher' => 'Addison-Wesley',
-                'year' => 2018,
-                'category' => 'Software Engineering',
-                'description' => 'Refactoring is a controlled technique for improving the design of an existing code base.',
-            ],
-            [
-                'title' => 'Mythical Man-Month, The',
-                'subtitle' => 'Essays on Software Engineering',
-                'isbn' => '9780201835953',
-                'author' => 'Frederick Brooks Jr.',
-                'publisher' => 'Addison-Wesley',
-                'year' => 1995,
-                'category' => 'Software Engineering',
-                'description' => 'Few books on software project management have been as influential and timeless as The Mythical Man-Month.',
-            ],
-
-            /* UI/UX Design */
-            [
-                'title' => 'Don\'t Make Me Think',
-                'subtitle' => 'A Common Sense Approach to Web Usability',
-                'isbn' => '9780321965516',
-                'author' => 'Steve Krug',
-                'publisher' => 'New Riders',
-                'year' => 2014,
-                'category' => 'UI/UX Design',
-                'description' => 'Since Don\'t Make Me Think was first published in 2000, hundreds of thousands of Web designers and developers have relied on usability guru Steve Krug\'s guide.',
-            ],
-            [
-                'title' => 'The Design of Everyday Things',
-                'subtitle' => 'Revised and Expanded Edition',
-                'isbn' => '9780465050659',
-                'author' => 'Don Norman',
-                'publisher' => 'Basic Books',
-                'year' => 2013,
-                'category' => 'UI/UX Design',
-                'description' => 'Even the smartest among us can feel inept as we fail to figure out which light switch or oven burner to turn on, or whether to push, pull, or slide a door.',
-            ],
-
-            /* General IT */
-            [
-                'title' => 'Code: The Hidden Language of Computer Hardware and Software',
-                'subtitle' => 'Second Edition',
-                'isbn' => '9780137909100',
-                'author' => 'Charles Petzold',
-                'publisher' => 'Microsoft Press',
-                'year' => 2022,
-                'category' => 'General IT',
-                'description' => 'A mesmerizing narrative that illuminates the very nature of computing.',
-            ],
         ];
 
         foreach ($booksData as $data) {
             $numItems = rand(2, 5);
+            $author = Author::firstOrCreate(['name' => $data['author']]);
+            $publisher = Publisher::firstOrCreate(['name' => $data['publisher']]);
 
-            $book = Book::create([
+            $book = Book::updateOrCreate([
                 'isbn' => $data['isbn'],
+            ], [
                 'title' => $data['title'],
                 'subtitle' => $data['subtitle'] ?? null,
                 'author' => $data['author'],
                 'publisher' => $data['publisher'],
+                'author_id' => $author->id,
+                'publisher_id' => $publisher->id,
                 'publication_year' => $data['year'],
                 'language' => 'en',
                 'description' => $data['description'],
@@ -230,18 +91,65 @@ class BookSeeder extends Seeder
                 'is_featured' => rand(0, 1) === 1,
                 'added_by' => $admin->id,
                 'pages' => rand(200, 800),
+                'is_digital' => false,
             ]);
 
-            // Hubungkan dengan kategori
             $category = $categories->where('name', $data['category'])->first();
             if ($category) {
-                $book->categories()->attach($category->id);
-            } else {
-                // Fallback jika nama kategori tidak persis sama
-                $book->categories()->attach($categories->random()->id);
+                $book->categories()->sync([$category->id]);
             }
         }
 
-        $this->command->info('BookSeeder: '.count($booksData).' books and their items created successfully!');
+        $digitalBooks = [
+            [
+                'title' => 'Implementasi Laravel Untuk Sistem Perpustakaan',
+                'author' => 'Budi Santoso',
+                'publisher' => 'Unisan Press',
+                'year' => 2024,
+                'type' => 'skripsi',
+                'nim' => '123456789',
+                'supervisor' => 'Dr. Ahmad Yani',
+                'category' => 'Software Engineering',
+            ],
+            [
+                'title' => 'Panduan Modern Web Development 2024',
+                'author' => 'Tere Liye',
+                'publisher' => 'Gramedia Pustaka Utama',
+                'year' => 2024,
+                'type' => 'ebook',
+                'category' => 'Web Development',
+            ]
+        ];
+
+        foreach ($digitalBooks as $data) {
+            $author = Author::firstOrCreate(['name' => $data['author']]);
+            $publisher = Publisher::firstOrCreate(['name' => $data['publisher']]);
+
+            $book = Book::updateOrCreate([
+                'title' => $data['title'],
+            ], [
+                'author' => $data['author'],
+                'publisher' => $data['publisher'],
+                'author_id' => $author->id,
+                'publisher_id' => $publisher->id,
+                'publication_year' => $data['year'],
+                'is_digital' => true,
+                'digital_file_type' => $data['type'],
+                'digital_file_path' => 'digital-books/sample.pdf',
+                'digital_file_size' => 1024 * 1024 * 2,
+                'nim' => $data['nim'] ?? null,
+                'supervisor' => $data['supervisor'] ?? null,
+                'keywords' => 'laravel, library, web',
+                'added_by' => $admin->id,
+                'is_available' => true,
+            ]);
+
+            $category = $categories->where('name', $data['category'])->first();
+            if ($category) {
+                $book->categories()->sync([$category->id]);
+            }
+        }
+
+        $this->command->info('BookSeeder: Physical and Digital books created successfully!');
     }
 }

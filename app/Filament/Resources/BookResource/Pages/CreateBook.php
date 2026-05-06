@@ -15,13 +15,8 @@ class CreateBook extends CreateRecord
         return $this->getResource()::getUrl('view', ['record' => $this->record]);
     }
 
-    protected function afterCreate(): void
-    {
-        $this->redirect(route('filament.admin.resources.book-items.create', ['book' => $this->record->id]));
-    }
-
     protected function getCreatedNotificationTitle(): ?string
     {
-        return 'Buku berhasil ditambahkan! Silakan tambahkan item/copy buku.';
+        return 'Buku berhasil ditambahkan!';
     }
 }

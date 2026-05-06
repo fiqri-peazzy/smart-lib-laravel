@@ -2,7 +2,7 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\DigitalCollection;
+use App\Models\Book;
 use Filament\Widgets\ChartWidget;
 
 class DigitalCollectionsByTypeChart extends ChartWidget
@@ -13,11 +13,12 @@ class DigitalCollectionsByTypeChart extends ChartWidget
 
     protected function getData(): array
     {
-        $ebook = DigitalCollection::where('type', 'ebook')->count();
-        $jurnal = DigitalCollection::where('type', 'jurnal')->count();
-        $skripsi = DigitalCollection::where('type', 'skripsi')->count();
-        $modul = DigitalCollection::where('type', 'modul')->count();
-        $paper = DigitalCollection::where('type', 'paper')->count();
+        $ebook = Book::digital()->where('digital_file_type', 'ebook')->count();
+        $jurnal = Book::digital()->where('digital_file_type', 'jurnal')->count();
+        $skripsi = Book::digital()->where('digital_file_type', 'skripsi')->count();
+        $modul = Book::digital()->where('digital_file_type', 'modul')->count();
+        $paper = Book::digital()->where('digital_file_type', 'paper')->count();
+
 
         return [
             'datasets' => [

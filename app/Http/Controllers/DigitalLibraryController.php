@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\DigitalCollection;
+use App\Models\Book;
 use App\Models\Major;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,15 +15,15 @@ class DigitalLibraryController extends Controller
      */
     public function index(Request $request)
     {
-        $query = DigitalCollection::with(['major'])->public();
+        $query = Book::with(['recommendedForMajor', 'authorMaster'])->digital();
 
         // Filters
         if ($request->filled('type')) {
-            $query->where('type', $request->type);
+            $query->where('digital_file_type', $request->type);
         }
 
         if ($request->filled('major')) {
-            $query->where('major_id', $request->major);
+            $query->where('recommended_for_major_id', $request->major);
         }
 
         if ($request->filled('search')) {
@@ -43,10 +43,10 @@ class DigitalLibraryController extends Controller
                 $query->oldest();
                 break;
             case 'popular':
-                $query->orderBy('view_count', 'desc');
+                $query->orderBy('digital_view_count', 'desc');
                 break;
             case 'downloads':
-                $query->orderBy('download_count', 'desc');
+                $query->orderBy('digital_download_count', 'desc');
                 break;
             default:
                 $query->latest();
@@ -55,7 +55,7 @@ class DigitalLibraryController extends Controller
 
         $collections = $query->paginate(12)->withQueryString();
         $majors = Major::all();
-        $types = DigitalCollection::select('type')->distinct()->pluck('type');
+        $types = Book::digital()->select('digital_file_type as type')->distinct()->pluck('type');
 
         return view('frontend.digital.index', compact('collections', 'majors', 'types'));
     }
@@ -63,58 +63,72 @@ class DigitalLibraryController extends Controller
     /**
      * Display the specified digital collection.
      */
-    public function show(DigitalCollection $collection)
+    public function show(Book $book)
     {
-        $collection->incrementViews();
+        if (!$book->is_digital) {
+            return redirect()->route('books.show', $book);
+        }
+
+        $book->increment('digital_view_count');
         
         // Related items
-        $relatedItems = DigitalCollection::where('type', $collection->type)
-            ->where('id', '!=', $collection->id)
-            ->public()
+        $relatedItems = Book::digital()
+            ->where('digital_file_type', $book->digital_file_type)
+            ->where('id', '!=', $book->id)
             ->take(4)
             ->get();
 
-        return view('frontend.digital.show', compact('collection', 'relatedItems'));
+        return view('frontend.digital.show', compact('book', 'relatedItems'));
     }
 
     /**
      * View/Read the digital file.
      */
-    public function read(DigitalCollection $collection)
+    public function read(Book $book)
     {
+        if (!$book->is_digital) {
+            return back()->with('error', 'Koleksi ini bukan merupakan koleksi digital.');
+        }
+
         // Access check
-        if (!$collection->canBeAccessedBy(Auth::user())) {
+        if (!$book->canBeAccessedBy(Auth::user())) {
             return back()->with('error', 'Anda tidak memiliki akses untuk membaca file ini secara digital.');
         }
 
         // Check if file exists
-        if (!Storage::disk('public')->exists($collection->file_path)) {
+        if (!Storage::disk('public')->exists($book->digital_file_path)) {
             return back()->with('error', 'File tidak ditemukan di server.');
         }
 
-        return view('frontend.digital.read', compact('collection'));
+        return view('frontend.digital.read', compact('book'));
     }
 
     /**
      * Download the digital file.
      */
-    public function download(DigitalCollection $collection)
+    public function download(Book $book)
     {
+        if (!$book->is_digital) {
+            return back()->with('error', 'Koleksi ini bukan merupakan koleksi digital.');
+        }
+
         // Access check
-        if (!$collection->canBeAccessedBy(Auth::user())) {
+        if (!$book->canBeAccessedBy(Auth::user())) {
             return back()->with('error', 'Anda tidak memiliki akses untuk mengunduh file ini.');
         }
 
         // Check if file exists
-        if (!Storage::disk('public')->exists($collection->file_path)) {
+        if (!Storage::disk('public')->exists($book->digital_file_path)) {
             return back()->with('error', 'File tidak ditemukan di server.');
         }
 
-        $collection->incrementDownloads();
+        $book->increment('digital_download_count');
 
         return Storage::disk('public')->download(
-            $collection->file_path, 
-            $collection->title . '.' . pathinfo($collection->file_path, PATHINFO_EXTENSION)
+            $book->digital_file_path, 
+            $book->title . '.' . pathinfo($book->digital_file_path, PATHINFO_EXTENSION)
         );
     }
+
 }
+

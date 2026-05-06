@@ -33,14 +33,15 @@ Route::prefix('books')->name('books.')->group(function () {
 // Digital Library Routes (Public browse, download butuh login)
 Route::prefix('digital')->name('digital.')->group(function () {
     Route::get('/', [DigitalLibraryController::class, 'index'])->name('index');
-    Route::get('/{collection}', [DigitalLibraryController::class, 'show'])->name('show');
+    Route::get('/{book}', [DigitalLibraryController::class, 'show'])->name('show');
 
     // Protected routes
     Route::middleware(['auth'])->group(function () {
-        Route::get('/{collection}/read', [DigitalLibraryController::class, 'read'])->name('read');
-        Route::get('/{collection}/download', [DigitalLibraryController::class, 'download'])->name('download');
+        Route::get('/{book}/read', [DigitalLibraryController::class, 'read'])->name('read');
+        Route::get('/{book}/download', [DigitalLibraryController::class, 'download'])->name('download');
     });
 });
+
 
 /*
 |--------------------------------------------------------------------------

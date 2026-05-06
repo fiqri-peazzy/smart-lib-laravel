@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use App\Models\BookCategory;
-use App\Models\DigitalCollection;
+
 
 class HomeController extends Controller
 {
@@ -16,8 +16,9 @@ class HomeController extends Controller
         // Statistics
         $stats = [
             'total_books' => Book::count(),
-            'total_digital' => DigitalCollection::count(),
-            'available_books' => Book::where('is_available', true)
+            'total_digital' => Book::digital()->count(),
+            'available_books' => Book::physical()
+                ->where('is_available', true)
                 ->where('available_stock', '>', 0)
                 ->count(),
         ];
@@ -36,7 +37,7 @@ class HomeController extends Controller
             ->get();
 
         // Latest Digital Collections
-        $latestDigital = DigitalCollection::where('is_public', true)
+        $latestDigital = Book::digital()
             ->latest()
             ->take(4)
             ->get();
@@ -48,6 +49,7 @@ class HomeController extends Controller
             'latestDigital'
         ));
     }
+
 
     /**
      * Display about page
