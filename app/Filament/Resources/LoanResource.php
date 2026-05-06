@@ -206,34 +206,34 @@ class LoanResource extends Resource
                     ->label('Qty')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('loan_date')
-                    ->label('Tgl Pinjam')
-                    ->date('d M Y')
-                    ->sortable()
-                    ->placeholder('Belum diambil')
-                    ->color(fn (Loan $record) => $record->loan_date === null ? 'warning' : null),
+                // Tables\Columns\TextColumn::make('loan_date')
+                //     ->label('Tgl Pinjam')
+                //     ->date('d M Y')
+                //     ->sortable()
+                //     ->placeholder('Belum diambil')
+                //     ->color(fn (Loan $record) => $record->loan_date === null ? 'warning' : null),
 
-                Tables\Columns\TextColumn::make('due_date')
-                    ->label('Jatuh Tempo')
-                    ->date('d M Y')
-                    ->sortable()
-                    ->placeholder(fn (Loan $record) => $record->loan_date === null ? 'Belum diambil' : 'Tanpa batas')
-                    ->color(fn (Loan $record) => $record->isOverdue() ? 'danger' : 'success'),
+                // Tables\Columns\TextColumn::make('due_date')
+                //     ->label('Jatuh Tempo')
+                //     ->date('d M Y')
+                //     ->sortable()
+                //     ->placeholder(fn (Loan $record) => $record->loan_date === null ? 'Belum diambil' : 'Tanpa batas')
+                //     ->color(fn (Loan $record) => $record->isOverdue() ? 'danger' : 'success'),
 
-                Tables\Columns\TextColumn::make('days_until_due')
-                    ->label('Sisa Hari')
-                    ->badge()
-                    ->color(fn (Loan $record) => match (true) {
-                        $record->status === 'pending_pickup' => 'warning',
-                        $record->return_date !== null => 'gray',
-                        $record->due_date === null => 'success',
-                        $record->days_until_due < 0 => 'danger',
-                        $record->days_until_due <= 2 => 'warning',
-                        default => 'success',
-                    })
-                    ->formatStateUsing(
-                        fn (Loan $record) => $record->status === 'pending_pickup' ? 'Pending Pickup' : ($record->return_date ? 'Returned' : ($record->due_date === null ? 'Tanpa batas' : ($record->days_until_due < 0 ? 'OVERDUE '.abs((int) $record->days_until_due).'d' : $record->days_until_due.' hari')))
-                    ),
+                // Tables\Columns\TextColumn::make('days_until_due')
+                //     ->label('Sisa Hari')
+                //     ->badge()
+                //     ->color(fn (Loan $record) => match (true) {
+                //         $record->status === 'pending_pickup' => 'warning',
+                //         $record->return_date !== null => 'gray',
+                //         $record->due_date === null => 'success',
+                //         $record->days_until_due < 0 => 'danger',
+                //         $record->days_until_due <= 2 => 'warning',
+                //         default => 'success',
+                //     })
+                //     ->formatStateUsing(
+                //         fn (Loan $record) => $record->status === 'pending_pickup' ? 'Pending Pickup' : ($record->return_date ? 'Returned' : ($record->due_date === null ? 'Tanpa batas' : ($record->days_until_due < 0 ? 'OVERDUE '.abs((int) $record->days_until_due).'d' : $record->days_until_due.' hari')))
+                //     ),
 
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
@@ -261,8 +261,15 @@ class LoanResource extends Resource
 
                 Tables\Columns\TextColumn::make('fine_amount')
                     ->label('Denda')
-                    ->money('IDR')
-                    ->color(fn ($state) => $state > 0 ? 'danger' : 'gray')
+                    ->color(fn (Loan $record) => $record->fine_paid ? 'success' : ($record->fine_amount > 0 ? 'danger' : 'gray'))
+                    ->formatStateUsing(function ($state, Loan $record) {
+                        if ($state > 0) {
+                            $formatted = 'Rp ' . number_format($state, 2, ',', '.');
+                            return $record->fine_paid ? "Lunas ({$formatted})" : $formatted;
+                        }
+                        return '-';
+                    })
+                    ->badge(fn (Loan $record) => $record->fine_paid)
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('return_date')
@@ -270,12 +277,12 @@ class LoanResource extends Resource
                     ->date('d M Y')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('pickup_deadline')
-                    ->label('Deadline Pickup')
-                    ->dateTime('d M Y H:i')
-                    ->placeholder('-')
-                    ->toggleable()
-                    ->color(fn (Loan $record) => $record->isPickupExpired() ? 'danger' : 'success'),
+                // Tables\Columns\TextColumn::make('pickup_deadline')
+                //     ->label('Deadline Pickup')
+                //     ->dateTime('d M Y H:i')
+                //     ->placeholder('-')
+                //     ->toggleable()
+                //     ->color(fn (Loan $record) => $record->isPickupExpired() ? 'danger' : 'success'),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
@@ -303,8 +310,8 @@ class LoanResource extends Resource
                     ->query(fn (Builder $query): Builder => $query->where('status', 'overdue')),
 
                 Tables\Filters\Filter::make('has_fine')
-                    ->label('Ada Denda')
-                    ->query(fn (Builder $query): Builder => $query->where('fine_amount', '>', 0)),
+                    ->label('Ada Denda Belum Lunas')
+                    ->query(fn (Builder $query): Builder => $query->where('fine_amount', '>', 0)->where('fine_paid', false)),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),

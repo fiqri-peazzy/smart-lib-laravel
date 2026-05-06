@@ -18,7 +18,7 @@
                 <h1 class="text-4xl font-black mb-2 uppercase tracking-wide text-center">Fakultas Ilmu Komputer</h1>
                 <p class="text-xl text-center mb-8 text-secondary-400 font-medium tracking-wider">Universitas Ichsan
                     Gorontalo</p>
-                <div class="grid grid-cols-3 gap-8 w-full max-w-md">
+                {{-- <div class="grid grid-cols-3 gap-8 w-full max-w-md">
                     <div class="text-center">
                         <div class="text-3xl font-bold">1000+</div>
                         <div class="text-sm opacity-80">Buku</div>
@@ -31,7 +31,7 @@
                         <div class="text-3xl font-bold">24/7</div>
                         <div class="text-sm opacity-80">Akses</div>
                     </div>
-                </div>
+                </div> --}}
             </div>
         </div>
 

@@ -96,16 +96,16 @@ class BookingResource extends Resource
                     ->boolean()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('booking_date')
-                    ->label('Tgl Booking')
-                    ->date('d M Y')
-                    ->sortable(),
+                // Tables\Columns\TextColumn::make('booking_date')
+                //     ->label('Tgl Booking')
+                //     ->date('d M Y')
+                //     ->sortable(),
 
-                Tables\Columns\TextColumn::make('expires_at')
-                    ->label('Kadaluarsa')
-                    ->date('d M Y')
-                    ->sortable()
-                    ->color(fn(Booking $record) => $record->isExpired() ? 'danger' : 'success'),
+                // Tables\Columns\TextColumn::make('expires_at')
+                //     ->label('Kadaluarsa')
+                //     ->date('d M Y')
+                //     ->sortable()
+                //     ->color(fn(Booking $record) => $record->isExpired() ? 'danger' : 'success'),
 
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
