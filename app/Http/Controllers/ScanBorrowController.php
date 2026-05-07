@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Book;
+use App\Models\BookItem;
 use App\Models\Loan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,23 +16,27 @@ class ScanBorrowController extends Controller
 
     public function fetchBookDetails(Request $request)
     {
-        $barcode = trim($request->get('barcode'));
-        $book = Book::whereRaw('LOWER(barcode) = LOWER(?)', [$barcode])->first();
+        $qrCode = trim($request->get('barcode')); // barcode parameter from frontend, actually QR Code
+        $bookItem = BookItem::with('book.rack')->whereRaw('LOWER(qr_code) = LOWER(?)', [$qrCode])->first();
 
-        if (! $book) {
-            return response()->json(['success' => false, 'message' => 'Buku tidak ditemukan berdasarkan barcode tersebut.']);
+        if (! $bookItem) {
+            return response()->json(['success' => false, 'message' => 'Eksemplar buku tidak ditemukan berdasarkan QR Code tersebut.']);
+        }
+
+        if ($bookItem->status !== 'available') {
+            return response()->json(['success' => false, 'message' => 'Eksemplar buku ini sedang tidak tersedia (Status: ' . $bookItem->status . ').']);
         }
 
         return response()->json([
             'success' => true,
             'book' => [
-                'id' => $book->id,
-                'title' => $book->title,
-                'author' => $book->author,
-                'barcode' => $book->barcode,
-                'available_stock' => $book->available_stock,
-                'rack_location' => $book->rack_location,
-                'cover_url' => $book->cover_url,
+                'id' => $bookItem->book->id,
+                'title' => $bookItem->book->title,
+                'author' => $bookItem->book->author,
+                'barcode' => $bookItem->qr_code,
+                'available_stock' => $bookItem->book->available_stock,
+                'rack_location' => $bookItem->book->rack?->name ?? '-',
+                'cover_url' => $bookItem->book->cover_url,
             ],
         ]);
     }
@@ -40,18 +44,17 @@ class ScanBorrowController extends Controller
     public function process(Request $request)
     {
         $request->validate([
-            'barcode' => 'required|string',
-            'quantity' => 'required|integer|min:1',
+            'barcode' => 'required|string', // this is actually qr_code
         ]);
 
-        $book = Book::where('barcode', $request->barcode)->first();
+        $bookItem = BookItem::with('book')->where('qr_code', $request->barcode)->first();
 
-        if (! $book) {
-            return response()->json(['success' => false, 'message' => 'Buku tidak ditemukan.']);
+        if (! $bookItem) {
+            return response()->json(['success' => false, 'message' => 'Eksemplar buku tidak ditemukan.']);
         }
 
-        if (! $book->canBeBorrowed($request->quantity)) {
-            return response()->json(['success' => false, 'message' => 'Stok buku tidak mencukupi. Sisa stok tersedia: '.$book->available_stock]);
+        if ($bookItem->status !== 'available') {
+            return response()->json(['success' => false, 'message' => 'Eksemplar buku ini sedang tidak tersedia.']);
         }
 
         $user = Auth::user();
@@ -64,8 +67,7 @@ class ScanBorrowController extends Controller
         // Create pending_pickup loan
         $loan = Loan::create([
             'user_id' => $user->id,
-            'book_id' => $book->id,
-            'quantity' => $request->quantity,
+            'book_item_id' => $bookItem->id,
             'status' => 'pending_pickup',
             'pickup_deadline' => now()->addHours(24),
             'notes' => 'Self-service borrow request',
@@ -75,9 +77,9 @@ class ScanBorrowController extends Controller
             'success' => true,
             'message' => 'Permintaan peminjaman berhasil dibuat. Silakan temui staf perpustakaan untuk proses pengambilan buku.',
             'book' => [
-                'title' => $book->title,
-                'barcode' => $book->barcode,
-                'quantity' => $request->quantity,
+                'title' => $bookItem->book->title,
+                'barcode' => $bookItem->qr_code,
+                'quantity' => 1,
             ],
         ]);
     }

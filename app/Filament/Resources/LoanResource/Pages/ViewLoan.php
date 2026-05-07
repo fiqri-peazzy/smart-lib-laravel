@@ -34,9 +34,9 @@ class ViewLoan extends ViewRecord
                             ->label('Credit Score')
                             ->badge()
                             ->color(fn ($state) => $state >= 70 ? 'success' : 'danger'),
-                        Infolists\Components\TextEntry::make('book.title')
+                        Infolists\Components\TextEntry::make('bookItem.book.title')
                             ->label('Judul Buku'),
-                        Infolists\Components\TextEntry::make('book.barcode')
+                        Infolists\Components\TextEntry::make('bookItem.qr_code')
                             ->label('QR Code')
                             ->copyable(),
                     ])

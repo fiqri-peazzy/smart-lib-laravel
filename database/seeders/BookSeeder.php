@@ -6,7 +6,9 @@ use App\Models\Author;
 use App\Models\Publisher;
 use App\Models\Book;
 use App\Models\BookCategory;
+use App\Models\BookItem;
 use App\Models\Major;
+use App\Models\Rack;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -27,9 +29,14 @@ class BookSeeder extends Seeder
 
         $majors = Major::all();
         $categories = BookCategory::all();
+        $racks = Rack::all();
 
         if ($categories->isEmpty()) {
             $this->command->error('No book categories found! Please run BookCategorySeeder first.');
+            return;
+        }
+        if ($racks->isEmpty()) {
+            $this->command->error('No racks found! Please run RackSeeder first.');
             return;
         }
 
@@ -83,10 +90,10 @@ class BookSeeder extends Seeder
                 'publication_year' => $data['year'],
                 'language' => 'en',
                 'description' => $data['description'],
-                'rack_location' => 'RAK-'.chr(rand(65, 70)).'-'.rand(1, 10),
+                'rack_id' => $racks->random()->id,
                 'recommended_for_major_id' => $majors->isNotEmpty() ? $majors->random()->id : null,
-                'total_stock' => $numItems,
-                'available_stock' => $numItems,
+                'total_stock' => 0, // Will be updated by BookItem observer
+                'available_stock' => 0,
                 'is_available' => true,
                 'is_featured' => rand(0, 1) === 1,
                 'added_by' => $admin->id,
@@ -97,6 +104,15 @@ class BookSeeder extends Seeder
             $category = $categories->where('name', $data['category'])->first();
             if ($category) {
                 $book->categories()->sync([$category->id]);
+            }
+
+            // Create Book Items
+            for ($i = 0; $i < $numItems; $i++) {
+                BookItem::create([
+                    'book_id' => $book->id,
+                    'status' => 'available',
+                    'condition' => 'excellent',
+                ]);
             }
         }
 

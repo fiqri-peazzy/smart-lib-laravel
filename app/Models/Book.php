@@ -18,7 +18,6 @@ class Book extends Model
 
     protected $fillable = [
         'isbn',
-        'barcode',
         'title',
         'subtitle',
         'author',
@@ -33,7 +32,7 @@ class Book extends Model
         'description',
         'total_stock',
         'available_stock',
-        'rack_location',
+        'rack_id',
         'recommended_for_major_id',
         'is_available',
         'is_featured',
@@ -84,15 +83,6 @@ class Book extends Model
         parent::boot();
 
         static::saving(function ($book) {
-            // Auto-generate barcode if empty
-            if (empty($book->barcode)) {
-                // Random 16 karakter alphanumeric (huruf kapital + angka)
-                do {
-                    $code = strtoupper(Str::random(16));
-                } while (static::withTrashed()->where('barcode', $code)->exists());
-
-                $book->barcode = $code;
-            }
 
             // Sync legacy string fields for compatibility if they are empty
             if ($book->author_id) {
@@ -134,6 +124,22 @@ class Book extends Model
     public function addedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'added_by');
+    }
+
+    /**
+     * Relasi ke Rack
+     */
+    public function rack(): BelongsTo
+    {
+        return $this->belongsTo(Rack::class, 'rack_id');
+    }
+
+    /**
+     * Relasi ke BookItem (Eksemplar)
+     */
+    public function bookItems(): HasMany
+    {
+        return $this->hasMany(BookItem::class);
     }
 
     /**

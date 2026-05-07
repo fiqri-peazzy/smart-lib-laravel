@@ -98,26 +98,26 @@ Route::middleware(['auth', 'user.role'])->group(function () {
 //     })->name('book-items.print-qr');
 // });
 
-// QR Code image route for admin book detail
-Route::middleware(['auth'])->get('/books/{book}/qrcode.png', function (\App\Models\Book $book) {
+// QR Code image route for book item
+Route::middleware(['auth'])->get('/book-items/{bookItem}/qrcode.png', function (\App\Models\BookItem $bookItem) {
     $options = new \chillerlan\QRCode\QROptions;
     $options->outputInterface = \chillerlan\QRCode\Output\QRGdImagePNG::class;
     $options->scale = 8;
     $options->outputBase64 = false;
 
     $qr = new \chillerlan\QRCode\QRCode($options);
-    $png = $qr->render($book->barcode);
+    $png = $qr->render($bookItem->qr_code);
 
     return response($png, 200, [
         'Content-Type' => 'image/png',
         'Cache-Control' => 'public, max-age=3600',
     ]);
-})->name('books.qrcode');
+})->name('book-items.qrcode');
 
 // QR Code print page
-Route::middleware(['auth'])->get('/books/{book}/qrcode/print', function (\App\Models\Book $book) {
-    return view('books.qrcode-print', ['book' => $book]);
-})->name('books.qrcode.print');
+Route::middleware(['auth'])->get('/book-items/{bookItem}/qrcode/print', function (\App\Models\BookItem $bookItem) {
+    return view('books.qrcode-print', ['item' => $bookItem]);
+})->name('book-items.qrcode.print');
 
 
 

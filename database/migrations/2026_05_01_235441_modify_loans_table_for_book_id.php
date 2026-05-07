@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('loans', function (Blueprint $table) {
             $table->dropForeign(['book_item_id']);
+            $table->dropIndex(['book_item_id', 'status']);
             $table->dropColumn('book_item_id');
 
             $table->foreignId('book_id')->after('user_id')->constrained()->onDelete('cascade');

@@ -22,11 +22,17 @@ class DatabaseSeeder extends Seeder
         // 3. Create default users for testing
         $this->createDefaultUsers();
 
-        // 4. Seed Categories
-        $this->call(BookCategorySeeder::class);
+        // 4. Seed Racks and Categories
+        $this->call([
+            RackSeeder::class,
+            BookCategorySeeder::class,
+        ]);
 
         // 5. Seed Books & Items
         $this->call(BookSeeder::class);
+
+        // 6. Seed Loans
+        $this->call(LoanTestSeeder::class);
     }
 
     /**

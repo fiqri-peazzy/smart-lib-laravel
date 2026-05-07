@@ -38,10 +38,7 @@ class ViewBook extends ViewRecord
                         Infolists\Components\TextEntry::make('isbn')
                             ->label('ISBN')
                             ->copyable(),
-                        Infolists\Components\ViewEntry::make('barcode')
-                            ->label('Barcode Fisik')
-                            ->view('filament.infolists.components.barcode')
-                            ->columnSpanFull(),
+
                         Infolists\Components\TextEntry::make('publisher')
                             ->label('Penerbit'),
                         Infolists\Components\TextEntry::make('publication_year')
@@ -64,7 +61,7 @@ class ViewBook extends ViewRecord
                             ->label('Kategori')
                             ->badge()
                             ->separator(','),
-                        Infolists\Components\TextEntry::make('rack_location')
+                        Infolists\Components\TextEntry::make('rack.name')
                             ->label('Lokasi Rak')
                             ->badge()
                             ->color('info'),

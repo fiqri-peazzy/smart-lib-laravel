@@ -30,7 +30,7 @@ class UserDashboardController extends Controller
 
         // Ambil peminjaman terbaru
         $recentLoans = $user->loans()
-            ->with('book')
+            ->with('bookItem.book')
             ->latest()
             ->take(5)
             ->get();
@@ -47,28 +47,28 @@ class UserDashboardController extends Controller
 
         // Pending Pickup (requested but not picked up yet)
         $pendingPickupLoans = $user->loans()
-            ->with(['book.categories'])
+            ->with(['bookItem.book.categories'])
             ->where('status', 'pending_pickup')
             ->latest('requested_at')
             ->get();
 
         // Active Loans (active + extended)
         $activeLoans = $user->loans()
-            ->with(['book.categories'])
+            ->with(['bookItem.book.categories'])
             ->whereIn('status', ['active', 'extended'])
             ->latest('loan_date')
             ->get();
 
         // Overdue Loans
         $overdueLoans = $user->loans()
-            ->with(['book.categories', 'fine'])
+            ->with(['bookItem.book.categories', 'fine'])
             ->where('status', 'overdue')
             ->latest('due_date')
             ->get();
 
         // History (returned)
         $historyLoans = $user->loans()
-            ->with(['book.categories'])
+            ->with(['bookItem.book.categories'])
             ->where('status', 'returned')
             ->latest('return_date')
             ->paginate(10);
@@ -96,7 +96,7 @@ class UserDashboardController extends Controller
                 $reason = 'Status peminjaman tidak valid untuk perpanjangan.';
             } else {
                 // Check for pending bookings
-                $hasPendingBookings = \App\Models\Booking::where('book_id', $loan->book_id)
+                $hasPendingBookings = \App\Models\Booking::where('book_id', $loan->bookItem?->book_id)
                     ->where('status', 'pending')
                     ->exists();
 
@@ -196,7 +196,9 @@ class UserDashboardController extends Controller
 
             // Check if user already borrowed this book
             $activeLoan = $user->activeLoans()
-                ->where('book_id', $book->id)
+                ->whereHas('bookItem', function($q) use ($book) {
+                    $q->where('book_id', $book->id);
+                })
                 ->first();
 
             if ($activeLoan) {

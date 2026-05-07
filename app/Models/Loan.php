@@ -23,8 +23,7 @@ class Loan extends Model
 
     protected $fillable = [
         'user_id',
-        'book_id',
-        'quantity',
+        'book_item_id',
         'processed_by',
         'returned_to',
         'loan_date',
@@ -71,11 +70,11 @@ class Loan extends Model
                 $loan->loan_date = now();
             }
 
-            // Update book stock
-            if ($loan->book_id) {
-                $book = Book::find($loan->book_id);
-                if ($book) {
-                    $book->decrementStock($loan->quantity ?? 1);
+            // Update book item status
+            if ($loan->book_item_id) {
+                $bookItem = BookItem::find($loan->book_item_id);
+                if ($bookItem) {
+                    $bookItem->update(['status' => 'on_loan']);
                 }
             }
         });
@@ -109,11 +108,11 @@ class Loan extends Model
     }
 
     /**
-     * Relasi ke book
+     * Relasi ke bookItem
      */
-    public function book(): BelongsTo
+    public function bookItem(): BelongsTo
     {
-        return $this->belongsTo(Book::class);
+        return $this->belongsTo(BookItem::class);
     }
 
     /**
@@ -272,11 +271,15 @@ class Loan extends Model
             return false;
         }
 
-        $hasPendingBookings = Booking::where('book_id', $this->book_id)
-            ->where('status', 'pending')
-            ->exists();
+        if ($this->bookItem) {
+            $hasPendingBookings = Booking::where('book_id', $this->bookItem->book_id)
+                ->where('status', 'pending')
+                ->exists();
 
-        return ! $hasPendingBookings;
+            return ! $hasPendingBookings;
+        }
+
+        return true;
     }
 
     /**
@@ -312,6 +315,10 @@ class Loan extends Model
             'pickup_deadline' => null,
         ]);
 
+        if ($this->bookItem && $this->status === 'active') {
+            $this->bookItem->update(['status' => 'on_loan']);
+        }
+
         // Update loan history
         $this->user->updateLoanHistory();
     }
@@ -325,9 +332,9 @@ class Loan extends Model
             return;
         }
 
-        // Return book stock
-        if ($this->book) {
-            $this->book->incrementStock($this->quantity ?? 1);
+        // Return book item stock
+        if ($this->bookItem) {
+            $this->bookItem->update(['status' => 'available']);
         }
 
         // Soft delete the loan request
@@ -392,11 +399,18 @@ class Loan extends Model
             $this->user->increment('total_fines', $totalFineAmount);
         }
 
-        if ($this->book) {
-            // Hanya kembalikan stok jika tidak hilang (atau kebijakan bisa dikembalikan lalu mark unavailable)
-            if ($condition !== 'lost') {
-                $this->book->incrementStock($this->quantity ?? 1);
+        if ($this->bookItem) {
+            $itemStatus = 'available';
+            if ($condition === 'lost') {
+                $itemStatus = 'lost';
+            } elseif ($condition === 'damaged' || $condition === 'poor') {
+                $itemStatus = 'damaged';
             }
+
+            $this->bookItem->update([
+                'status' => $itemStatus,
+                'condition' => $condition,
+            ]);
         }
 
         $this->user->updateLoanHistory();
@@ -411,7 +425,9 @@ class Loan extends Model
      */
     protected function notifyBookings(): void
     {
-        $bookings = Booking::where('book_id', $this->book_id)
+        if (!$this->bookItem) return;
+
+        $bookings = Booking::where('book_id', $this->bookItem->book_id)
             ->where('status', 'pending')
             ->orderBy('is_priority', 'desc')
             ->orderBy('booking_date', 'asc')

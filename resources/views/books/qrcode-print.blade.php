@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>QR Code - {{ $book->title }}</title>
+    <title>QR Code - {{ $item->book->title }}</title>
     <style>
         @page { size: 60mm 60mm; margin: 3mm; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -55,10 +55,10 @@
 </head>
 <body>
     <div class="qr-container">
-        <img src="{{ route('books.qrcode', $book) }}" alt="QR" class="qr-img">
-        <div class="qr-code-text">{{ $book->barcode }}</div>
+        <img src="{{ route('book-items.qrcode', $item) }}" alt="QR" class="qr-img">
+        <div class="qr-code-text">{{ $item->qr_code }}</div>
         <div class="qr-label">Smart Library</div>
-        <div class="book-title">{{ Str::limit($book->title, 30) }}</div>
+        <div class="book-title">{{ Str::limit($item->book->title, 30) }}</div>
     </div>
 
     <div class="no-print" style="margin-top: 20px;">

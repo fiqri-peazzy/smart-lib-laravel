@@ -175,7 +175,9 @@ class BookController extends Controller
 
         // Check if user already has active loan for this book
         $existingLoan = $user->loans()
-            ->where('book_id', $book->id)
+            ->whereHas('bookItem', function ($q) use ($book) {
+                $q->where('book_id', $book->id);
+            })
             ->whereIn('status', ['pending_pickup', 'active', 'extended', 'overdue'])
             ->first();
 
@@ -193,14 +195,20 @@ class BookController extends Controller
             return back()->with('error', 'Anda sudah memiliki booking untuk buku ini. Silakan ambil buku di perpustakaan.');
         }
 
+        // Find an available book item
+        $bookItem = $book->items()->where('status', 'available')->first();
+
+        if (! $bookItem) {
+            return back()->with('error', 'Semua eksemplar sedang dipinjam atau tidak tersedia.');
+        }
+
         // Use DB transaction
         DB::beginTransaction();
         try {
             // Create loan request with pending_pickup status
             $loan = Loan::create([
                 'user_id' => $user->id,
-                'book_id' => $book->id,
-                'quantity' => 1,
+                'book_item_id' => $bookItem->id,
                 'status' => 'pending_pickup',
                 'requested_at' => now(),
                 'pickup_deadline' => now()->addDays(3), // 3 days to pickup

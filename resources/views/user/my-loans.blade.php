@@ -137,9 +137,9 @@
                                     class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border-2 border-yellow-500">
                                     <!-- Book Cover -->
                                     <div class="relative h-48 bg-gradient-to-br from-yellow-500 to-orange-600">
-                                        @if ($loan->book->cover_image)
-                                            <img src="{{ $loan->book->cover_url }}"
-                                                alt="{{ $loan->book->title }}"
+                                        @if ($loan->bookItem->book->cover_image)
+                                            <img src="{{ $loan->bookItem->book->cover_url }}"
+                                                alt="{{ $loan->bookItem->book->title }}"
                                                 class="w-full h-full object-cover">
                                         @else
                                             <div class="w-full h-full flex items-center justify-center text-white">
@@ -161,7 +161,7 @@
                                     <div class="p-5">
                                         <!-- Title -->
                                         <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
-                                            {{ $loan->book->title }}
+                                            {{ $loan->bookItem->book->title }}
                                         </h3>
 
                                         <!-- Info -->
@@ -196,7 +196,7 @@
                                             </div>
                                             <div class="flex items-center">
                                                 <i class="bi bi-upc-scan mr-2"></i>
-                                                <span class="font-mono text-xs">{{ $loan->book->barcode }}</span>
+                                                <span class="font-mono text-xs">{{ $loan->bookItem->qr_code }}</span>
                                             </div>
                                         </div>
 
@@ -205,9 +205,9 @@
                                             <p class="text-xs text-blue-700 dark:text-blue-300 font-semibold mb-1 flex items-center gap-1">
                                                 <i class="bi bi-qr-code-scan"></i> QR Code Buku:
                                             </p>
-                                            <img src="{{ route('books.qrcode', $loan->book) }}" alt="QR Code"
+                                            <img src="{{ route('book-items.qrcode', $loan->bookItem) }}" alt="QR Code"
                                                 class="w-28 h-28 mx-auto object-contain bg-white rounded-lg p-1.5 border border-blue-200">
-                                            <p class="text-xs text-center text-blue-600 dark:text-blue-400 mt-1.5 font-mono">{{ $loan->book->barcode }}</p>
+                                            <p class="text-xs text-center text-blue-600 dark:text-blue-400 mt-1.5 font-mono">{{ $loan->bookItem->qr_code }}</p>
                                             <p class="text-xs text-center text-gray-500 dark:text-gray-400 mt-1">Staff scan ini saat Anda mengambil buku</p>
                                         </div>
 
@@ -276,17 +276,17 @@
                                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                                                 <td class="px-6 py-4">
                                                     <div class="flex items-center">
-                                                        <img src="{{ $loan->book->cover_url }}"
-                                                            alt="{{ $loan->book->title }}"
+                                                        <img src="{{ $loan->bookItem->book->cover_url }}"
+                                                            alt="{{ $loan->bookItem->book->title }}"
                                                             class="w-12 h-16 object-cover rounded shadow-sm">
                                                         <div class="ml-4">
                                                             <div
                                                                 class="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2">
-                                                                {{ $loan->book->title }}
+                                                                {{ $loan->bookItem->book->title }}
                                                             </div>
                                                             <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                                                 <i class="bi bi-upc-scan mr-1"></i>
-                                                                {{ $loan->book->barcode }}
+                                                                {{ $loan->bookItem->qr_code }}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -420,17 +420,17 @@
                                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                                                 <td class="px-6 py-4">
                                                     <div class="flex items-center">
-                                                        <img src="{{ $loan->book->cover_url }}"
-                                                            alt="{{ $loan->book->title }}"
+                                                        <img src="{{ $loan->bookItem->book->cover_url }}"
+                                                            alt="{{ $loan->bookItem->book->title }}"
                                                             class="w-12 h-16 object-cover rounded shadow-sm">
                                                         <div class="ml-4">
                                                             <div
                                                                 class="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2">
-                                                                {{ $loan->book->title }}
+                                                                {{ $loan->bookItem->book->title }}
                                                             </div>
                                                             <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                                                 <i class="bi bi-upc-scan mr-1"></i>
-                                                                {{ $loan->book->barcode }}
+                                                                {{ $loan->bookItem->qr_code }}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -505,17 +505,17 @@
                                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                                                 <td class="px-6 py-4">
                                                     <div class="flex items-center">
-                                                        <img src="{{ $loan->book->cover_url }}"
-                                                            alt="{{ $loan->book->title }}"
+                                                        <img src="{{ $loan->bookItem->book->cover_url }}"
+                                                            alt="{{ $loan->bookItem->book->title }}"
                                                             class="w-12 h-16 object-cover rounded shadow-sm">
                                                         <div class="ml-4">
                                                             <div
                                                                 class="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2">
-                                                                {{ $loan->book->title }}
+                                                                {{ $loan->bookItem->book->title }}
                                                             </div>
                                                             <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                                                 <i class="bi bi-upc-scan mr-1"></i>
-                                                                {{ $loan->book->barcode }}
+                                                                {{ $loan->bookItem->qr_code }}
                                                             </div>
                                                         </div>
                                                     </div>

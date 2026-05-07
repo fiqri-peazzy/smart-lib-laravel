@@ -74,45 +74,36 @@ class LoanResource extends Resource
                     ])
                     ->columns(1),
 
-                Forms\Components\Section::make('Pilih Buku')
+                Forms\Components\Section::make('Pilih Eksemplar Buku')
                     ->schema([
-                        Forms\Components\Select::make('book_id')
-                            ->label('Buku')
+                        Forms\Components\Select::make('book_item_id')
+                            ->label('Buku (Eksemplar)')
                             ->options(function () {
-                                return \App\Models\Book::where('is_available', true)
-                                    ->where('available_stock', '>', 0)
+                                return \App\Models\BookItem::with('book')
+                                    ->where('status', 'available')
                                     ->get()
-                                    ->mapWithKeys(function ($book) {
+                                    ->mapWithKeys(function ($item) {
                                         return [
-                                            $book->id => "{$book->title} - {$book->barcode} (Stok: {$book->available_stock})",
+                                            $item->id => "{$item->book->title} - {$item->qr_code}",
                                         ];
                                     });
                             })
                             ->searchable()
                             ->required()
-                            ->helperText('Hanya menampilkan buku yang tersedia')
+                            ->helperText('Cari berdasarkan judul buku atau scan QR Code')
                             ->reactive()
                             ->afterStateUpdated(function ($state, callable $set) {
                                 if ($state) {
-                                    $book = \App\Models\Book::find($state);
-                                    if ($book) {
-                                        $set('book_info', "Penulis: {$book->author} | Lokasi: {$book->rack_location} | Stok Tersedia: {$book->available_stock}");
-                                        // Set max attribute for quantity if possible
+                                    $item = \App\Models\BookItem::with('book')->find($state);
+                                    if ($item && $item->book) {
+                                        $set('book_info', "Judul: {$item->book->title} | Penulis: {$item->book->author} | Kondisi: {$item->condition} | QR: {$item->qr_code}");
                                     }
                                 }
                             }),
 
                         Forms\Components\Placeholder::make('book_info')
                             ->label('Info Buku')
-                            ->content(fn ($get) => $get('book_info') ?? 'Pilih buku untuk melihat info'),
-
-                        Forms\Components\TextInput::make('quantity')
-                            ->label('Jumlah Pinjam')
-                            ->numeric()
-                            ->default(1)
-                            ->minValue(1)
-                            ->required()
-                            ->helperText('Jumlah eksemplar yang dipinjam'),
+                            ->content(fn ($get) => $get('book_info') ?? 'Pilih eksemplar buku untuk melihat info'),
                     ])
                     ->columns(1),
 
@@ -195,16 +186,12 @@ class LoanResource extends Resource
                     ->sortable()
                     ->description(fn (Loan $record) => $record->user->nim),
 
-                Tables\Columns\TextColumn::make('book.title')
+                Tables\Columns\TextColumn::make('bookItem.book.title')
                     ->label('Buku')
                     ->searchable()
                     ->limit(40)
                     ->wrap()
-                    ->description(fn (Loan $record) => $record->book->barcode),
-
-                Tables\Columns\TextColumn::make('quantity')
-                    ->label('Qty')
-                    ->sortable(),
+                    ->description(fn (Loan $record) => $record->bookItem?->qr_code ?? '-'),
 
                 // Tables\Columns\TextColumn::make('loan_date')
                 //     ->label('Tgl Pinjam')
@@ -324,7 +311,7 @@ class LoanResource extends Resource
                     ->visible(fn (Loan $record) => $record->status === 'pending_pickup')
                     ->requiresConfirmation()
                     ->modalHeading('Konfirmasi Pengambilan Buku')
-                    ->modalDescription(fn (Loan $record) => "Konfirmasi bahwa {$record->user->name} telah mengambil buku \"{$record->book->title}\" sebanyak {$record->quantity} eksemplar?")
+                    ->modalDescription(fn (Loan $record) => "Konfirmasi bahwa {$record->user->name} telah mengambil buku \"{$record->bookItem?->book->title}\"?")
                     ->modalSubmitActionLabel('Konfirmasi')
                     ->form([
                         Forms\Components\DatePicker::make('loan_date')
@@ -378,7 +365,7 @@ class LoanResource extends Resource
                     ->visible(fn (Loan $record) => $record->canBeExtended())
                     ->requiresConfirmation()
                     ->modalHeading('Perpanjang Peminjaman')
-                    ->modalDescription(fn (Loan $record) => "Perpanjang peminjaman buku \"{$record->book->title}\" selama 7 hari?")
+                    ->modalDescription(fn (Loan $record) => "Perpanjang peminjaman buku \"{$record->bookItem?->book->title}\" selama 7 hari?")
                     ->action(function (Loan $record) {
                         if ($record->extend(7)) {
                             \Filament\Notifications\Notification::make()
@@ -743,6 +730,6 @@ class LoanResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->with(['user', 'book']);
+        return parent::getEloquentQuery()->with(['user', 'bookItem.book']);
     }
 }
