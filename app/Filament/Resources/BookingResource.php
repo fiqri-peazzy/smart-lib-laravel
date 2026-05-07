@@ -83,7 +83,7 @@ class BookingResource extends Resource
                     ->label('User')
                     ->searchable(['name', 'nim'])
                     ->sortable()
-                    ->description(fn(Booking $record) => $record->user->nim),
+                    ->description(fn (Booking $record) => $record->user->nim),
 
                 Tables\Columns\TextColumn::make('book.title')
                     ->label('Buku')
@@ -117,7 +117,7 @@ class BookingResource extends Resource
                         'gray' => 'cancelled',
                         'danger' => 'expired',
                     ])
-                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
                         'pending' => 'Menunggu',
                         'notified' => 'Sudah Diberitahu',
                         'fulfilled' => 'Terpenuhi',
@@ -157,54 +157,20 @@ class BookingResource extends Resource
                 Tables\Filters\Filter::make('expired')
                     ->label('Sudah Expired')
                     ->query(
-                        fn(Builder $query): Builder =>
-                        $query->where('status', 'pending')
+                        fn (Builder $query): Builder => $query->where('status', 'pending')
                             ->where('expires_at', '<', now())
                     ),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn(Booking $record) => $record->status === 'pending'),
-
-                Tables\Actions\Action::make('notify')
-                    ->label('Beritahu')
-                    ->icon('heroicon-o-bell')
-                    ->color('info')
-                    ->visible(fn(Booking $record) => $record->status === 'pending')
-                    ->requiresConfirmation()
-                    ->modalHeading('Beritahu User')
-                    ->modalDescription(fn(Booking $record) => "Kirim notifikasi ke {$record->user->name} bahwa buku tersedia?")
-                    ->action(function (Booking $record) {
-                        $record->notify();
-
-                        \Filament\Notifications\Notification::make()
-                            ->title('Notifikasi terkirim')
-                            ->body('User akan diberitahu bahwa buku sudah tersedia')
-                            ->success()
-                            ->send();
-                    }),
-
-                Tables\Actions\Action::make('fulfill')
-                    ->label('Penuhi')
-                    ->icon('heroicon-o-check-circle')
-                    ->color('success')
-                    ->visible(fn(Booking $record) => in_array($record->status, ['pending', 'notified']))
-                    ->requiresConfirmation()
-                    ->action(function (Booking $record) {
-                        $record->fulfill();
-
-                        \Filament\Notifications\Notification::make()
-                            ->title('Booking terpenuhi')
-                            ->success()
-                            ->send();
-                    }),
+                    ->visible(fn (Booking $record) => $record->status === 'pending'),
 
                 Tables\Actions\Action::make('cancel')
                     ->label('Batalkan')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn(Booking $record) => in_array($record->status, ['pending', 'notified']))
+                    ->visible(fn (Booking $record) => in_array($record->status, ['pending', 'notified']))
                     ->form([
                         Forms\Components\Textarea::make('reason')
                             ->label('Alasan Pembatalan')

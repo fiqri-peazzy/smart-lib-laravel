@@ -25,9 +25,6 @@ Route::prefix('books')->name('books.')->group(function () {
     Route::get('/{book}', [BookController::class, 'show'])->name('show');
     Route::get('/category/{category}', [BookController::class, 'byCategory'])->name('category');
 
-    // request loan (butuh login)
-
-    Route::post('/{book}/request-loan', [BookController::class, 'requestLoan'])->name('request-loan')->middleware(['auth', 'user.role']);
 });
 
 // Digital Library Routes (Public browse, download butuh login)
@@ -41,7 +38,6 @@ Route::prefix('digital')->name('digital.')->group(function () {
         Route::get('/{book}/download', [DigitalLibraryController::class, 'download'])->name('download');
     });
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -118,8 +114,6 @@ Route::middleware(['auth'])->get('/book-items/{bookItem}/qrcode.png', function (
 Route::middleware(['auth'])->get('/book-items/{bookItem}/qrcode/print', function (\App\Models\BookItem $bookItem) {
     return view('books.qrcode-print', ['item' => $bookItem]);
 })->name('book-items.qrcode.print');
-
-
 
 /*
 |--------------------------------------------------------------------------

@@ -39,8 +39,6 @@ class BookResource extends Resource
                             ->unique(ignoreRecord: true)
                             ->placeholder('978-xxx-xxx-xxx-x'),
 
-
-
                         Forms\Components\TextInput::make('title')
                             ->label('Judul Buku')
                             ->required()
@@ -140,9 +138,8 @@ class BookResource extends Resource
                                 ])
                                 ->visible(fn ($get) => $get('digital_file_type') === 'skripsi'),
                         ])
-                        ->visible(fn ($get) => $get('is_digital')),
+                            ->visible(fn ($get) => $get('is_digital')),
                     ]),
-
 
                 Forms\Components\Section::make('Detail Fisik')
                     ->schema([
@@ -224,8 +221,6 @@ class BookResource extends Resource
                             ->label('Buku Unggulan')
                             ->default(false)
                             ->helperText('Tampilkan di koleksi unggulan homepage'),
-
-
 
                         Forms\Components\Hidden::make('added_by')
                             ->default(Auth::id()),
@@ -359,6 +354,12 @@ class BookResource extends Resource
                     ->query(fn ($query) => $query->where('available_stock', 0)),
             ])
             ->actions([
+                Tables\Actions\Action::make('manage_items')
+                    ->label('Kelola Eksemplar')
+                    ->icon('heroicon-o-queue-list')
+                    ->color('success')
+                    ->url(fn (Book $record): string => BookResource::getUrl('items', ['record' => $record]))
+                    ->hidden(fn (Book $record): bool => $record->is_digital),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
@@ -375,7 +376,7 @@ class BookResource extends Resource
     public static function getRelations(): array
     {
         return [
-            \App\Filament\Resources\BookResource\RelationManagers\BookItemsRelationManager::class,
+            //
         ];
     }
 
@@ -386,6 +387,7 @@ class BookResource extends Resource
             'create' => Pages\CreateBook::route('/create'),
             'view' => Pages\ViewBook::route('/{record}'),
             'edit' => Pages\EditBook::route('/{record}/edit'),
+            'items' => Pages\ManageBookItems::route('/{record}/items'),
         ];
     }
 

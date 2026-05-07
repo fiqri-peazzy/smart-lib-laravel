@@ -56,8 +56,8 @@
                         <button
                             class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
                             data-tab="pending" onclick="switchTab('pending')">
-                            <i class="bi bi-hourglass-split mr-2"></i>
-                            Pending Pickup
+                            <i class="bi bi-box-seam mr-2"></i>
+                            Siap Diambil
                             <span
                                 class="ml-2 px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
                                 {{ $pendingPickupLoans->count() }}
@@ -107,9 +107,8 @@
                                 class="w-20 h-20 bg-yellow-100 dark:bg-yellow-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <i class="bi bi-hourglass-split text-3xl text-yellow-600 dark:text-yellow-400"></i>
                             </div>
-                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Tidak Ada Request Pending</h3>
-                            <p class="text-gray-600 dark:text-gray-400 mb-6">Anda belum memiliki request peminjaman yang
-                                menunggu pickup</p>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Tidak Ada Buku Siap Diambil</h3>
+                            <p class="text-gray-600 dark:text-gray-400 mb-6">Anda belum memiliki buku hasil antrean yang siap untuk diambil di perpustakaan.</p>
                             <a href="{{ route('books.index') }}"
                                 class="inline-flex items-center px-6 py-3 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 transition-colors shadow-sm">
                                 <i class="bi bi-collection mr-2"></i>
@@ -125,8 +124,7 @@
                             <div class="flex-1">
                                 <h4 class="text-yellow-900 dark:text-yellow-300 font-bold mb-1">Segera Ambil Buku Anda!</h4>
                                 <p class="text-yellow-800 dark:text-yellow-300 text-sm">
-                                 Anda memiliki {{ $pendingPickupLoans->count() }} buku menunggu diambil. Datang ke
-                                    perpustakaan — staff akan scan QR Code di buku untuk aktivasi peminjaman.
+                                 Pesanan Anda tersedia! Anda memiliki {{ $pendingPickupLoans->count() }} buku yang siap diambil. Silakan datang ke meja sirkulasi perpustakaan sebelum batas waktu habis.
                                 </p>
                             </div>
                         </div>
@@ -151,8 +149,8 @@
                                         <div class="absolute top-3 right-3">
                                             <span
                                                 class="inline-flex items-center px-3 py-1 bg-yellow-500 text-white text-xs font-bold rounded-full shadow-lg animate-pulse">
-                                                <i class="bi bi-hourglass-split mr-1"></i>
-                                                Pending Pickup
+                                                <i class="bi bi-box-seam mr-1"></i>
+                                                Siap Diambil
                                             </span>
                                         </div>
                                     </div>
@@ -168,12 +166,12 @@
                                         <div class="space-y-2 mb-4 text-sm text-gray-600 dark:text-gray-400">
                                             <div class="flex items-center">
                                                 <i class="bi bi-calendar-plus mr-2"></i>
-                                                <span>Request: {{ $loan->requested_at->format('d M Y H:i') }}</span>
+                                                <span>Tersedia sejak: {{ $loan->requested_at ? $loan->requested_at->format('d M Y H:i') : '-' }}</span>
                                             </div>
                                             <div class="flex items-center">
                                                 <i class="bi bi-clock mr-2"></i>
                                                 <span>Ambil sebelum:
-                                                    {{ $loan->pickup_deadline->format('d M Y H:i') }}</span>
+                                                    {{ $loan->pickup_deadline ? $loan->pickup_deadline->format('d M Y H:i') : '-' }}</span>
                                             </div>
                                             <div class="flex items-center">
                                                 <i class="bi bi-hourglass-bottom mr-2"></i>
@@ -208,7 +206,7 @@
                                             <img src="{{ route('book-items.qrcode', $loan->bookItem) }}" alt="QR Code"
                                                 class="w-28 h-28 mx-auto object-contain bg-white rounded-lg p-1.5 border border-blue-200">
                                             <p class="text-xs text-center text-blue-600 dark:text-blue-400 mt-1.5 font-mono">{{ $loan->bookItem->qr_code }}</p>
-                                            <p class="text-xs text-center text-gray-500 dark:text-gray-400 mt-1">Staff scan ini saat Anda mengambil buku</p>
+                                            <p class="text-xs text-center text-gray-500 dark:text-gray-400 mt-1">Tunjukkan ke staff saat mengambil buku pesanan</p>
                                         </div>
 
                                         <!-- Warning -->
@@ -216,8 +214,8 @@
                                             class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-500 rounded-lg p-3">
                                             <p class="text-xs text-yellow-800 dark:text-yellow-300 flex items-start">
                                                 <i class="bi bi-info-circle-fill mr-2 mt-0.5 flex-shrink-0"></i>
-                                                <span>Request akan otomatis dibatalkan jika tidak diambil dalam
-                                                    {{ $daysLeft > 0 ? $daysLeft : 0 }} hari</span>
+                                                <span>Pesanan otomatis dibatalkan dan dialihkan ke pengantre berikutnya jika tidak diambil dalam
+                                                    {{ $daysLeft > 0 ? $daysLeft : 0 }} hari.</span>
                                             </p>
                                         </div>
                                     </div>
@@ -527,7 +525,7 @@
                                                     {{ $loan->return_date ? $loan->return_date->format('d M Y') : '-' }}
                                                 </td>
                                                 <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                                                    {{ $loan->loan_date->diffInDays($loan->return_date) }} hari
+                                                    {{ $loan->loan_date && $loan->return_date ? $loan->loan_date->diffInDays($loan->return_date) : 0 }} hari
                                                 </td>
                                                 <td class="px-6 py-4 text-center">
                                                     @if ($loan->return_date <= $loan->due_date)
@@ -591,7 +589,7 @@
 
         // Initialize first tab as active
         document.addEventListener('DOMContentLoaded', function() {
-            switchTab('pending'); // Changed from 'active' to 'pending'
+            switchTab('active');
         });
     </script>
 @endsection

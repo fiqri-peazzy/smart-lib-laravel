@@ -1,23 +1,30 @@
 <?php
 
-namespace App\Filament\Resources\BookResource\RelationManagers;
+namespace App\Filament\Resources\BookResource\Pages;
 
+use App\Filament\Resources\BookResource;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Resources\Pages\ManageRelatedRecords;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Database\Eloquent\Model;
 
-class BookItemsRelationManager extends RelationManager
+class ManageBookItems extends ManageRelatedRecords
 {
+    protected static string $resource = BookResource::class;
+
     protected static string $relationship = 'bookItems';
 
-    public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
+    protected static ?string $navigationIcon = 'heroicon-o-queue-list';
+
+    // Indonesian translations
+    protected static ?string $title = 'Kelola Eksemplar Buku';
+
+    protected static ?string $navigationLabel = 'Eksemplar';
+
+    public function getTitle(): string
     {
-        return ! $ownerRecord->is_digital;
+        return 'Kelola Eksemplar: '.$this->getRecord()->title;
     }
 
     public function form(Form $form): Form
@@ -61,6 +68,9 @@ class BookItemsRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('qr_code')
+            ->heading('Daftar Eksemplar')
+            ->modelLabel('Eksemplar')
+            ->pluralModelLabel('Eksemplar')
             ->columns([
                 Tables\Columns\TextColumn::make('qr_code')
                     ->label('QR Code')
@@ -89,7 +99,8 @@ class BookItemsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\CreateAction::make()
+                    ->label('Tambah Eksemplar'),
             ])
             ->actions([
                 Tables\Actions\Action::make('print_qr')

@@ -3,21 +3,26 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PublisherResource\Pages;
-use App\Filament\Resources\PublisherResource\RelationManagers;
 use App\Models\Publisher;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PublisherResource extends Resource
 {
     protected static ?string $model = Publisher::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-building-office';
+
+    protected static ?string $navigationLabel = 'Penerbit';
+
+    protected static ?string $modelLabel = 'Penerbit';
+
+    protected static ?string $pluralModelLabel = 'Penerbit';
+
+    protected static ?string $navigationGroup = 'Master Data';
 
     public static function form(Form $form): Form
     {

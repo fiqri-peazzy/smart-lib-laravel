@@ -3,21 +3,26 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\RackResource\Pages;
-use App\Filament\Resources\RackResource\RelationManagers;
 use App\Models\Rack;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class RackResource extends Resource
 {
     protected static ?string $model = Rack::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-server-stack';
+
+    protected static ?string $navigationLabel = 'Rak';
+
+    protected static ?string $modelLabel = 'Rak';
+
+    protected static ?string $pluralModelLabel = 'Rak';
+
+    protected static ?string $navigationGroup = 'Master Data';
 
     public static function form(Form $form): Form
     {

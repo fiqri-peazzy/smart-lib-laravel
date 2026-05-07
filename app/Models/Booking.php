@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -40,7 +39,7 @@ class Booking extends Model
 
         static::creating(function ($booking) {
             // Set booking date
-            if (!$booking->booking_date) {
+            if (! $booking->booking_date) {
                 $booking->booking_date = now();
             }
 
@@ -50,10 +49,6 @@ class Booking extends Model
                 $booking->is_priority = true;
             }
 
-            // Set expired date (3 hari dari sekarang)
-            if (!$booking->expires_at) {
-                $booking->expires_at = now()->addDays(3);
-            }
         });
     }
 
@@ -107,7 +102,7 @@ class Booking extends Model
         $this->update([
             'status' => 'notified',
             'notified_at' => now(),
-            'expires_at' => now()->addDays(3), // Reset expired 3 hari lagi
+            'expires_at' => now()->addDay(), // Reset expired 24 jam lagi
         ]);
 
         // TODO: Send actual notification (email/whatsapp)
@@ -132,7 +127,7 @@ class Booking extends Model
     {
         $this->update([
             'status' => 'cancelled',
-            'notes' => $reason ? $this->notes . "\nCancelled: " . $reason : $this->notes,
+            'notes' => $reason ? $this->notes."\nCancelled: ".$reason : $this->notes,
         ]);
     }
 
@@ -166,7 +161,7 @@ class Booking extends Model
      */
     public function getDaysUntilExpiresAttribute(): int
     {
-        if (!$this->expires_at) {
+        if (! $this->expires_at) {
             return 0;
         }
 

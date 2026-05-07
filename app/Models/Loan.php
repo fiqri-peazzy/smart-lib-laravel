@@ -425,16 +425,34 @@ class Loan extends Model
      */
     protected function notifyBookings(): void
     {
-        if (!$this->bookItem) return;
+        if (! $this->bookItem || $this->bookItem->status !== 'available') {
+            return;
+        }
 
-        $bookings = Booking::where('book_id', $this->bookItem->book_id)
+        // Cari 1 antrean terlama (dengan priority tertinggi di atas)
+        $booking = Booking::where('book_id', $this->bookItem->book_id)
             ->where('status', 'pending')
             ->orderBy('is_priority', 'desc')
             ->orderBy('booking_date', 'asc')
-            ->get();
+            ->first();
 
-        foreach ($bookings as $booking) {
+        if ($booking) {
+            // 1. Notify user (status -> notified, expires_at -> +24 jam)
             $booking->notify();
+
+            // 2. Tahan eksemplar ini
+            $this->bookItem->update(['status' => 'reserved']);
+
+            // 3. Buat Loan pending_pickup untuk booking agar siap diambil
+            self::create([
+                'user_id' => $booking->user_id,
+                'book_item_id' => $this->bookItem->id,
+                'status' => 'pending_pickup',
+                'requested_at' => now(),
+                'pickup_deadline' => now()->addDay(), // 1x24 jam
+                'loan_date' => null,
+                'due_date' => null,
+            ]);
         }
     }
 

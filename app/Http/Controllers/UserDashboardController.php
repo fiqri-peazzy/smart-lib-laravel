@@ -196,7 +196,7 @@ class UserDashboardController extends Controller
 
             // Check if user already borrowed this book
             $activeLoan = $user->activeLoans()
-                ->whereHas('bookItem', function($q) use ($book) {
+                ->whereHas('bookItem', function ($q) use ($book) {
                     $q->where('book_id', $book->id);
                 })
                 ->first();
@@ -212,7 +212,7 @@ class UserDashboardController extends Controller
                 'user_id' => $user->id,
                 'book_id' => $book->id,
                 'booking_date' => now(),
-                'expires_at' => now()->addDays(3),
+                'expires_at' => null,
                 'status' => 'pending',
                 'is_priority' => $user->isDosen(), // Dosen auto priority
             ]);

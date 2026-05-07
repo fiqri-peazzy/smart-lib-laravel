@@ -186,24 +186,11 @@
                                                 <i class="bi bi-calendar-event mr-2"></i>
                                                 <span>Dibooking: {{ $booking->booking_date->format('d M Y') }}</span>
                                             </div>
-                                            <div class="flex items-center">
-                                                <i class="bi bi-clock mr-2"></i>
-                                                <span>Expired: {{ $booking->expires_at->format('d M Y') }}</span>
-                                            </div>
-                                            <div class="flex items-center">
-                                                <i class="bi bi-hourglass-bottom mr-2"></i>
-                                                @php
-                                                    $daysLeft = $booking->days_until_expires;
-                                                @endphp
-                                                @if ($daysLeft > 0)
-                                                    <span class="text-yellow-600 dark:text-yellow-400 font-medium">
-                                                        {{ $daysLeft }} hari lagi
-                                                    </span>
-                                                @else
-                                                    <span class="text-red-600 dark:text-red-400 font-medium">
-                                                        Akan expired hari ini
-                                                    </span>
-                                                @endif
+                                            <div class="flex items-start mt-2">
+                                                <i class="bi bi-info-circle-fill mr-2 mt-0.5 text-blue-500"></i>
+                                                <span class="text-blue-600 dark:text-blue-400 font-medium text-xs leading-relaxed">
+                                                    Masuk dalam antrean. Anda akan diberitahu jika buku sudah tersedia.
+                                                </span>
                                             </div>
                                         </div>
 
