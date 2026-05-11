@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,6 +20,7 @@ class RegisteredUserController extends Controller
     public function create(): View
     {
         $majors = \App\Models\Major::where('is_active', true)->get();
+
         return view('auth.register', compact('majors'));
     }
 
@@ -31,10 +31,10 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'nim' => ['required', 'string', 'max:20', 'unique:' . User::class],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
+            'nim' => ['required', 'string', 'max:20', 'unique:'.User::class],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
             'major_id' => ['required', 'exists:majors,id'],
-            'angkatan' => ['required', 'integer', 'min:2000', 'max:' . date('Y')],
+            'angkatan' => ['required', 'integer', 'min:2000', 'max:'.date('Y')],
             'phone' => ['required', 'string', 'max:20'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
@@ -46,7 +46,7 @@ class RegisteredUserController extends Controller
 
         // Ensure unique username
         while (User::where('username', $username)->exists()) {
-            $username = $baseUsername . $counter;
+            $username = $baseUsername.$counter;
             $counter++;
         }
 
@@ -60,12 +60,14 @@ class RegisteredUserController extends Controller
             'angkatan' => $request->angkatan,
             'phone' => $request->phone,
             'credit_score' => 100, // Default perfect score
-            'max_loans' => 4, // Default max loans
             'status' => 'active',
         ]);
 
         // Assign mahasiswa role
         $user->assignRole('mahasiswa');
+
+        // Update max loans based on role and score
+        $user->updateMaxLoans();
 
         // Create loan history
         \App\Models\LoanHistory::create([

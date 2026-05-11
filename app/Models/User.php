@@ -8,14 +8,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
-use App\Models\Loan;
-use App\Models\Booking;
-use App\Models\LoanHistory;
-use App\Models\Fine;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles, SoftDeletes;
+    use HasFactory, HasRoles, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -75,8 +71,8 @@ class User extends Authenticatable
 
     /**
      * Override method untuk mendukung login dengan NIM/Username/Email
-     * 
-     * @param string $username
+     *
+     * @param  string  $username
      * @return string
      */
     public function findForPassport($username)
@@ -157,48 +153,31 @@ class User extends Authenticatable
     public function getAvatarUrlAttribute(): string
     {
         if ($this->avatar) {
-            return asset('storage/' . $this->avatar);
+            return asset('storage/'.$this->avatar);
         }
 
         // Default avatar menggunakan UI Avatars
-        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=7F9CF5&background=EBF4FF';
+        return 'https://ui-avatars.com/api/?name='.urlencode($this->name).'&color=7F9CF5&background=EBF4FF';
     }
-
-    /**
-     * Method untuk kalkulasi ulang credit score
-     * (akan digunakan di service layer nanti)
-     */
-    // public function recalculateCreditScore(): void
-    // {
-    //     // Implementasi algoritma credit score
-    //     // Base score: 100
-    //     // - (Late Returns × 5)
-    //     // - (Unpaid Fines / 1000)
-    //     // + (On-time Returns × 0.5)
-
-    //     // TODO: Implement setelah ada tabel loans
-    // }
 
     /**
      * Method untuk update max_loans berdasarkan credit_score
      */
     public function updateMaxLoans(): void
     {
-        $score = $this->credit_score;
-
-        if ($score >= 90) {
-            $maxLoans = 4;
-        } elseif ($score >= 70) {
-            $maxLoans = 3;
-        } elseif ($score >= 50) {
-            $maxLoans = 2;
-        } else {
-            $maxLoans = 1;
-        }
-
-        // Dosen dapat 2x lipat
         if ($this->isDosen()) {
-            $maxLoans *= 2;
+            $maxLoans = SystemSetting::get('loan_limit_dosen', 25);
+        } else {
+            $score = $this->credit_score;
+            if ($score >= 90) {
+                $maxLoans = SystemSetting::get('loan_limit_mahasiswa_90', 5);
+            } elseif ($score >= 70) {
+                $maxLoans = SystemSetting::get('loan_limit_mahasiswa_70', 4);
+            } elseif ($score >= 50) {
+                $maxLoans = SystemSetting::get('loan_limit_mahasiswa_50', 3);
+            } else {
+                $maxLoans = SystemSetting::get('loan_limit_mahasiswa_default', 2);
+            }
         }
 
         $this->update(['max_loans' => $maxLoans]);
@@ -294,6 +273,12 @@ class User extends Authenticatable
      */
     public function recalculateCreditScore(): void
     {
+        if ($this->isDosen()) {
+            $this->update(['credit_score' => 100]);
+
+            return;
+        }
+
         // Get or create loan history
         $history = LoanHistory::firstOrCreate(['user_id' => $this->id]);
 

@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
-use App\Models\Major;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -11,7 +10,6 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Spatie\Permission\Models\Role;
 
 class UserResource extends Resource
 {
@@ -58,8 +56,8 @@ class UserResource extends Resource
                         Forms\Components\TextInput::make('password')
                             ->label('Password')
                             ->password()
-                            ->required(fn(string $context): bool => $context === 'create')
-                            ->dehydrated(fn($state) => filled($state))
+                            ->required(fn (string $context): bool => $context === 'create')
+                            ->dehydrated(fn ($state) => filled($state))
                             ->revealable()
                             ->minLength(8)
                             ->maxLength(255)
@@ -131,6 +129,7 @@ class UserResource extends Resource
                             ->multiple()
                             ->preload()
                             ->required()
+                            ->reactive()
                             ->helperText('Pilih role untuk menentukan hak akses'),
 
                         Forms\Components\Select::make('status')
@@ -151,13 +150,14 @@ class UserResource extends Resource
                             ->maxValue(100)
                             ->default(100)
                             ->suffix('/ 100')
-                            ->helperText('Score kredibilitas peminjaman (0-100)'),
+                            ->disabled(fn ($get) => in_array('dosen', $get('roles') ?? []))
+                            ->helperText(fn ($get) => in_array('dosen', $get('roles') ?? []) ? 'Tidak berlaku untuk dosen' : 'Score kredibilitas peminjaman (0-100)'),
 
                         Forms\Components\TextInput::make('max_loans')
                             ->label('Maksimal Peminjaman')
                             ->numeric()
                             ->minValue(0)
-                            ->maxValue(20)
+                            ->maxValue(100)
                             ->default(4)
                             ->suffix('buku')
                             ->helperText('Jumlah maksimal buku yang dapat dipinjam'),
@@ -181,7 +181,7 @@ class UserResource extends Resource
                 Tables\Columns\ImageColumn::make('avatar')
                     ->label('Foto')
                     ->circular()
-                    ->defaultImageUrl(fn($record) => $record->avatar_url),
+                    ->defaultImageUrl(fn ($record) => $record->avatar_url),
 
                 Tables\Columns\TextColumn::make('nim')
                     ->label('NIM')
@@ -227,13 +227,14 @@ class UserResource extends Resource
                     ->label('Credit Score')
                     ->numeric(decimalPlaces: 0)
                     ->sortable()
-                    ->color(fn(string $state): string => match (true) {
+                    ->formatStateUsing(fn ($state, $record) => $record->isDosen() ? '-' : $state)
+                    ->color(fn ($state, $record): string => $record->isDosen() ? 'gray' : match (true) {
                         $state >= 90 => 'success',
                         $state >= 70 => 'warning',
                         $state >= 50 => 'danger',
                         default => 'gray',
                     })
-                    ->icon(fn(string $state): string => match (true) {
+                    ->icon(fn ($state, $record): string => $record->isDosen() ? null : match (true) {
                         $state >= 90 => 'heroicon-o-check-circle',
                         $state >= 70 => 'heroicon-o-exclamation-circle',
                         $state >= 50 => 'heroicon-o-x-circle',
@@ -249,7 +250,7 @@ class UserResource extends Resource
                     ->label('Denda')
                     ->money('IDR')
                     ->sortable()
-                    ->color(fn(string $state): string => $state > 0 ? 'danger' : 'success')
+                    ->color(fn (string $state): string => $state > 0 ? 'danger' : 'success')
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('status')
@@ -294,11 +295,11 @@ class UserResource extends Resource
 
                 Tables\Filters\Filter::make('has_fines')
                     ->label('Punya Denda')
-                    ->query(fn(Builder $query): Builder => $query->where('total_fines', '>', 0)),
+                    ->query(fn (Builder $query): Builder => $query->where('total_fines', '>', 0)),
 
                 Tables\Filters\Filter::make('low_credit')
                     ->label('Credit Score Rendah')
-                    ->query(fn(Builder $query): Builder => $query->where('credit_score', '<', 70)),
+                    ->query(fn (Builder $query): Builder => $query->where('credit_score', '<', 70)),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
