@@ -42,28 +42,16 @@ class ManageLoanLimits extends Page implements HasForms
         return $form
             ->schema([
                 Section::make('Batas Pinjam Mahasiswa')
-                    ->description('Atur jumlah maksimal buku yang dapat dipinjam mahasiswa berdasarkan credit score.')
+                    ->description('Atur jumlah maksimal buku yang dapat dipinjam mahasiswa.')
                     ->schema([
-                        TextInput::make('loan_limit_mahasiswa_90')
-                            ->label('Score 90+')
+                        TextInput::make('loan_limit_mahasiswa')
+                            ->label('Batas Maksimal Buku')
                             ->numeric()
                             ->required(),
-                        TextInput::make('loan_limit_mahasiswa_70')
-                            ->label('Score 70+')
-                            ->numeric()
-                            ->required(),
-                        TextInput::make('loan_limit_mahasiswa_50')
-                            ->label('Score 50+')
-                            ->numeric()
-                            ->required(),
-                        TextInput::make('loan_limit_mahasiswa_default')
-                            ->label('Score < 50 (Default)')
-                            ->numeric()
-                            ->required(),
-                    ])->columns(2),
+                    ]),
 
                 Section::make('Batas Pinjam Dosen')
-                    ->description('Atur jumlah maksimal buku yang dapat dipinjam dosen. Dosen tidak terpengaruh oleh sistem credit score.')
+                    ->description('Atur jumlah maksimal buku yang dapat dipinjam dosen.')
                     ->schema([
                         TextInput::make('loan_limit_dosen')
                             ->label('Batas Maksimal Buku')

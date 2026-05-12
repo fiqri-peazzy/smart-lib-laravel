@@ -143,16 +143,6 @@ class UserResource extends Resource
                             ->default('active')
                             ->required(),
 
-                        Forms\Components\TextInput::make('credit_score')
-                            ->label('Credit Score')
-                            ->numeric()
-                            ->minValue(0)
-                            ->maxValue(100)
-                            ->default(100)
-                            ->suffix('/ 100')
-                            ->disabled(fn ($get) => in_array('dosen', $get('roles') ?? []))
-                            ->helperText(fn ($get) => in_array('dosen', $get('roles') ?? []) ? 'Tidak berlaku untuk dosen' : 'Score kredibilitas peminjaman (0-100)'),
-
                         Forms\Components\TextInput::make('max_loans')
                             ->label('Maksimal Peminjaman')
                             ->numeric()
@@ -222,24 +212,6 @@ class UserResource extends Resource
                     ->label('Angkatan')
                     ->sortable()
                     ->toggleable(),
-
-                Tables\Columns\TextColumn::make('credit_score')
-                    ->label('Credit Score')
-                    ->numeric(decimalPlaces: 0)
-                    ->sortable()
-                    ->formatStateUsing(fn ($state, $record) => $record->isDosen() ? '-' : $state)
-                    ->color(fn ($state, $record): string => $record->isDosen() ? 'gray' : match (true) {
-                        $state >= 90 => 'success',
-                        $state >= 70 => 'warning',
-                        $state >= 50 => 'danger',
-                        default => 'gray',
-                    })
-                    ->icon(fn ($state, $record): string => $record->isDosen() ? null : match (true) {
-                        $state >= 90 => 'heroicon-o-check-circle',
-                        $state >= 70 => 'heroicon-o-exclamation-circle',
-                        $state >= 50 => 'heroicon-o-x-circle',
-                        default => 'heroicon-o-minus-circle',
-                    }),
 
                 Tables\Columns\TextColumn::make('max_loans')
                     ->label('Max Pinjam')

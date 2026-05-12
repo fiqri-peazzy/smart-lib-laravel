@@ -165,20 +165,8 @@ class User extends Authenticatable
      */
     public function updateMaxLoans(): void
     {
-        if ($this->isDosen()) {
-            $maxLoans = SystemSetting::get('loan_limit_dosen', 25);
-        } else {
-            $score = $this->credit_score;
-            if ($score >= 90) {
-                $maxLoans = SystemSetting::get('loan_limit_mahasiswa_90', 5);
-            } elseif ($score >= 70) {
-                $maxLoans = SystemSetting::get('loan_limit_mahasiswa_70', 4);
-            } elseif ($score >= 50) {
-                $maxLoans = SystemSetting::get('loan_limit_mahasiswa_50', 3);
-            } else {
-                $maxLoans = SystemSetting::get('loan_limit_mahasiswa_default', 2);
-            }
-        }
+        $rolePrefix = $this->isDosen() ? 'dosen' : 'mahasiswa';
+        $maxLoans = SystemSetting::get("loan_limit_{$rolePrefix}", $this->isDosen() ? 25 : 5);
 
         $this->update(['max_loans' => $maxLoans]);
     }
@@ -269,42 +257,14 @@ class User extends Authenticatable
     }
 
     /**
-     * Method untuk kalkulasi ulang credit score
+     * Method untuk kalkulasi ulang credit score (Disabled)
      */
     public function recalculateCreditScore(): void
     {
-        if ($this->isDosen()) {
+        // Credit score system has been disabled.
+        // Every user has a base score of 100.
+        if ($this->credit_score != 100) {
             $this->update(['credit_score' => 100]);
-
-            return;
         }
-
-        // Get or create loan history
-        $history = LoanHistory::firstOrCreate(['user_id' => $this->id]);
-
-        // Base score: 100
-        $baseScore = 100;
-
-        // - (Late Returns × 5)
-        $lateReturnsPenalty = $history->late_returns * 5;
-
-        // - (Unpaid Fines / 1000)
-        $unpaidFines = $this->fines()->where('status', 'unpaid')->sum('amount');
-        $finesPenalty = $unpaidFines / 1000;
-
-        // + (On-time Returns × 0.5)
-        $onTimeBonus = $history->on_time_returns * 0.5;
-
-        // Calculate final score
-        $calculatedScore = $baseScore - $lateReturnsPenalty - $finesPenalty + $onTimeBonus;
-
-        // Ensure score is between 0-100
-        $finalScore = max(0, min(100, $calculatedScore));
-
-        // Update history
-        $history->update(['calculated_score' => $finalScore]);
-
-        // Update user
-        $this->update(['credit_score' => $finalScore]);
     }
 }

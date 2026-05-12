@@ -16,26 +16,18 @@ beforeEach(function () {
     (new \Database\Seeders\SystemSettingSeeder)->run();
 });
 
-test('mahasiswa gets correct loan limits based on credit score', function () {
+test('mahasiswa gets flat loan limits', function () {
     $user = User::factory()->create(['credit_score' => 100]);
     $user->assignRole('mahasiswa');
     $user->updateMaxLoans();
-    expect($user->fresh()->max_loans)->toBe(5); // loan_limit_mahasiswa_90
-
-    $user->update(['credit_score' => 80]);
-    $user->updateMaxLoans();
-    expect($user->fresh()->max_loans)->toBe(4); // loan_limit_mahasiswa_70
-
-    $user->update(['credit_score' => 60]);
-    $user->updateMaxLoans();
-    expect($user->fresh()->max_loans)->toBe(3); // loan_limit_mahasiswa_50
+    expect($user->fresh()->max_loans)->toBe(5); // loan_limit_mahasiswa
 
     $user->update(['credit_score' => 40]);
     $user->updateMaxLoans();
-    expect($user->fresh()->max_loans)->toBe(2); // loan_limit_mahasiswa_default
+    expect($user->fresh()->max_loans)->toBe(5); // still loan_limit_mahasiswa
 });
 
-test('dosen gets flat loan limits regardless of credit score', function () {
+test('dosen gets flat loan limits', function () {
     $user = User::factory()->create(['credit_score' => 100]);
     $user->assignRole('dosen');
     $user->updateMaxLoans();
@@ -46,19 +38,18 @@ test('dosen gets flat loan limits regardless of credit score', function () {
     expect($user->fresh()->max_loans)->toBe(25); // still loan_limit_dosen
 });
 
-test('dosen credit score is always forced to 100', function () {
+test('credit score is always forced to 100 for everyone', function () {
     $user = User::factory()->create(['credit_score' => 40]);
-    $user->assignRole('dosen');
     $user->recalculateCreditScore();
     expect($user->fresh()->credit_score)->toBe(100.0);
 });
 
 test('loan limits can be updated via settings', function () {
-    SystemSetting::set('loan_limit_dosen', 50);
+    SystemSetting::set('loan_limit_mahasiswa', 10);
 
-    $user = User::factory()->create(['credit_score' => 100]);
-    $user->assignRole('dosen');
+    $user = User::factory()->create();
+    $user->assignRole('mahasiswa');
     $user->updateMaxLoans();
 
-    expect($user->fresh()->max_loans)->toBe(50);
+    expect($user->fresh()->max_loans)->toBe(10);
 });
