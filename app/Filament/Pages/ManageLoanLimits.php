@@ -22,6 +22,8 @@ class ManageLoanLimits extends Page implements HasForms
 
     protected static ?string $navigationLabel = 'Batas Peminjaman';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $title = 'Pengaturan Batas Peminjaman';
 
     protected static ?string $navigationGroup = 'Sistem';
