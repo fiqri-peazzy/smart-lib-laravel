@@ -21,7 +21,7 @@
                     </div>
                     <span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">Aktif</span>
                 </div>
-                <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['active_loans'] }}</div>
+                <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['active_loans'] }} / {{ $user->max_loans }}</div>
                 <div class="text-sm text-gray-500 dark:text-gray-400">Peminjaman Aktif</div>
             </div>
 
@@ -176,8 +176,8 @@
                                 class="text-gray-900 dark:text-white font-medium">{{ $user->major?->name ?? 'Fasilkom Ichsan' }}</span>
                         </div>
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-500">Max Pinjam</span>
-                            <span class="text-gray-900 dark:text-white font-medium">{{ $user->max_loans }} Buku</span>
+                            <span class="text-gray-500">Kuota Pinjam</span>
+                            <span class="text-gray-900 dark:text-white font-medium">{{ $stats['active_loans'] }} / {{ $user->max_loans }} Buku</span>
                         </div>
                     </div>
                     <div class="mt-6">
