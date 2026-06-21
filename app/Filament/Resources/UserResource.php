@@ -34,10 +34,10 @@ class UserResource extends Resource
                 Forms\Components\Section::make('Informasi Akun')
                     ->schema([
                         Forms\Components\TextInput::make('nim')
-                            ->label('NIM')
+                            ->label('NIM/ID')
                             ->maxLength(20)
                             ->unique(ignoreRecord: true)
-                            ->placeholder('Kosongkan untuk staff/admin'),
+                            ->placeholder('NIM untuk mahasiswa atau ID untuk dosen (opsional)'),
 
                         Forms\Components\TextInput::make('username')
                             ->label('Username')
@@ -143,15 +143,6 @@ class UserResource extends Resource
                             ->default('active')
                             ->required(),
 
-                        Forms\Components\TextInput::make('max_loans')
-                            ->label('Maksimal Peminjaman')
-                            ->numeric()
-                            ->minValue(0)
-                            ->maxValue(100)
-                            ->default(4)
-                            ->suffix('buku')
-                            ->helperText('Jumlah maksimal buku yang dapat dipinjam'),
-
                         Forms\Components\TextInput::make('total_fines')
                             ->label('Total Denda')
                             ->numeric()
@@ -201,29 +192,30 @@ class UserResource extends Resource
                     ])
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('major.code')
-                    ->label('Prodi')
-                    ->badge()
-                    ->color('info')
-                    ->sortable()
-                    ->toggleable(),
+                // Tables\Columns\TextColumn::make('major.code')
+                //     ->label('Prodi')
+                //     ->badge()
+                //     ->color('info')
+                //     ->sortable()
+                //     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('angkatan')
-                    ->label('Angkatan')
-                    ->sortable()
-                    ->toggleable(),
+                // Tables\Columns\TextColumn::make('angkatan')
+                //     ->label('Angkatan')
+                //     ->sortable()
+                //     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('max_loans')
                     ->label('Max Pinjam')
                     ->suffix(' buku')
-                    ->toggleable(),
+                    ->toggleable()
+                    ->visible(fn () => auth()->user()->isDosen()),
 
-                Tables\Columns\TextColumn::make('total_fines')
-                    ->label('Denda')
-                    ->money('IDR')
-                    ->sortable()
-                    ->color(fn (string $state): string => $state > 0 ? 'danger' : 'success')
-                    ->toggleable(),
+                // Tables\Columns\TextColumn::make('total_fines')
+                //     ->label('Denda')
+                //     ->money('IDR')
+                //     ->sortable()
+                //     ->color(fn (string $state): string => $state > 0 ? 'danger' : 'success')
+                //     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')

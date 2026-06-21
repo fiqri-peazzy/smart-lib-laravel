@@ -18,6 +18,11 @@ class EditUser extends EditRecord
         ];
     }
 
+    protected function afterSave(): void
+    {
+        $this->record->updateMaxLoans();
+    }
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

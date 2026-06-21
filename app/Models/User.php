@@ -20,6 +20,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'nim',
+        'nik',
         'username',
         'email',
         'password',
@@ -34,6 +35,15 @@ class User extends Authenticatable
         'total_fines',
         'status',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($user) {
+            $user->updateMaxLoans();
+        });
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -161,13 +171,17 @@ class User extends Authenticatable
     }
 
     /**
-     * Method untuk update max_loans berdasarkan credit_score
+     * Method untuk update max_loans berdasarkan role
      */
     public function updateMaxLoans(): void
     {
-        $rolePrefix = $this->isDosen() ? 'dosen' : 'mahasiswa';
-        $maxLoans = SystemSetting::get("loan_limit_{$rolePrefix}", $this->isDosen() ? 25 : 5);
-
+        if ($this->isDosen()) {
+            $maxLoans = 50;
+        } elseif ($this->isMahasiswa() || $this->hasRole('umum')) {
+            $maxLoans = 10;
+        } else {
+            $maxLoans = 10; // Default untuk role lainnya
+        }
         $this->update(['max_loans' => $maxLoans]);
     }
 

@@ -11,7 +11,7 @@ class EnsureUserRole
 {
     /**
      * Handle an incoming request.
-     * Ensure only mahasiswa & dosen can access user routes
+     * Ensure only mahasiswa, dosen & umum can access user routes
      * Admin & staff should use Filament
      */
     public function handle(Request $request, Closure $next): Response
@@ -28,8 +28,8 @@ class EnsureUserRole
             return redirect('/admin')->with('info', 'Silakan gunakan panel admin untuk akses sistem.');
         }
 
-        // Allow mahasiswa & dosen
-        if ($user->hasAnyRole(['mahasiswa', 'dosen'])) {
+        // Allow mahasiswa, dosen & umum
+        if ($user->hasAnyRole(['mahasiswa', 'dosen', 'umum'])) {
             return $next($request);
         }
 

@@ -31,10 +31,12 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'nim' => ['required', 'string', 'max:20', 'unique:'.User::class],
+            'role' => ['required', 'in:mahasiswa,dosen,umum'],
+            'nim' => ['required_if:role,mahasiswa', 'nullable', 'string', 'max:20', 'unique:'.User::class],
+            'nik' => ['required_if:role,umum', 'nullable', 'string', 'max:20', 'unique:'.User::class],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
-            'major_id' => ['required', 'exists:majors,id'],
-            'angkatan' => ['required', 'integer', 'min:2000', 'max:'.date('Y')],
+            'major_id' => ['required_if:role,mahasiswa', 'nullable', 'exists:majors,id'],
+            'angkatan' => ['required_if:role,mahasiswa', 'nullable', 'integer', 'min:2000', 'max:'.date('Y')],
             'phone' => ['required', 'string', 'max:20'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
@@ -50,23 +52,32 @@ class RegisteredUserController extends Controller
             $counter++;
         }
 
+        // Use NIK as NIM for umum role
+        $nim = null;
+        if ($request->role === 'mahasiswa') {
+            $nim = $request->nim;
+        } elseif ($request->role === 'umum') {
+            $nim = $request->nik;
+        }
+
         $user = User::create([
             'name' => $request->name,
-            'nim' => $request->nim,
+            'nim' => $nim,
+            'nik' => $request->role === 'umum' ? $request->nik : null,
             'username' => $username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'major_id' => $request->major_id,
-            'angkatan' => $request->angkatan,
+            'major_id' => $request->role === 'mahasiswa' ? $request->major_id : null,
+            'angkatan' => $request->role === 'mahasiswa' ? $request->angkatan : null,
             'phone' => $request->phone,
             'credit_score' => 100, // Default perfect score
             'status' => 'active',
         ]);
 
-        // Assign mahasiswa role
-        $user->assignRole('mahasiswa');
+        // Assign role selected during registration
+        $user->assignRole($request->role);
 
-        // Update max loans based on role and score
+        // Update max loans based on role
         $user->updateMaxLoans();
 
         // Create loan history

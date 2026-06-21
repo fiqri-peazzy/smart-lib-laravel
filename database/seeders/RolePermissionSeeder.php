@@ -135,5 +135,20 @@ class RolePermissionSeeder extends Seeder
             'cancel_bookings',
             'view_notifications',
         ]);
+
+        // 5. UMUM - General public user privileges
+        $umumRole = Role::create(['name' => 'umum']);
+        $umumRole->givePermissionTo([
+            'view_books',
+            'view_digital_collections',
+            'download_digital_collections',
+            'view_own_loans',
+            'create_loans', // Self-service (optional)
+            'extend_loans',
+            'create_bookings',
+            'view_bookings',
+            'cancel_bookings',
+            'view_notifications',
+        ]);
     }
 }
