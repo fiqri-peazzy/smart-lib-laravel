@@ -37,8 +37,8 @@ class AuthenticatedSessionController extends Controller
             return redirect()->intended('/admin');
         }
 
-        // Mahasiswa & Dosen ke dashboard user
-        if ($user->hasAnyRole(['mahasiswa', 'dosen'])) {
+        // Mahasiswa, Dosen & Umum ke dashboard user
+        if ($user->hasAnyRole(['mahasiswa', 'dosen', 'umum'])) {
             return redirect()->intended(route('dashboard'));
         }
 

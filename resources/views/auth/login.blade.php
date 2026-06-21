@@ -51,6 +51,16 @@
                 <!-- Session Status -->
                 <x-auth-session-status class="mb-4" :status="session('status')" />
 
+                <!-- Login Errors -->
+                @if ($errors->any())
+                    <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                        <p class="text-sm text-red-800 dark:text-red-300 font-semibold mb-2">❌ Gagal masuk:</p>
+                        <p class="text-sm text-red-700 dark:text-red-400">
+                            {{ $errors->first('login') ?: 'NIM/NIK, username, email, atau password salah.' }}
+                        </p>
+                    </div>
+                @endif
+
                 <!-- Admin Info -->
                 <div
                     class="mb-6 p-4 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg">
@@ -65,11 +75,11 @@
 
                     <!-- Login Field (NIM/Username/Email) -->
                     <div>
-                        <x-input-label for="login" value="NIM / Nama Pengguna / Email" />
+                        <x-input-label for="login" value="NIM / NIK / Nama Pengguna / Email" />
                         <x-text-input id="login"
                             class="block mt-1 w-full border-gray-300 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
                             type="text" name="login" :value="old('login')" required autofocus autocomplete="username"
-                            placeholder="Masukkan NIM, username, atau email" />
+                            placeholder="Masukkan NIM, NIK, username, atau email" />
                         <x-input-error :messages="$errors->get('login')" class="mt-2" />
                     </div>
 

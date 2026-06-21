@@ -40,25 +40,19 @@ class LoginRequest extends FormRequest
         $login = $this->input('login');
         $password = $this->input('password');
 
-        // Determine login field type
-        $loginField = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        // Try multiple authentication attempts in order
+        $authAttempts = [
+            ['email' => $login, 'password' => $password],
+            ['username' => $login, 'password' => $password],
+            ['nim' => $login, 'password' => $password],
+            ['nik' => $login, 'password' => $password],
+        ];
 
-        // Try to authenticate with determined field
-        if (Auth::attempt([$loginField => $login, 'password' => $password], $this->boolean('remember'))) {
-            RateLimiter::clear($this->throttleKey());
-            return;
-        }
-
-        // If failed, try with NIM
-        if ($loginField !== 'email' && Auth::attempt(['nim' => $login, 'password' => $password], $this->boolean('remember'))) {
-            RateLimiter::clear($this->throttleKey());
-            return;
-        }
-
-        // If still failed, try with username
-        if ($loginField === 'email' && Auth::attempt(['username' => $login, 'password' => $password], $this->boolean('remember'))) {
-            RateLimiter::clear($this->throttleKey());
-            return;
+        foreach ($authAttempts as $credentials) {
+            if (Auth::attempt($credentials, $this->boolean('remember'))) {
+                RateLimiter::clear($this->throttleKey());
+                return;
+            }
         }
 
         RateLimiter::hit($this->throttleKey());

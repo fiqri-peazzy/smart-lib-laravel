@@ -52,18 +52,20 @@ class RegisteredUserController extends Controller
             $counter++;
         }
 
-        // Use NIK as NIM for umum role
+        // Handle NIM/NIK berdasarkan role
         $nim = null;
+        $nik = null;
+
         if ($request->role === 'mahasiswa') {
             $nim = $request->nim;
         } elseif ($request->role === 'umum') {
-            $nim = $request->nik;
+            $nik = $request->nik;
         }
 
         $user = User::create([
             'name' => $request->name,
             'nim' => $nim,
-            'nik' => $request->role === 'umum' ? $request->nik : null,
+            'nik' => $nik,
             'username' => $username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
