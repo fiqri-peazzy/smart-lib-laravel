@@ -28,7 +28,7 @@ class SystemSettingSeeder extends Seeder
             // Dosen Limit (Flat)
             [
                 'key' => 'loan_limit_dosen',
-                'value' => '25',
+                'value' => '10',
                 'type' => 'integer',
                 'group' => 'loan_limits',
                 'display_name' => 'Batas Pinjam Dosen',

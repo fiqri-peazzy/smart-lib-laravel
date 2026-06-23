@@ -30,16 +30,63 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'role' => ['required', 'in:mahasiswa,dosen,umum'],
-            'nim' => ['required_if:role,mahasiswa', 'nullable', 'string', 'max:20', 'unique:'.User::class],
-            'nik' => ['required_if:role,umum', 'nullable', 'string', 'max:20', 'unique:'.User::class],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
-            'major_id' => ['required_if:role,mahasiswa', 'nullable', 'exists:majors,id'],
-            'angkatan' => ['required_if:role,mahasiswa', 'nullable', 'integer', 'min:2000', 'max:'.date('Y')],
-            'phone' => ['required', 'string', 'max:20'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+        'name' => ['required', 'string', 'max:255'],
+        'role' => ['required', 'in:mahasiswa,dosen,umum'],
+        'nim' => ['required_if:role,mahasiswa', 'nullable', 'string', 'max:20', 'unique:'.User::class],
+        'nik' => ['required_if:role,umum', 'nullable', 'string', 'max:20', 'unique:'.User::class],
+        'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
+        'major_id' => ['required_if:role,mahasiswa', 'nullable', 'exists:majors,id'],
+        'angkatan' => ['required_if:role,mahasiswa', 'nullable', 'integer', 'min:2000', 'max:'.date('Y')],
+        'phone' => ['required', 'string', 'max:20'],
+        'password' => ['required', 'confirmed', Rules\Password::defaults()],
+    ], [
+        // NAME
+        'name.required'         => 'Nama lengkap wajib diisi.',
+        'name.string'           => 'Nama lengkap harus berupa teks.',
+        'name.max'              => 'Nama lengkap tidak boleh lebih dari 255 karakter.',
+
+        // ROLE
+        'role.required'         => 'Jenis pengguna wajib dipilih.',
+        'role.in'               => 'Jenis pengguna yang dipilih tidak valid.',
+
+        // NIM
+        'nim.required_if'       => 'NIM wajib diisi untuk mahasiswa.',
+        'nim.string'            => 'NIM harus berupa teks.',
+        'nim.max'               => 'NIM tidak boleh lebih dari 20 karakter.',
+        'nim.unique'            => 'NIM sudah terdaftar, gunakan NIM lain.',
+
+        // NIK
+        'nik.required_if'       => 'NIK wajib diisi untuk pengguna umum.',
+        'nik.string'            => 'NIK harus berupa teks.',
+        'nik.max'               => 'NIK tidak boleh lebih dari 20 karakter.',
+        'nik.unique'            => 'NIK sudah terdaftar, gunakan NIK lain.',
+
+        // EMAIL
+        'email.required'        => 'Alamat email wajib diisi.',
+        'email.string'          => 'Alamat email harus berupa teks.',
+        'email.email'           => 'Format alamat email tidak valid.',
+        'email.max'             => 'Alamat email tidak boleh lebih dari 255 karakter.',
+        'email.unique'          => 'Alamat email sudah terdaftar, gunakan email lain.',
+
+        // MAJOR
+        'major_id.required_if'  => 'Program studi wajib dipilih untuk mahasiswa.',
+        'major_id.exists'       => 'Program studi yang dipilih tidak ditemukan.',
+
+        // ANGKATAN
+        'angkatan.required_if'  => 'Tahun angkatan wajib diisi untuk mahasiswa.',
+        'angkatan.integer'      => 'Tahun angkatan harus berupa angka.',
+        'angkatan.min'          => 'Tahun angkatan tidak boleh kurang dari 2000.',
+        'angkatan.max'          => 'Tahun angkatan tidak boleh melebihi tahun ini ('.date('Y').').',
+
+        // PHONE
+        'phone.required'        => 'Nomor telepon wajib diisi.',
+        'phone.string'          => 'Nomor telepon harus berupa teks.',
+        'phone.max'             => 'Nomor telepon tidak boleh lebih dari 20 karakter.',
+
+        // PASSWORD
+        'password.required'     => 'Kata sandi wajib diisi.',
+        'password.confirmed'    => 'Konfirmasi kata sandi tidak cocok.',
+    ]);
 
         // Generate username from name
         $username = strtolower(str_replace(' ', '.', $request->name));

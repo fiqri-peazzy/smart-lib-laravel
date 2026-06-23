@@ -171,17 +171,17 @@ class User extends Authenticatable
     }
 
     /**
-     * Method untuk update max_loans berdasarkan role
+     * Method untuk update max_loans berdasarkan role.
+     * Mahasiswa dan umum default 5 buku, dosen 10 buku.
      */
     public function updateMaxLoans(): void
     {
-        if ($this->isDosen()) {
-            $maxLoans = 50;
-        } elseif ($this->isMahasiswa() || $this->hasRole('umum')) {
-            $maxLoans = 10;
-        } else {
-            $maxLoans = 10; // Default untuk role lainnya
-        }
+        $maxLoans = match (true) {
+            $this->isDosen() => (int) SystemSetting::get('loan_limit_dosen', 10),
+            $this->isMahasiswa() || $this->hasRole('umum') => (int) SystemSetting::get('loan_limit_mahasiswa', 5),
+            default => 0,
+        };
+
         $this->update(['max_loans' => $maxLoans]);
     }
 

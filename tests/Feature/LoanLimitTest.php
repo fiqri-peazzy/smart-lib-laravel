@@ -11,6 +11,7 @@ beforeEach(function () {
     // Seed roles
     Role::create(['name' => 'mahasiswa']);
     Role::create(['name' => 'dosen']);
+    Role::create(['name' => 'umum']);
 
     // Seed settings
     (new \Database\Seeders\SystemSettingSeeder)->run();
@@ -31,11 +32,19 @@ test('dosen gets flat loan limits', function () {
     $user = User::factory()->create(['credit_score' => 100]);
     $user->assignRole('dosen');
     $user->updateMaxLoans();
-    expect($user->fresh()->max_loans)->toBe(25); // loan_limit_dosen
+    expect($user->fresh()->max_loans)->toBe(10); // loan_limit_dosen
 
     $user->update(['credit_score' => 40]);
     $user->updateMaxLoans();
-    expect($user->fresh()->max_loans)->toBe(25); // still loan_limit_dosen
+    expect($user->fresh()->max_loans)->toBe(10); // still loan_limit_dosen
+});
+
+test('umum gets the same limit as mahasiswa', function () {
+    $user = User::factory()->create(['credit_score' => 100]);
+    $user->assignRole('umum');
+    $user->updateMaxLoans();
+
+    expect($user->fresh()->max_loans)->toBe(5);
 });
 
 test('credit score is always forced to 100 for everyone', function () {

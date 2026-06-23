@@ -11,7 +11,7 @@
         </div>
 
         <!-- Stats Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
             <!-- Active Loans -->
             <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
                 <div class="flex items-center justify-between mb-4">
@@ -52,18 +52,7 @@
                 <div class="text-sm text-gray-500 dark:text-gray-400">Total Denda</div>
             </div>
 
-            <!-- Credit Score -->
-            <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-                <div class="flex items-center justify-between mb-4">
-                    <div
-                        class="w-12 h-12 bg-green-50 dark:bg-green-900/20 rounded-xl flex items-center justify-center text-green-600 dark:text-green-400">
-                        <i class="bi bi-star text-2xl"></i>
-                    </div>
-                    <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">Score</span>
-                </div>
-                <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ $user->credit_score }}</div>
-                <div class="text-sm text-gray-500 dark:text-gray-400">Credit Score</div>
-            </div>
+           
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
