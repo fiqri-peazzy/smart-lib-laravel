@@ -283,9 +283,9 @@ class LoanResource extends Resource
                     ->modalHeading('Konfirmasi Pengambilan Buku')
                     // FIXED: null-safe untuk user & bookItem
                     ->modalDescription(function (Loan $record) {
-                        $userName = $record->user?->name ?? 'peminjam';
+                        // $userName = $record->user?->name ?? 'peminjam';
                         $bookTitle = $record->bookItem?->book?->title ?? '-';
-                        return "Konfirmasi bahwa {$userName} telah mengambil buku \"{$bookTitle}\"?";
+                        return "Konfirmasi bahwa user telah mengambil buku \"{$bookTitle}\"?";
                     })    
                     ->modalSubmitActionLabel('Konfirmasi')
                     ->form([
@@ -323,7 +323,7 @@ class LoanResource extends Resource
                         // FIXED: null-safe user->name
                         \Filament\Notifications\Notification::make()
                         ->title('Pickup Berhasil Dikonfirmasi')
-                        ->body("Loan untuk {$userName} telah aktif. Jatuh tempo: {$dueDate}")
+                        ->body("Loan telah aktif. Jatuh tempo: {$dueDate}")
                         ->success()
                         ->send();
                     }),
