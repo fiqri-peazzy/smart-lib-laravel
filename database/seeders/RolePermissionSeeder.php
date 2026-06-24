@@ -8,9 +8,6 @@ use Spatie\Permission\Models\Permission;
 
 class RolePermissionSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         // Reset cached roles and permissions
@@ -72,7 +69,7 @@ class RolePermissionSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+            Permission::firstOrCreate(['name' => $permission]);
         }
 
         // ========================================
@@ -80,12 +77,12 @@ class RolePermissionSeeder extends Seeder
         // ========================================
 
         // 1. ADMIN - Full access
-        $adminRole = Role::create(['name' => 'admin']);
-        $adminRole->givePermissionTo(Permission::all());
+        $adminRole = Role::firstOrCreate(['name' => 'admin']);
+        $adminRole->syncPermissions(Permission::all());
 
         // 2. STAFF PUSTAKAWAN - Operational access
-        $staffRole = Role::create(['name' => 'staff']);
-        $staffRole->givePermissionTo([
+        $staffRole = Role::firstOrCreate(['name' => 'staff']);
+        $staffRole->syncPermissions([
             'view_books',
             'create_books',
             'edit_books',
@@ -107,13 +104,13 @@ class RolePermissionSeeder extends Seeder
         ]);
 
         // 3. DOSEN - Extended user privileges
-        $dosenRole = Role::create(['name' => 'dosen']);
-        $dosenRole->givePermissionTo([
+        $dosenRole = Role::firstOrCreate(['name' => 'dosen']);
+        $dosenRole->syncPermissions([
             'view_books',
             'view_digital_collections',
             'download_digital_collections',
             'view_own_loans',
-            'create_loans', // Self-service (optional)
+            'create_loans',
             'extend_loans',
             'create_bookings',
             'view_bookings',
@@ -122,13 +119,13 @@ class RolePermissionSeeder extends Seeder
         ]);
 
         // 4. MAHASISWA - Basic user privileges
-        $mahasiswaRole = Role::create(['name' => 'mahasiswa']);
-        $mahasiswaRole->givePermissionTo([
+        $mahasiswaRole = Role::firstOrCreate(['name' => 'mahasiswa']);
+        $mahasiswaRole->syncPermissions([
             'view_books',
             'view_digital_collections',
             'download_digital_collections',
             'view_own_loans',
-            'create_loans', // Self-service (optional)
+            'create_loans',
             'extend_loans',
             'create_bookings',
             'view_bookings',
@@ -137,13 +134,13 @@ class RolePermissionSeeder extends Seeder
         ]);
 
         // 5. UMUM - General public user privileges
-        $umumRole = Role::create(['name' => 'umum']);
-        $umumRole->givePermissionTo([
+        $umumRole = Role::firstOrCreate(['name' => 'umum']);
+        $umumRole->syncPermissions([
             'view_books',
             'view_digital_collections',
             'download_digital_collections',
             'view_own_loans',
-            'create_loans', // Self-service (optional)
+            'create_loans',
             'extend_loans',
             'create_bookings',
             'view_bookings',
