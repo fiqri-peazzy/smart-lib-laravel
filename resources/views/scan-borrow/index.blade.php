@@ -96,12 +96,17 @@
                     <p id="book-author" class="text-sm text-gray-500 dark:text-gray-400 mt-1"></p>
                     <div class="flex gap-3 mt-3 flex-wrap">
                         <div class="bg-blue-50 dark:bg-blue-900/30 rounded-lg px-3 py-2 text-center min-w-[80px]">
-                            <p class="text-xs text-blue-500 font-medium">Stok</p>
+                            <p class="text-xs text-blue-500 font-medium">Stok Tersedia</p>
                             <p id="book-stock" class="text-xl font-bold text-blue-700 dark:text-blue-300"></p>
                         </div>
                         <div class="bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-2 text-center min-w-[80px]">
                             <p class="text-xs text-gray-500 font-medium">Lokasi</p>
                             <p id="book-rack" class="text-sm font-bold text-gray-700 dark:text-gray-200 mt-0.5"></p>
+                        </div>
+                        {{-- Slot info --}}
+                        <div id="slot-info-box" class="bg-green-50 dark:bg-green-900/30 rounded-lg px-3 py-2 text-center min-w-[80px] hidden">
+                            <p class="text-xs text-green-600 font-medium">Sisa Slot</p>
+                            <p id="slot-info" class="text-xl font-bold text-green-700 dark:text-green-300"></p>
                         </div>
                     </div>
                 </div>
@@ -113,7 +118,10 @@
                 <input type="hidden" id="book-barcode" name="barcode">
 
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Jumlah Eksemplar</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Jumlah Eksemplar
+                    </label>
+                    <p id="qty-hint" class="text-xs text-gray-400 dark:text-gray-500 mb-2"></p>
                     <div class="flex items-center gap-3">
                         <button type="button" onclick="changeQty(-1)"
                             class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-white font-bold text-xl flex items-center justify-center hover:bg-gray-200 transition-colors">−</button>
@@ -124,12 +132,18 @@
                     </div>
                 </div>
 
+                {{-- Warning jika stok < yang diminta --}}
+                <div id="stock-warning" class="hidden mb-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl px-4 py-3 flex items-start gap-2 text-sm text-amber-700 dark:text-amber-300">
+                    <i class="bi bi-exclamation-triangle-fill mt-0.5 flex-shrink-0"></i>
+                    <span id="stock-warning-msg"></span>
+                </div>
+
                 <button type="submit" id="submit-btn"
                     class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-600/20 transition-all flex items-center justify-center gap-2 text-base">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    Konfirmasi Peminjaman
+                    <span id="submit-btn-text">Konfirmasi Peminjaman</span>
                 </button>
 
                 <button type="button" onclick="backToScanner()"
@@ -141,15 +155,42 @@
     </div>
 
     {{-- ============ STEP 3: SUCCESS ============ --}}
-    <div id="step-success" class="hidden text-center py-10">
-        <div class="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-5">
+    <div id="step-success" class="hidden text-center py-8">
+
+        {{-- Icon: full success vs partial --}}
+        <div id="success-icon-full" class="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-5">
             <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
             </svg>
         </div>
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Permintaan Terkirim!</h2>
-        <p class="text-gray-600 dark:text-gray-400 mb-1" id="success-book-name"></p>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mb-8">Temui staf perpustakaan untuk pengambilan buku.</p>
+        <div id="success-icon-partial" class="hidden w-20 h-20 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mx-auto mb-5">
+            <svg class="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            </svg>
+        </div>
+
+        <h2 id="success-title" class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Permintaan Terkirim!</h2>
+        <p id="success-book-name" class="text-gray-700 dark:text-gray-300 font-medium mb-1"></p>
+        <p id="success-subtitle" class="text-sm text-gray-500 dark:text-gray-400 mb-4"></p>
+
+        {{-- Partial info --}}
+        <div id="success-partial-info" class="hidden mb-5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl px-4 py-3 text-left">
+            <p class="text-sm font-semibold text-amber-700 dark:text-amber-300 mb-1">
+                <i class="bi bi-info-circle mr-1"></i>Diproses sebagian
+            </p>
+            <p id="success-partial-msg" class="text-sm text-amber-600 dark:text-amber-400"></p>
+        </div>
+
+        {{-- Assigned items list --}}
+        <div id="success-items-wrap" class="hidden mb-5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-left">
+            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">
+                <i class="bi bi-list-check mr-1"></i>Eksemplar yang di-assign
+            </p>
+            <ul id="success-items-list" class="space-y-1"></ul>
+        </div>
+
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Temui staf perpustakaan untuk pengambilan buku.</p>
+
         <div class="flex gap-3 justify-center flex-wrap">
             <a href="{{ route('dashboard') }}"
                class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors">
@@ -167,36 +208,34 @@
 {{-- Toast --}}
 <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 hidden max-w-sm w-full px-4">
     <div id="toast-inner" class="bg-red-600 text-white rounded-xl px-4 py-3 shadow-xl flex items-center gap-3 text-sm font-medium">
-        <i class="bi bi-exclamation-circle-fill text-lg"></i>
+        <i id="toast-icon" class="bi bi-exclamation-circle-fill text-lg"></i>
         <span id="toast-msg"></span>
     </div>
 </div>
 
 <style>
-    /* html5-qrcode styles */
     #reader { background: #000; width: 100% !important; height: 100% !important; }
-    #reader video { 
-        object-fit: cover !important; 
-        width: 100% !important; 
-        height: 100% !important; 
-        border-radius: 0 !important; 
+    #reader video {
+        object-fit: cover !important;
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 0 !important;
     }
     #reader__scan_region { background: transparent !important; height: 100% !important; }
     #reader__dashboard { display: none !important; }
     #reader__scan_region img { display: none !important; }
     #reader__header_message { display: none !important; }
-    /* Remove built-in border */
     #reader__scan_region video { border: none !important; }
     #qr-shaded-region { border: none !important; }
 </style>
 @endsection
 
 @push('scripts')
-{{-- html5-qrcode: QR scanner library dari Google, sangat stabil untuk smartphone --}}
 <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
-let scanner = null;
+let scanner    = null;
 let scanLocked = false;
+let maxQty     = 1; // diisi saat fetchBook berhasil
 
 // ---- Helpers ----
 function show(id) {
@@ -206,7 +245,7 @@ function show(id) {
     window.scrollTo(0, 0);
 }
 
-// ---- Camera Scanner (html5-qrcode) ----
+// ---- Camera Scanner ----
 function startScanner() {
     document.getElementById('state-idle').classList.add('hidden');
     scanLocked = false;
@@ -217,26 +256,20 @@ function startScanner() {
 
     scanner.start(
         { facingMode: 'environment' },
-        {
-            fps: 15,
-            disableFlip: false
-        },
+        { fps: 15, disableFlip: false },
         onScanSuccess,
-        () => {} // error tiap frame kosong = normal, abaikan
+        () => {}
     ).then(() => {
         document.getElementById('scanner-controls').classList.remove('hidden');
     }).catch(err => {
         document.getElementById('state-idle').classList.remove('hidden');
         showToast('Gagal akses kamera: ' + err);
-        console.error(err);
     });
 }
 
 function stopScanner() {
     if (scanner && scanner.isScanning) {
-        scanner.stop().then(() => {
-            scanner.clear();
-        }).catch(() => {});
+        scanner.stop().then(() => scanner.clear()).catch(() => {});
     }
     document.getElementById('scanner-controls').classList.add('hidden');
     document.getElementById('state-idle').classList.remove('hidden');
@@ -245,19 +278,13 @@ function stopScanner() {
 function onScanSuccess(decodedText) {
     if (scanLocked) return;
     scanLocked = true;
-    console.log('QR terbaca:', decodedText);
 
-    // Beep feedback
     try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.frequency.value = 1800;
-        gain.gain.value = 0.15;
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.12);
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator(), gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = 1800; gain.gain.value = 0.15;
+        osc.start(); osc.stop(ctx.currentTime + 0.12);
     } catch(e) {}
 
     fetchBook(decodedText);
@@ -273,14 +300,11 @@ function fetchBook(barcode) {
     .then(r => r.json())
     .then(data => {
         if (data.success) {
-            // Ditemukan → stop scanner & tampil detail
             stopScanner();
             fillBookDetail(data.book);
             show('step-detail');
         } else {
-            // Tidak ditemukan — lanjut scan
-            console.log('Buku tidak ditemukan:', barcode);
-            showToast('QR tidak memuat data ID buku apa pun.');
+            showToast(data.message || 'Buku tidak ditemukan.');
             setTimeout(() => { scanLocked = false; }, 2000);
         }
     })
@@ -291,26 +315,76 @@ function fetchBook(barcode) {
 }
 
 function fillBookDetail(book) {
-    document.getElementById('book-cover').src   = book.cover_url || '';
+    document.getElementById('book-cover').src          = book.cover_url || '';
     document.getElementById('book-title').textContent  = book.title;
     document.getElementById('book-author').textContent = book.author;
     document.getElementById('book-stock').textContent  = book.available_stock;
     document.getElementById('book-rack').textContent   = book.rack_location || '-';
     document.getElementById('book-barcode').value      = book.barcode;
-    document.getElementById('quantity').max   = book.available_stock;
-    document.getElementById('quantity').value = 1;
+
+    // max qty = stok tersedia (slot user dicek di backend, tapi kita tampilkan info)
+    maxQty = book.available_stock || 1;
+
+    const qtyInput = document.getElementById('quantity');
+    qtyInput.max   = maxQty;
+    qtyInput.value = Math.min(1, maxQty);
+
+    // Hint teks
+    document.getElementById('qty-hint').textContent =
+        `Maksimal ${maxQty} eksemplar tersedia untuk judul ini.`;
+
+    // Reset warning
+    document.getElementById('stock-warning').classList.add('hidden');
+    updateSubmitLabel();
 }
 
+// ---- Qty controls ----
 function changeQty(d) {
-    const i = document.getElementById('quantity');
-    i.value = Math.min(parseInt(i.max)||99, Math.max(1, (parseInt(i.value)||1) + d));
+    const input = document.getElementById('quantity');
+    const newVal = Math.min(maxQty, Math.max(1, (parseInt(input.value) || 1) + d));
+    input.value = newVal;
+    onQtyChange();
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('quantity').addEventListener('input', onQtyChange);
+});
+
+function onQtyChange() {
+    const input   = document.getElementById('quantity');
+    let val       = parseInt(input.value) || 1;
+    val           = Math.max(1, Math.min(maxQty, val));
+    input.value   = val;
+
+    const warn    = document.getElementById('stock-warning');
+    const warnMsg = document.getElementById('stock-warning-msg');
+
+    if (val >= maxQty && maxQty > 0) {
+        warn.classList.remove('hidden');
+        warnMsg.textContent = `Stok tersedia hanya ${maxQty} eksemplar. Sistem akan memproses sebanyak yang tersedia.`;
+    } else {
+        warn.classList.add('hidden');
+    }
+
+    updateSubmitLabel();
+}
+
+function updateSubmitLabel() {
+    const val = parseInt(document.getElementById('quantity').value) || 1;
+    document.getElementById('submit-btn-text').textContent =
+        val > 1 ? `Konfirmasi Peminjaman (${val} Eksemplar)` : 'Konfirmasi Peminjaman';
+}
+
+// ---- Process Borrow ----
 function processBorrow(e) {
     e.preventDefault();
     const btn = document.getElementById('submit-btn');
     btn.disabled = true;
-    btn.innerHTML = '<svg class="animate-spin w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Memproses...';
+    btn.innerHTML = `<svg class="animate-spin w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+    </svg> Memproses...`;
+
     const fd = new FormData(e.target);
     fetch('{{ route("scan-borrow.process") }}', {
         method: 'POST',
@@ -320,19 +394,69 @@ function processBorrow(e) {
     .then(r => r.json())
     .then(data => {
         if (data.success) {
-            document.getElementById('success-book-name').textContent = data.book?.title || '';
-            show('step-success');
+            showSuccessStep(data);
         } else {
             showToast(data.message || 'Gagal memproses.');
             btn.disabled = false;
-            btn.innerHTML = 'Konfirmasi Peminjaman';
+            btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg><span id="submit-btn-text">Konfirmasi Peminjaman</span>`;
         }
     })
     .catch(() => {
         showToast('Koneksi gagal.');
         btn.disabled = false;
-        btn.innerHTML = 'Konfirmasi Peminjaman';
+        btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg><span id="submit-btn-text">Konfirmasi Peminjaman</span>`;
     });
+}
+
+// ---- Show Success Step ----
+function showSuccessStep(data) {
+    const isPartial = data.skipped > 0;
+
+    // Icon
+    document.getElementById('success-icon-full').classList.toggle('hidden', isPartial);
+    document.getElementById('success-icon-partial').classList.toggle('hidden', !isPartial);
+
+    // Title & subtitle
+    document.getElementById('success-title').textContent = isPartial
+        ? 'Diproses Sebagian'
+        : 'Permintaan Terkirim!';
+
+    document.getElementById('success-book-name').textContent =
+        `${data.processed} eksemplar "${data.book?.title || ''}"`;
+
+    document.getElementById('success-subtitle').textContent = isPartial
+        ? `${data.requested} diminta, ${data.processed} berhasil diproses.`
+        : 'Temui staf perpustakaan untuk pengambilan buku.';
+
+    // Partial warning box
+    const partialBox = document.getElementById('success-partial-info');
+    if (isPartial) {
+        partialBox.classList.remove('hidden');
+        document.getElementById('success-partial-msg').textContent = data.message;
+    } else {
+        partialBox.classList.add('hidden');
+    }
+
+    // Assigned items list
+    const itemsWrap = document.getElementById('success-items-wrap');
+    const itemsList = document.getElementById('success-items-list');
+    if (data.assigned_items && data.assigned_items.length > 0) {
+        itemsList.innerHTML = data.assigned_items.map((qr, i) =>
+            `<li class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                <span class="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 text-xs flex items-center justify-center font-bold flex-shrink-0">${i+1}</span>
+                <span class="font-mono text-xs bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">${qr}</span>
+            </li>`
+        ).join('');
+        itemsWrap.classList.remove('hidden');
+    } else {
+        itemsWrap.classList.add('hidden');
+    }
+
+    show('step-success');
 }
 
 function backToScanner() {
@@ -351,13 +475,13 @@ function switchTab(tab) {
         stopScanner();
         document.getElementById('panel-camera').classList.add('hidden');
         document.getElementById('panel-upload').classList.remove('hidden');
-        document.getElementById('tab-upload').className  = on;
-        document.getElementById('tab-camera').className  = off;
+        document.getElementById('tab-upload').className = on;
+        document.getElementById('tab-camera').className = off;
     } else {
         document.getElementById('panel-upload').classList.add('hidden');
         document.getElementById('panel-camera').classList.remove('hidden');
-        document.getElementById('tab-camera').className  = on;
-        document.getElementById('tab-upload').className  = off;
+        document.getElementById('tab-camera').className = on;
+        document.getElementById('tab-upload').className = off;
     }
 }
 
@@ -377,7 +501,7 @@ function testQRImage(input) {
     html5QrCode.scanFile(file, true)
         .then(decodedText => {
             resultBox.innerHTML = '<p class="text-sm text-gray-500 animate-pulse">Memverifikasi ke database...</p>';
-            
+
             fetch('{{ route("scan-borrow.details") }}', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
@@ -386,18 +510,16 @@ function testQRImage(input) {
             .then(r => r.json())
             .then(data => {
                 if (data.success) {
-                    // Valid book
                     fillBookDetail(data.book);
                     show('step-detail');
                 } else {
-                    // Invalid QR / not a book
                     resultBox.innerHTML = `
                         <div class="text-amber-600 dark:text-amber-400">
                             <i class="bi bi-exclamation-triangle-fill text-3xl"></i>
                             <p class="font-bold text-base mt-2">Bukan QR Buku Perpustakaan</p>
-                            <p class="text-xs text-gray-500 mt-1 bg-gray-100 dark:bg-gray-800 p-2 rounded overflow-hidden text-ellipsis">${decodedText}</p>
+                            <p class="text-xs text-gray-500 mt-1 bg-gray-100 dark:bg-gray-800 p-2 rounded">${decodedText}</p>
                         </div>`;
-                    showToast('QR tidak memuat data ID buku apa pun.');
+                    showToast(data.message || 'QR tidak dikenali.');
                 }
             })
             .catch(() => {
@@ -407,7 +529,7 @@ function testQRImage(input) {
 
             URL.revokeObjectURL(url);
         })
-        .catch(err => {
+        .catch(() => {
             resultBox.innerHTML = `
                 <div class="text-red-500">
                     <i class="bi bi-x-circle-fill text-3xl"></i>
@@ -422,16 +544,26 @@ function testQRImage(input) {
 
 // ---- Toast ----
 function showToast(msg, type = 'error') {
-    const t = document.getElementById('toast');
+    const t    = document.getElementById('toast');
+    const inner = document.getElementById('toast-inner');
+    const icon  = document.getElementById('toast-icon');
     document.getElementById('toast-msg').textContent = msg;
-    document.getElementById('toast-inner').className =
-        (type === 'success' ? 'bg-green-600' : 'bg-red-600') +
-        ' text-white rounded-xl px-4 py-3 shadow-xl flex items-center gap-3 text-sm font-medium';
+
+    if (type === 'success') {
+        inner.className = 'bg-green-600 text-white rounded-xl px-4 py-3 shadow-xl flex items-center gap-3 text-sm font-medium';
+        icon.className  = 'bi bi-check-circle-fill text-lg';
+    } else if (type === 'warning') {
+        inner.className = 'bg-amber-500 text-white rounded-xl px-4 py-3 shadow-xl flex items-center gap-3 text-sm font-medium';
+        icon.className  = 'bi bi-exclamation-triangle-fill text-lg';
+    } else {
+        inner.className = 'bg-red-600 text-white rounded-xl px-4 py-3 shadow-xl flex items-center gap-3 text-sm font-medium';
+        icon.className  = 'bi bi-exclamation-circle-fill text-lg';
+    }
+
     t.classList.remove('hidden');
     clearTimeout(t._timer);
     t._timer = setTimeout(() => t.classList.add('hidden'), 3500);
 }
 </script>
-{{-- Hidden div for scanFile utility --}}
 <div id="upload-temp-reader" style="display:none;"></div>
 @endpush

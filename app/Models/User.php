@@ -196,11 +196,18 @@ class User extends Authenticatable
         }
 
         // Cek denda
-        if ($this->total_fines > 50000) { // Threshold 50rb
+        if ($this->total_fines > 50000) {
             return false;
         }
 
-        // TODO: Cek jumlah peminjaman aktif (setelah ada tabel loans)
+        // Cek jumlah peminjaman aktif + pending_pickup
+        $currentLoans = $this->loans()
+            ->whereIn('status', ['active', 'overdue', 'extended', 'pending_pickup'])
+            ->count();
+
+        if ($currentLoans >= $this->max_loans) {
+            return false;
+        }
 
         return true;
     }
