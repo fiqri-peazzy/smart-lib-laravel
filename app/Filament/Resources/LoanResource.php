@@ -17,17 +17,11 @@ use Illuminate\Support\Facades\Auth;
 class LoanResource extends Resource
 {
     protected static ?string $model = Loan::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-arrow-path';
-
     protected static ?string $navigationLabel = 'Peminjaman';
-
     protected static ?string $navigationGroup = 'Manajemen Perpustakaan';
-
     protected static ?int $navigationSort = 4;
-
     protected static ?string $modelLabel = 'Peminjaman';
-
     protected static ?string $pluralModelLabel = 'Peminjaman';
 
     public static function form(Form $form): Form
@@ -58,8 +52,7 @@ class LoanResource extends Resource
                                         }
                                         // Show user info
                                         $activeLoans = $user->activeLoans()->count();
-                                        $set('user_info', "Credit Score: {$user->credit_score} | Max Loans: {$user->max_loans} | Active: {$activeLoans} | Denda: Rp ".number_format((float) $user->total_fines, 0));
-
+                                        $set('user_info', "Credit Score: {$user->credit_score} | Max Loans: {$user->max_loans} | Active: {$activeLoans} | Denda: Rp " . number_format((float) $user->total_fines, 0));
                                         if ($user->isDosen()) {
                                             $set('due_date', null);
                                         }
@@ -67,13 +60,11 @@ class LoanResource extends Resource
                                 }
                             })
                             ->helperText('Cari berdasarkan nama, NIM, atau email'),
-
                         Forms\Components\Placeholder::make('user_info')
                             ->label('Info Peminjam')
                             ->content(fn ($get) => $get('user_info') ?? 'Pilih peminjam untuk melihat info'),
                     ])
                     ->columns(1),
-
                 Forms\Components\Section::make('Pilih Eksemplar Buku')
                     ->schema([
                         Forms\Components\Select::make('book_item_id')
@@ -100,13 +91,11 @@ class LoanResource extends Resource
                                     }
                                 }
                             }),
-
                         Forms\Components\Placeholder::make('book_info')
                             ->label('Info Buku')
                             ->content(fn ($get) => $get('book_info') ?? 'Pilih eksemplar buku untuk melihat info'),
                     ])
                     ->columns(1),
-
                 Forms\Components\Section::make('Tanggal Peminjaman')
                     ->schema([
                         Forms\Components\DatePicker::make('loan_date')
@@ -114,7 +103,6 @@ class LoanResource extends Resource
                             ->default(now())
                             ->required()
                             ->maxDate(now()),
-
                         Forms\Components\DatePicker::make('due_date')
                             ->label('Tanggal Jatuh Tempo')
                             ->required(fn (callable $get) => ! (User::find($get('user_id'))?->isDosen()))
@@ -129,7 +117,6 @@ class LoanResource extends Resource
                                     $user = User::find($userId);
                                     if ($user && $user->isDosen()) {
                                         $set('due_date', null);
-
                                         return;
                                     }
                                     $maxDays = 14;
@@ -151,19 +138,15 @@ class LoanResource extends Resource
                                     if ($user && $user->isDosen()) {
                                         return 'Dosen tidak memiliki batas waktu peminjaman';
                                     }
-
                                     return 'Maksimal 14 hari untuk mahasiswa';
                                 }
-
                                 return 'Mahasiswa: max 14 hari, Dosen: tanpa batas';
                             }),
-
                         Forms\Components\Textarea::make('notes')
                             ->label('Catatan')
                             ->rows(3)
                             ->placeholder('Catatan tambahan (optional)')
                             ->columnSpanFull(),
-
                         Forms\Components\Hidden::make('processed_by')
                             ->default(Auth::id()),
                     ])
@@ -179,34 +162,30 @@ class LoanResource extends Resource
                     ->label('ID')
                     ->sortable()
                     ->searchable(),
-
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Peminjam')
                     ->searchable(['name', 'nim'])
                     ->sortable()
-                    ->description(fn (Loan $record) => $record->user->nim),
-
+                    // FIXED: null-safe operator, fallback '-' jika user dihapus
+                    ->description(fn (Loan $record) => $record->user?->nim ?? '-'),
                 Tables\Columns\TextColumn::make('bookItem.book.title')
                     ->label('Buku')
                     ->searchable()
                     ->limit(40)
                     ->wrap()
                     ->description(fn (Loan $record) => $record->bookItem?->qr_code ?? '-'),
-
                 // Tables\Columns\TextColumn::make('loan_date')
                 //     ->label('Tgl Pinjam')
                 //     ->date('d M Y')
                 //     ->sortable()
                 //     ->placeholder('Belum diambil')
                 //     ->color(fn (Loan $record) => $record->loan_date === null ? 'warning' : null),
-
                 // Tables\Columns\TextColumn::make('due_date')
                 //     ->label('Jatuh Tempo')
                 //     ->date('d M Y')
                 //     ->sortable()
                 //     ->placeholder(fn (Loan $record) => $record->loan_date === null ? 'Belum diambil' : 'Tanpa batas')
                 //     ->color(fn (Loan $record) => $record->isOverdue() ? 'danger' : 'success'),
-
                 // Tables\Columns\TextColumn::make('days_until_due')
                 //     ->label('Sisa Hari')
                 //     ->badge()
@@ -221,7 +200,6 @@ class LoanResource extends Resource
                 //     ->formatStateUsing(
                 //         fn (Loan $record) => $record->status === 'pending_pickup' ? 'Pending Pickup' : ($record->return_date ? 'Returned' : ($record->due_date === null ? 'Tanpa batas' : ($record->days_until_due < 0 ? 'OVERDUE '.abs((int) $record->days_until_due).'d' : $record->days_until_due.' hari')))
                 //     ),
-
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
                     ->badge()
@@ -240,12 +218,10 @@ class LoanResource extends Resource
                         'returned' => 'Dikembalikan',
                         default => $state,
                     }),
-
                 Tables\Columns\IconColumn::make('is_extended')
                     ->label('Extended')
                     ->boolean()
                     ->toggleable(),
-
                 Tables\Columns\TextColumn::make('fine_amount')
                     ->label('Denda')
                     ->color(fn (Loan $record) => $record->fine_paid ? 'success' : ($record->fine_amount > 0 ? 'danger' : 'gray'))
@@ -258,12 +234,10 @@ class LoanResource extends Resource
                     })
                     ->badge(fn (Loan $record) => $record->fine_paid)
                     ->toggleable(),
-
                 Tables\Columns\TextColumn::make('return_date')
                     ->label('Tgl Kembali')
                     ->date('d M Y')
                     ->toggleable(isToggledHiddenByDefault: true),
-
                 // Tables\Columns\TextColumn::make('pickup_deadline')
                 //     ->label('Deadline Pickup')
                 //     ->dateTime('d M Y H:i')
@@ -281,21 +255,17 @@ class LoanResource extends Resource
                         'returned' => 'Dikembalikan',
                     ])
                     ->multiple(),
-
                 Tables\Filters\SelectFilter::make('user_id')
                     ->label('Peminjam')
                     ->relationship('user', 'name')
                     ->searchable()
                     ->preload(),
-
                 Tables\Filters\Filter::make('pending_pickup')
                     ->label('Pending Pickup')
                     ->query(fn (Builder $query): Builder => $query->where('status', 'pending_pickup')),
-
                 Tables\Filters\Filter::make('overdue')
                     ->label('Hanya Terlambat')
                     ->query(fn (Builder $query): Builder => $query->where('status', 'overdue')),
-
                 Tables\Filters\Filter::make('has_fine')
                     ->label('Ada Denda Belum Lunas')
                     ->query(fn (Builder $query): Builder => $query->where('fine_amount', '>', 0)->where('fine_paid', false)),
@@ -303,7 +273,7 @@ class LoanResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
 
-                // CONFIRM PICKUP ACTION (NEW)
+                // CONFIRM PICKUP ACTION
                 Tables\Actions\Action::make('confirmPickup')
                     ->label('Konfirmasi Pengambilan')
                     ->icon('heroicon-o-check-circle')
@@ -311,7 +281,12 @@ class LoanResource extends Resource
                     ->visible(fn (Loan $record) => $record->status === 'pending_pickup')
                     ->requiresConfirmation()
                     ->modalHeading('Konfirmasi Pengambilan Buku')
-                    ->modalDescription(fn (Loan $record) => "Konfirmasi bahwa {$record->user->name} telah mengambil buku \"{$record->bookItem?->book->title}\"?")
+                    // FIXED: null-safe untuk user & bookItem
+                    ->modalDescription(function (Loan $record) {
+                        $userName = $record->user?->name ?? 'peminjam';
+                        $bookTitle = $record->bookItem?->book?->title ?? '-';
+                        return "Konfirmasi bahwa {$userName} telah mengambil buku \"{$bookTitle}\"?";
+                    })    
                     ->modalSubmitActionLabel('Konfirmasi')
                     ->form([
                         Forms\Components\DatePicker::make('loan_date')
@@ -319,7 +294,6 @@ class LoanResource extends Resource
                             ->default(now())
                             ->required()
                             ->maxDate(now()),
-
                         Forms\Components\Select::make('loan_duration')
                             ->label('Durasi Peminjaman')
                             ->options([
@@ -328,31 +302,30 @@ class LoanResource extends Resource
                                 21 => '21 hari',
                             ])
                             ->default(14)
-                            ->visible(fn (Loan $record) => ! $record->user->isDosen())
-                            ->required(fn (Loan $record) => ! $record->user->isDosen())
+                            // FIXED: null-safe isDosen()
+                            ->visible(fn (Loan $record) => ! $record->user?->isDosen())
+                            ->required(fn (Loan $record) => ! $record->user?->isDosen())
                             ->helperText('Pilih durasi sesuai kebijakan'),
                     ])
                     ->action(function (Loan $record, array $data) {
-                        $loanDays = $record->user->isDosen() ? null : (int) ($data['loan_duration'] ?? 14);
-
+                        // FIXED: null-safe isDosen()
+                        $loanDays = $record->user?->isDosen() ? null : (int) ($data['loan_duration'] ?? 14);
                         $record->confirmPickup(
                             processedBy: Auth::id(),
                             loanDays: $loanDays
                         );
-
-                        // Update loan_date if specified
                         if (isset($data['loan_date'])) {
                             $record->update([
                                 'loan_date' => $data['loan_date'],
                                 'due_date' => $loanDays ? \Carbon\Carbon::parse($data['loan_date'])->addDays($loanDays) : null,
                             ]);
                         }
-
+                        // FIXED: null-safe user->name
                         \Filament\Notifications\Notification::make()
-                            ->title('Pickup Berhasil Dikonfirmasi')
-                            ->body("Loan untuk {$record->user->name} telah aktif. Jatuh tempo: ".($record->due_date ? $record->due_date->format('d M Y') : 'Tanpa batas'))
-                            ->success()
-                            ->send();
+                        ->title('Pickup Berhasil Dikonfirmasi')
+                        ->body("Loan untuk {$userName} telah aktif. Jatuh tempo: {$dueDate}")
+                        ->success()
+                        ->send();
                     }),
 
                 Tables\Actions\EditAction::make()
@@ -365,12 +338,15 @@ class LoanResource extends Resource
                     ->visible(fn (Loan $record) => $record->canBeExtended())
                     ->requiresConfirmation()
                     ->modalHeading('Perpanjang Peminjaman')
-                    ->modalDescription(fn (Loan $record) => "Perpanjang peminjaman buku \"{$record->bookItem?->book->title}\" selama 7 hari?")
+                    ->modalDescription(function (Loan $record) {
+                        $bookTitle = $record->bookItem?->book?->title ?? '-';
+                        return "Perpanjang peminjaman buku \"{$bookTitle}\" selama 7 hari?";
+                    })
                     ->action(function (Loan $record) {
                         if ($record->extend(7)) {
                             \Filament\Notifications\Notification::make()
                                 ->title('Peminjaman diperpanjang')
-                                ->body('Jatuh tempo baru: '.\Carbon\Carbon::parse($record->due_date)->format('d M Y'))
+                                ->body('Jatuh tempo baru: ' . \Carbon\Carbon::parse($record->due_date)->format('d M Y'))
                                 ->success()
                                 ->send();
                         } else {
@@ -401,7 +377,6 @@ class LoanResource extends Resource
                             ->required()
                             ->default('good')
                             ->helperText('Jika buku dikembalikan dalam kondisi Buruk/Rusak/Hilang, denda kerusakan otomatis ditambahkan ke tagihan mahasiswa.'),
-
                         Forms\Components\Textarea::make('return_notes')
                             ->label('Catatan Pengembalian')
                             ->rows(3),
@@ -412,15 +387,14 @@ class LoanResource extends Resource
                             $data['return_notes'] ?? null,
                             Auth::id()
                         );
-
                         \Filament\Notifications\Notification::make()
                             ->title('Buku berhasil dikembalikan')
-                            ->body($record->fine_amount > 0 ? 'Denda: Rp '.number_format($record->fine_amount, 0) : 'Tidak ada denda')
+                            ->body($record->fine_amount > 0 ? 'Denda: Rp ' . number_format($record->fine_amount, 0) : 'Tidak ada denda')
                             ->success()
                             ->send();
                     }),
 
-                // CANCEL PENDING PICKUP ACTION (NEW)
+                // CANCEL PENDING PICKUP ACTION
                 Tables\Actions\Action::make('cancelPendingPickup')
                     ->label('Batalkan Request')
                     ->icon('heroicon-o-x-circle')
@@ -437,7 +411,6 @@ class LoanResource extends Resource
                     ])
                     ->action(function (Loan $record, array $data) {
                         $record->cancelPendingPickup($data['cancel_reason'] ?? 'Dibatalkan oleh staff');
-
                         \Filament\Notifications\Notification::make()
                             ->title('Request Dibatalkan')
                             ->body('Peminjaman telah dibatalkan dan buku tersedia kembali')
@@ -451,22 +424,20 @@ class LoanResource extends Resource
                         ->label('Buat QRIS')
                         ->icon('heroicon-o-qr-code')
                         ->color('info')
-                        ->visible(fn (\App\Models\Loan $record) => $record->fine !== null && $record->fine->status === 'unpaid')
+                        ->visible(fn (Loan $record) => $record->fine !== null && $record->fine->status === 'unpaid')
                         ->requiresConfirmation()
                         ->modalHeading('Generate QRIS Payment')
-                        ->modalDescription(fn (\App\Models\Loan $record) => 'Generate QRIS untuk pembayaran denda Rp '.number_format((float) $record->fine->amount, 0, ',', '.'))
+                        ->modalDescription(fn (Loan $record) => 'Generate QRIS untuk pembayaran denda Rp ' . number_format((float) $record->fine->amount, 0, ',', '.'))
                         ->modalSubmitActionLabel('Generate QRIS')
-                        ->action(function (\App\Models\Loan $record) {
+                        ->action(function (Loan $record) {
                             try {
                                 $paymentService = app(\App\Services\PaymentService::class);
                                 $transaction = $paymentService->generateQRIS($record->fine);
-
                                 \Filament\Notifications\Notification::make()
                                     ->title('Pembayaran Dibuat')
                                     ->body('Silakan selesaikan pembayaran melalui portal Midtrans.')
                                     ->success()
                                     ->send();
-
                                 $snapUrl = data_get($transaction->metadata, 'snap_url');
                                 if ($snapUrl) {
                                     return redirect()->away($snapUrl);
@@ -484,7 +455,7 @@ class LoanResource extends Resource
                         ->label('Buat VA')
                         ->icon('heroicon-o-credit-card')
                         ->color('warning')
-                        ->visible(fn (\App\Models\Loan $record) => $record->fine !== null && $record->fine->status === 'unpaid')
+                        ->visible(fn (Loan $record) => $record->fine !== null && $record->fine->status === 'unpaid')
                         ->form([
                             Forms\Components\Select::make('bank')
                                 ->label('Bank')
@@ -499,17 +470,15 @@ class LoanResource extends Resource
                                 ->default('bca')
                                 ->helperText('Pilih bank untuk Virtual Account'),
                         ])
-                        ->action(function (\App\Models\Loan $record, array $data) {
+                        ->action(function (Loan $record, array $data) {
                             try {
                                 $paymentService = app(\App\Services\PaymentService::class);
                                 $transaction = $paymentService->generateVA($record->fine, $data['bank']);
-
                                 \Filament\Notifications\Notification::make()
                                     ->title('VA Berhasil Dibuat')
                                     ->body('Silakan selesaikan pembayaran melalui portal Midtrans.')
                                     ->success()
                                     ->send();
-
                                 $snapUrl = data_get($transaction->metadata, 'snap_url');
                                 if ($snapUrl) {
                                     return redirect()->away($snapUrl);
@@ -527,44 +496,37 @@ class LoanResource extends Resource
                         ->label('Cek Status Pembayaran')
                         ->icon('heroicon-o-arrow-path')
                         ->color('gray')
-                        ->visible(function (\App\Models\Loan $record) {
+                        ->visible(function (Loan $record) {
                             return $record->fine !== null && $record->fine->status === 'unpaid' &&
                                 PaymentTransaction::where('fine_id', $record->fine->id)
                                     ->where('status', 'pending')
                                     ->exists();
                         })
-                        ->action(function (\App\Models\Loan $record) {
+                        ->action(function (Loan $record) {
                             try {
                                 $transaction = PaymentTransaction::where('fine_id', $record->fine->id)
                                     ->where('status', 'pending')
                                     ->latest()
                                     ->first();
-
                                 if (! $transaction) {
                                     \Filament\Notifications\Notification::make()
                                         ->title('Tidak Ada Transaksi Pending')
                                         ->warning()
                                         ->send();
-
                                     return;
                                 }
-
                                 $paymentService = app(\App\Services\PaymentService::class);
                                 $status = $paymentService->checkPaymentStatus($transaction);
-
                                 if ($status['success']) {
                                     $transactionStatus = $status['status'];
-
                                     if (in_array($transactionStatus, ['settlement', 'capture'])) {
                                         $transactionId = data_get($status['data'], 'transaction_id');
                                         $transaction->markAsSuccess($transactionId);
-
                                         $record->fine->processPayment(
                                             amount: (float) $transaction->amount,
                                             method: $transaction->payment_method,
                                             reference: $transactionId
                                         );
-
                                         \Filament\Notifications\Notification::make()
                                             ->title('Pembayaran Berhasil')
                                             ->body('Pembayaran telah diverifikasi dan denda telah lunas.')
@@ -573,7 +535,7 @@ class LoanResource extends Resource
                                     } else {
                                         \Filament\Notifications\Notification::make()
                                             ->title('Status Pembayaran')
-                                            ->body('Status saat ini: '.strtoupper($transactionStatus))
+                                            ->body('Status saat ini: ' . strtoupper($transactionStatus))
                                             ->info()
                                             ->send();
                                     }
@@ -597,17 +559,16 @@ class LoanResource extends Resource
                         ->label('Bayar Manual')
                         ->icon('heroicon-o-currency-dollar')
                         ->color('success')
-                        ->visible(fn (\App\Models\Loan $record) => $record->fine !== null && $record->fine->status === 'unpaid')
+                        ->visible(fn (Loan $record) => $record->fine !== null && $record->fine->status === 'unpaid')
                         ->form([
                             Forms\Components\TextInput::make('paid_amount')
                                 ->label('Jumlah Dibayar')
                                 ->numeric()
                                 ->prefix('Rp')
                                 ->required()
-                                ->default(fn (\App\Models\Loan $record) => $record->fine->amount)
+                                ->default(fn (Loan $record) => $record->fine->amount)
                                 ->minValue(0)
-                                ->helperText(fn (\App\Models\Loan $record) => 'Total denda: Rp '.number_format((float) $record->fine->amount, 0)),
-
+                                ->helperText(fn (Loan $record) => 'Total denda: Rp ' . number_format((float) $record->fine->amount, 0)),
                             Forms\Components\Select::make('payment_method')
                                 ->label('Metode Pembayaran')
                                 ->options([
@@ -617,23 +578,20 @@ class LoanResource extends Resource
                                 ])
                                 ->required()
                                 ->default('cash'),
-
                             Forms\Components\TextInput::make('payment_reference')
                                 ->label('Referensi Pembayaran')
                                 ->placeholder('No. Bukti / Referensi (optional)'),
-
                             Forms\Components\Textarea::make('notes')
                                 ->label('Catatan')
                                 ->rows(2),
                         ])
-                        ->action(function (\App\Models\Loan $record, array $data) {
+                        ->action(function (Loan $record, array $data) {
                             $record->fine->processPayment(
                                 $data['paid_amount'],
                                 $data['payment_method'],
                                 $data['payment_reference'] ?? null,
                                 Auth::id()
                             );
-
                             \Filament\Notifications\Notification::make()
                                 ->title('Pembayaran Berhasil')
                                 ->body('Denda telah dibayar. Credit score user telah diupdate.')
@@ -645,7 +603,8 @@ class LoanResource extends Resource
                         ->label('Bebaskan')
                         ->icon('heroicon-o-shield-check')
                         ->color('info')
-                        ->visible(fn (\App\Models\Loan $record) => collect(Auth::user()->roles->pluck('name'))->contains('admin') && $record->fine !== null && $record->fine->status === 'unpaid')
+                        // FIXED: null-safe Auth::user() & roles
+                        ->visible(fn (Loan $record) => collect(Auth::user()?->roles?->pluck('name') ?? [])->contains('admin') && $record->fine !== null && $record->fine->status === 'unpaid')
                         ->requiresConfirmation()
                         ->form([
                             Forms\Components\Textarea::make('waive_reason')
@@ -654,9 +613,8 @@ class LoanResource extends Resource
                                 ->rows(3)
                                 ->placeholder('Jelaskan alasan pembebasan denda...'),
                         ])
-                        ->action(function (\App\Models\Loan $record, array $data) {
+                        ->action(function (Loan $record, array $data) {
                             $record->fine->waive($data['waive_reason'], Auth::id());
-
                             \Filament\Notifications\Notification::make()
                                 ->title('Denda Dibebaskan')
                                 ->body('Denda telah dibebaskan oleh admin.')
@@ -668,16 +626,16 @@ class LoanResource extends Resource
                         ->label('Log Transaksi')
                         ->icon('heroicon-o-list-bullet')
                         ->color('gray')
-                        ->visible(fn (\App\Models\Loan $record) => $record->fine !== null && PaymentTransaction::where('fine_id', $record->fine->id)->exists())
+                        ->visible(fn (Loan $record) => $record->fine !== null && PaymentTransaction::where('fine_id', $record->fine->id)->exists())
                         ->modalHeading('Riwayat Transaksi Gateway')
-                        ->modalContent(fn (\App\Models\Loan $record) => view('filament.resources.fines.transactions-modal', [
+                        ->modalContent(fn (Loan $record) => view('filament.resources.fines.transactions-modal', [
                             'transactions' => PaymentTransaction::where('fine_id', $record->fine->id)->latest()->get(),
                         ])),
                 ])
                     ->label('Kelola Denda')
                     ->icon('heroicon-o-banknotes')
                     ->color('danger')
-                    ->visible(fn (\App\Models\Loan $record) => $record->fine !== null),
+                    ->visible(fn (Loan $record) => $record->fine !== null),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -709,7 +667,6 @@ class LoanResource extends Resource
     {
         $pendingCount = static::getModel()::where('status', 'pending_pickup')->count();
         $activeCount = static::getModel()::whereIn('status', ['active', 'overdue', 'extended'])->count();
-
         return $pendingCount > 0 ? "Pending {$pendingCount} | Active {$activeCount}" : $activeCount;
     }
 
@@ -717,14 +674,12 @@ class LoanResource extends Resource
     {
         $overdueCount = static::getModel()::where('status', 'overdue')->count();
         $pendingCount = static::getModel()::where('status', 'pending_pickup')->count();
-
         if ($overdueCount > 0) {
             return 'danger';
         }
         if ($pendingCount > 0) {
             return 'warning';
         }
-
         return 'success';
     }
 
